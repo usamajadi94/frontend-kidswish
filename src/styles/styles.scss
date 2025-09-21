@@ -1,0 +1,28 @@
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ Import/write your custom styles here.
+/*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
+/* ----------------------------------------------------------------------------------------------------- */
+
+@import '../styles/shared.scss';
+.mdc-text-field{
+    margin-top: 0 !important;
+}
+
+.ant-modal-header {
+    padding: 12px 24px !important;
+}
+
+.ant-btn {
+    padding: 0px 12px 0px 12px !important;
+    height: 26px !important;
+    font-size: 13px !important;
+
+}
+.ant-modal-close {
+    color: red !important;
+}
+
+.table-header{
+    font-size: 13px !important;
+}
+

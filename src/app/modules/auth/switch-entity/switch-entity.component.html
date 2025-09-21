@@ -1,0 +1,39 @@
+<div class="absolute inset-0 flex min-w-0 flex-col overflow-y-auto p-6 md:p-8" cdkScrollable>
+
+    <div class="flex-0">
+        <div class="mb-8">
+            <div class="text-3xl font-semibold leading-8 tracking-tight">
+                Entities
+            </div>
+            <div class="text-secondary font-medium tracking-tight">
+                Switching entities will reload the application. The entity you choose will impact the all data.
+            </div>
+        </div>
+
+
+
+        <bft-input-text placholder="Search..." name="search" />
+
+        <nz-table #basicTable [nzData]="data" [nzShowPagination]="false">
+            <thead>
+                <tr>
+                    <th>Entity</th>
+                    <th>Created Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (data of basicTable.data; track data) {
+                <tr>
+                    <td>{{ data.Name }}</td>
+                    <td>{{ data.CreatedDate }}</td>
+                    <td>
+                        <bft-button name="Select" (click)="onEntitySelect(data)" />
+                    </td>
+
+                </tr>
+                }
+            </tbody>
+        </nz-table>
+
+    </div>

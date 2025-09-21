@@ -1,0 +1,71 @@
+    .quick-category {
+
+        ::ng-deep .ant-form-item-label {
+            display: inline-block !important;
+        }
+    }
+
+    tfoot {
+        mat-icon {
+            ::ng-deep svg {
+                height: 17px;
+            }
+        }
+    }
+
+   
+
+
+    @media (max-width: 768px) {
+        .form-table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .form-table th,
+        .form-table td {
+            min-width: 150px;
+        }
+    }
+
+
+    @media (max-width: 768px) {
+        .grid.grid-cols-2 {
+            grid-template-columns: 1fr !important;
+            margin-bottom: 0.6rem;
+        }
+
+        .grid.grid-cols-2>div {
+            width: 100% !important;
+            margin-bottom: 0.1rem !important;
+        }
+
+        .grid.grid-cols-2>div.first {
+            margin-top: 1rem !important;
+        }
+
+        bft-input-text,
+        bft-select,
+        bft-input-currency,
+        bft-input-date {
+            display: block;
+            width: 100%;
+
+            ::ng-deep label {
+                display: block;
+                font-weight: 600;
+                font-size: 0.95rem;
+            }
+
+            ::ng-deep input,
+            ::ng-deep select {
+                width: 100%;
+                font-size: 0.95rem;
+            }
+        }
+
+        .action-buttons {
+            margin-top: 1.5rem;
+        }
+    }

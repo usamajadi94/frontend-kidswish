@@ -1,0 +1,362 @@
+<div class="flex-0">
+
+  <div class="list-header-row grid grid-cols-3 items-center">
+    <div class="col-span-2">
+      <ng-content></ng-content>
+    </div>
+    <div class="flex justify-end items-center">
+      <nz-form-item class="search w-full">
+        <nz-form-control class="w-full">
+          <nz-input-group [nzPrefix]="suffixIconSearch">
+            <input nz-input type="text" name="search" #input placeholder="Search..." [(ngModel)]="search"  (keyup)="Search()" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <ng-template #suffixIconSearch>
+        <!-- <span nz-icon nzType="search" class="icon-clr"></span> -->
+         <mat-icon style="cursor: pointer;"
+                class="icon-size-5"
+                svgIcon="search"
+               
+            ></mat-icon>
+      </ng-template>
+    </div>
+  </div>
+</div>
+<div class="w-full ">
+  <div class="tableCard mt-5">
+
+
+    <!--  <div class="grid grid-cols-2 items-center">
+            <div class="w-full ">
+
+                <div class="flex items-center">
+                    <div class="w-1/5">
+                        
+                        <bft-button name="Export" type="stroked" beforeIcon="file_export"/>
+                    </div>
+                    <div class="w-1/5">
+                        
+                        <bft-button name="Setting" type="stroked" beforeIcon="setting" (onClick)="showModal()" />
+                    </div>
+                </div>
+                <!-- <as-button name="Add New Item" icon="plus" (onClick)="onNewBtn()"></as-button>
+                
+                <as-button name="Export" type="info" icon="file-excel" (onClick)="onGenerateExcel()" class="mx-1 ms-2" ></as-button>
+        
+                <as-button name="Setting" type="info" icon="setting" (onClick)="showModal()" ></as-button> ------
+            </div>
+
+            <div class="w-full flex justify-end items-start">
+            
+                <div class="w-1/2">
+                    <!-- <bft-input-text name="search" prefixIcon="search" placeholder="Search..." [(ngModel)]="search"
+                        (keyup)="Search()" [required]="true"/> --------
+                  
+                </div>
+            </div>
+        </div>
+        <hr class="m-0"> -->
+
+    @if(filtersStore.length > 0){
+    <div class="filter-row mt-3 mb-3">
+      <div class="filter-tag">
+        @for (op of filtersStore; track $index) {
+        <ng-container>
+          <div class="Title">{{ op.header }}:</div>
+
+          @for (item of op.data; track $index) {
+          <div>
+            @if (item.selected) {
+
+            <span>
+              @if (op.data.length <= 2) { <nz-tag class="cursor" nzMode="closeable" (click)="onClose(item , op)">
+                {{item.text
+                }}</nz-tag>
+                }
+            </span>
+            }
+          </div>
+
+          }
+
+          @if (op.data.length > 2) {
+
+          <nz-tag nz-dropdown [nzDropdownMenu]="menu" class="cursor">{{op.data.length}}
+            <mat-icon>keyboard_arrow_down</mat-icon>
+          </nz-tag>
+          }
+          <nz-dropdown-menu #menu="nzDropdownMenu">
+            <ul nz-menu>
+              @for (items of op.data; track $index) {
+
+              <li nz-menu-item>
+                @if (items.selected) {
+                <span>
+                  <nz-tag class="cursor" nzMode="closeable" (click)="onClose(items , op)">{{items.text }}</nz-tag>
+                </span>
+                }
+              </li>
+              }
+            </ul>
+          </nz-dropdown-menu>
+        </ng-container>
+        }
+
+      </div>
+      @if (filtersStore.length > 0) {
+      <div class="filter-clr">
+        <nz-tag nzMode="closeable" class="cursor" (click)="onClear()">Clear Filter </nz-tag>
+      </div>
+      }
+    </div>
+    }
+
+    <nz-table #filterTable [nzData]="displayData" [nzLoading]="loading" [nzCustomColumn]="customColumn"
+    [nzShowPagination]="true" [nzShowSizeChanger]="true" [nzPageSize]="20" [nzScroll]="{ x: '100%' }">
+      <!-- nzFooter="Footer" nzTitle="Header" -->
+      <thead>
+        <!-- [nzSortOrder]="col.sortOrder" -->
+        <tr>
+          <!-- <th  [nzCustomFilter]="false" *ngFor="let col of columns"  [nzSortFn]="col.sortFn" [nzCellControl]="col.name"
+                [nzSortDirections]="col.sortDirections" [nzFilterMultiple]="col.filterMultiple" [nzFilters]="col.listOfFilter"
+                [nzFilterFn]="col.filterFn" (nzFilterChange)="lorem($event , col.name )">
+                {{ col.header }}
+              </th> -->
+          <!-- <th style="width: 10%;">
+            Action
+          </th> -->
+          @for (col of columns; track $index) {
+
+          <th nzCustomFilter [nzSortFn]="col.sortFn" [nzCellControl]="col.name" [nzSortDirections]="col.sortDirections"
+            [nzFilterMultiple]="col.filterMultiple" [nzFilters]="col.listOfFilter" [nzFilterFn]="col.filterFn">
+            {{ col.header }}
+            <nz-filter-trigger>
+              <!-- <span nz-icon nzType="filter" nzTheme="outline" (click)="open(col)"></span> -->
+              <mat-icon (click)="open(col)" style="    font-size: 14px;
+    color: #3AAFA9;">filter_alt</mat-icon>
+            </nz-filter-trigger>
+          </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (data of filterTable.data; track $index) {
+
+        <tr class="bft-table-row" (click)="onViewbtn(data)">
+          <!-- <td style="width: 10%; " class="">
+      
+            <button mat-icon-button (click)="onViewbtn(data)" class="table-view">
+              <mat-icon svgIcon="mat_outline:remove_red_eye" class="icon-size-4" />
+            </button>
+
+          </td> -->
+          @for (col of columns; track $index) {
+
+          <td [nzCellControl]="col.name">
+            @if (col.type === 'text') {
+            <span>
+              {{ data[col.name] }}
+            </span>
+            }
+            @else if (col.type === 'date') {
+            <span>
+              {{ data[col.name] | date:'MM/dd/yyyy' }}
+            </span>
+
+            }
+            @else if (col.type === 'currency') {
+
+            <span>
+              {{data[col.name] | currency:currency }}
+            </span>
+            }
+            @else if (col.type === 'number') {
+            <span>
+              {{data[col.name] | number}}
+            </span>
+            }
+            @else if (col.type === 'pNumber') {
+
+            <span>
+              {{data[col.name] | mask: '(000) 000-0000'}}
+            </span>
+            }
+            @else if(col.type == 'status'){
+              <span
+                  class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide"
+                  [ngClass]="{
+                      'bg-red-200 text-red-800 dark:bg-red-600 dark:text-red-50':
+                      data[col.name] === 'No',
+                      'bg-green-200 text-green-800 dark:bg-green-600 dark:text-green-50':
+                      data[col.name] === 'Yes'
+                  }"
+              >
+                  <span
+                      class="whitespace-nowrap leading-relaxed"
+                      > {{data[col.name] }}</span
+                  >
+              </span>
+            }
+            @else {
+            <span>
+              {{data[col.name] }}
+            </span>
+            }
+          </td>
+          }
+        </tr>
+        }
+
+        <tr *ngIf="filterTable.data?.length && isTotalExists">
+          @for (col of columns; track $index) {
+            <td class="font-bold" [nzCellControl]="col.name">
+              @if ($index === 0) {
+                Total
+              }
+              @else if (col.type === 'currency' && col?.total === true) {
+                <span>
+
+                  {{ getTotal(col.name) | currency:currency }}
+                </span>
+              }
+              @else if (col.type === 'number' && col?.total === true) {
+                <span>
+                  {{ getTotal(col.name) | number }}
+                </span>
+              }
+            </td>
+          }
+        </tr>
+         <tr *ngIf="filterTable.data?.length">
+            <td class="font-bold" colspan="{{columns.length}}">
+              
+                Total Rows Count ({{filterTable.data?.length}})
+              
+            </td>
+          </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>
+
+<nz-modal [(nzVisible)]="isVisible" nzCentered nzTitle="Custom Column" (nzOnCancel)="handleCancel()"
+  (nzOnOk)="handleOk()">
+  <ng-container *nzModalContent>
+    <div nz-row [nzGutter]="24">
+      <div nz-col class="gutter-row" [nzSpan]="12">
+        <div class="example-container">
+          <p>Displayed (drag and drop to sort)</p>
+          <!-- <div class="example-box" >
+                {{ item.name }}
+              </div> -->
+          <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="fix" [cdkDropListConnectedTo]="[doneList]"
+            class="example-list" (cdkDropListDropped)="drop($event)">
+            @for (item of fix; track $index) {
+            <div class="example-box" cdkDrag>
+              {{ item.name }}
+              <mat-icon (click)="deleteCustom(item, i)">delete</mat-icon>
+              <!-- <span nz-icon nzType="minus-circle" nzTheme="outline" (click)="deleteCustom(item, i)"></span> -->
+            </div>
+            }
+          </div>
+          <!-- <div class="example-box" *ngFor="let item of footer">
+                {{ item.name }}
+              </div> -->
+        </div>
+      </div>
+      <div nz-col class="gutter-row" [nzSpan]="12">
+        <div class="example-container">
+          <p>Not Shown</p>
+          <div cdkDropList #doneList="cdkDropList" [cdkDropListData]="notFix" [cdkDropListConnectedTo]="[todoList]"
+            class="example-list" (cdkDropListDropped)="drop($event)">
+            @for (item of notFix; track $index; let i = $index) {
+            <div class="example-box" cdkDrag>
+              {{ item.name }}
+              <mat-icon (click)="addCustom(item, i)">add</mat-icon>
+              <!-- <span nz-icon nzType="plus-circle" nzTheme="outline" (click)="addCustom(item, i)"></span> -->
+            </div>
+
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div *nzModalFooter>
+    <!-- <as-button name="Cancel" type="info" (onClick)="handleCancel()" class="me-2"/> -->
+    <bft-button name="Cancel" class="me-2" (onClick)="handleCancel()" />
+    <bft-button name="Ok" (onClick)="handleOk()" />
+    <!-- <as-button name="Ok" (onClick)="handleOk()" /> -->
+  </div>
+</nz-modal>
+
+<nz-drawer nzWrapClassName="filter-modal" [nzClosable]="false" [nzVisible]="visible" [nzPlacement]="'right'"
+  (nzOnClose)="close()">
+  <ng-container *nzDrawerContent>
+    <div class="grid grid-cols-2">
+      <div class="col-span-2">
+        <h5> Filter by '{{filterTitle}}'</h5>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 my-2">
+      <div class="col-span-2">
+        <!-- <app-as-custom-input placeholder="Search..." suffix="search"></app-as-custom-input> -->
+
+        <!-- <bft-select placeholder="Search" [(ngModel)]="inputValue" [search]="true" [data]="options" name="search" on /> -->
+
+        <nz-input-group nzSize="default" [nzPrefix]="suffixIcon">
+          <input placeholder="Search.." nz-input [(ngModel)]="inputValue" (input)="onInput($event)"
+            [nzAutocomplete]="filtersOption" />
+        </nz-input-group>
+
+        <ng-template #suffixIcon>
+          @if (inputValue != '') {
+          <mat-icon style="color: red; cursor: pointer;" (click)="resetSearch()">close</mat-icon>
+          }
+          <!-- <span style="color: red; cursor: pointer;" nz-icon nzType="close" *ngIf="inputValue != ''"
+              (click)="resetSearch()"></span> -->
+          <!-- <span nz-icon nzType="search"></span> -->
+          <mat-icon>search</mat-icon>
+        </ng-template>
+
+        <nz-autocomplete [nzDataSource]="options" nzBackfill #filtersOption (selectionChange)="onfilterChange($event)">
+        </nz-autocomplete>
+
+      </div>
+    </div>
+    @for (op of filtersArr; track $index) {
+
+    <div>
+      @if (op.columnName === currentColumn) {
+
+      <ng-container>
+        @for (item of op.data; track $index) {
+
+        <span class="filter-text">
+          <!-- <label nz-checkbox nzValue="true" [(ngModel)]="item.selected" name="selected"
+                        style="margin-right: 3px;">
+                        
+                        {{item.text}}
+                      </label> -->
+          <bft-checkbox [(ngModel)]="item.selected" [label]="item.text" />
+        </span>
+        }
+      </ng-container>
+      }
+    </div>
+    }
+    <div class="grid grid-cols-3 gap-1 mt-4">
+      <div class="">
+        <bft-button name="Apply" icon="filter_alt" (onClick)="applyFilters()"></bft-button>
+      </div>
+      <div class="">
+        <bft-button name="Clear" type="stroked" icon="close" (onClick)="clearFilters()"></bft-button>
+        <!-- <as-button name="Apply" icon="filter" (click)="applyFilters()"></as-button>
+          <as-button name="Clear" icon="close" type="info" class="ms-4" (click)="clearFilters()"></as-button> -->
+      </div>
+    </div>
+  </ng-container>
+</nz-drawer>

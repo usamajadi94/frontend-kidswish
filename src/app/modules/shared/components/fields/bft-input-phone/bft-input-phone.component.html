@@ -1,0 +1,63 @@
+@if(skeleton){
+
+<bft-skeleton />
+}
+
+@else {
+<nz-form-item>
+    @if (label != '') {
+    <nz-form-label [nzRequired]="required">
+        {{label}}
+    </nz-form-label>
+    }
+    <nz-form-control [nzErrorTip]="required ? errorTpl : ''">
+
+        <nz-input-group [nzPrefix]="addOnBeforeTemplate" [nzSuffix]="suffixTemplate" [nzPrefix]="prefixTemplate">
+            @if (prefixIcon == '' && prefixText == '' && prefixSvgIcon == '') {
+            <ng-template #addOnBeforeTemplate>
+                <img [src]="flagImg" alt="" srcset="" style="    height: 20px;
+               width: 23px;">
+            </ng-template>
+        }
+            <input nz-input type="text" [name]="name" [(ngModel)]="model" #inputName="ngModel" [required]="required"
+                [disabled]="disabled" [mask]="mask" (focusout)="onFocusOut(inputName)"
+                (ngModelChange)="onValueChange(model)" />
+            <!-- [showMaskTyped]="true" -->
+
+            <ng-template #prefixTemplate>
+                @if (prefixText != null && prefixIcon == null && prefixSvgIcon == null) {
+                <span>{{prefixText}}</span>
+                }
+                @else if(prefixText == null && prefixIcon == null && prefixSvgIcon != null ){
+                <mat-icon [svgIcon]="prefixSvgIcon" class="icon-size-4"></mat-icon>
+                }
+                @else if(prefixText == null && prefixIcon !=null && prefixSvgIcon == null ){
+                <mat-icon>{{prefixIcon}}</mat-icon>
+                }
+
+            </ng-template>
+
+            <ng-template #suffixTemplate>
+
+                @if (suffixText != null && suffixIcon == null) {
+                <span>{{suffixText}}</span>
+                }
+                @else if(suffixText == null && suffixIcon !=null ){
+                <mat-icon>{{suffixIcon}}</mat-icon>
+                }
+
+            </ng-template>
+        </nz-input-group>
+
+        <ng-template #errorTpl let-control>
+            @if (control.invalid && (control.dirty || control.touched)) {
+            <ng-container>
+                Please enter a valid Phone Number.
+            </ng-container>
+            }
+        </ng-template>
+
+
+    </nz-form-control>
+</nz-form-item>
+}

@@ -1,0 +1,191 @@
+<div class="flex  justify-end  gap-4 items-center w-full">
+    @if (formData.OrderNo && primaryKey > 0) {
+    <div class="flex-shrink-0">
+        <span
+            class="rounded-full px-3 py-0.5 text-md font-semibold bg-green-100 text-green-800 dark:bg-green-500 dark:text-green-50 flex items-center gap-1">
+            <mat-icon svgIcon="heroicons_outline:clipboard-document-list" class="icon-size-4"></mat-icon>
+            {{ formData.OrderNo }}
+        </span>
+    </div>
+    }
+
+</div>
+
+<div class="grid grid-cols-3 gap-2 mt-2">
+    <!-- <div class="w-full first">
+        <bft-input-text name="OrderNo" [required]="true" label="Order No" [(ngModel)]="formData.OrderNo"
+            [skeleton]="isDataLoading" />
+    </div> -->
+    <div class="w-full">
+        <bft-input-date name="OrderDate" [required]="true" label="Order Date" [(ngModel)]="formData.OrderDate"
+            [skeleton]="isDataLoading" />
+    </div>
+    <div class="w-full">
+        <bft-select name="CustomerID" [(ngModel)]="formData.CustomerID" [displayList]="customersDrp" label="Customer"
+            valueField="ID" displayField="Description" [skeleton]="isDataLoading" [required]="true" [enableAddFeature]="true" (onAddNewItem)="addCustomer()" [SCode]="componentRegister.customer.SCode" />
+    </div>
+    <div class="w-full">
+        <bft-select name="OrderBookerID"  [(ngModel)]="formData.OrderBookerID"
+            [displayList]="orderBookersDrp" label="Order Booker" valueField="ID" displayField="Description"
+            [skeleton]="isDataLoading" [enableAddFeature]="true" (onAddNewItem)="addOrderBooker()" [SCode]="componentRegister.orderBooker.SCode" />
+    </div>
+</div>
+<mat-divider class="my-2"></mat-divider>
+
+<div class="flex justify-between mt-5">
+    <div class="w-100">
+        <bft-autocomplete (onInput)="onInput($event)" [options]="option" displayField="Description" autofocus
+            [placeholder]="'Search Item...'" [prefixIcon]="'search'" (optionSelected)="onfilterChange($event)" />
+
+    </div>
+    <div>
+        <bft-button name="Add Row" icon="add" class="py-1" (click)="addRow()" />
+
+    </div>
+</div>
+
+
+
+<div class="overflow-x-auto overflow-y-auto max-h-[378px]">
+    <table class="w-full form-table mt-2 min-w-[1100px]">
+        <thead class="sticky top-0 bg-white z-10">
+            <tr>
+                <th class="table-header border-r border-l w-15">Item</th>
+                <th class="table-header border-r border-l w-5">Buy In</th>
+                <th class="table-header border-r w-20">Sale Pr</th>
+                <th class="table-header border-r w-10">Qty</th>
+                <th class="table-header border-r w-20">Total Amount</th>
+                <th class="table-header border-r w-10 text-center">
+                    <div class="flex items-center justify-center space-x-1">
+                        <span class="mr-2">Discount</span>
+                        <bft-checkbox [(ngModel)]="masterDiscountCheck" name="masterDiscountCheck"
+                            (ngModelChange)="onMasterCheckboxChange($event)" [nzIndeterminate]="indeterminate" />
+                    </div>
+                </th>
+                <th class="table-header border-r w-10">Sale Tax</th>
+                <th class="table-header border-r w-20">Net Amount</th>
+                @if (formData.Order_Detail.length > 1) {
+                <th class="table-header border-r">Action</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for (element of formData.Order_Detail; track $index) {
+            <tr class="border-b py-2">
+                <td class="py-0 px-2 border-r border-l w-15">
+                    <bft-select name="ItemID" [required]="true" [(ngModel)]="element.ItemID" [displayList]="itemsDrp"
+                        displayField="Description" valueField="ID" [skeleton]="isDataLoading"
+                        (onChange)="onbuyInSelect(element)" />
+                </td>
+
+                <td class="py-0 px-2 border-r border-l w-5">
+                    <bft-select name="BuyIn" [required]="true" [(ngModel)]="element.BuyIn" [displayList]="buyInList"
+                        displayField="Description" valueField="Description" [skeleton]="isDataLoading"
+                        (onChange)="onbuyInSelect(element)" />
+                </td>
+                <td class="py-0 px-2 border-r border-l w-20">
+                    <bft-input-currency name="Sale Price" [required]="true" [(ngModel)]="element.SalePrice"
+                        [skeleton]="isDataLoading" (change)="getTAmt(element)" />
+                </td>
+                <td class="py-0 px-2 border-r border-l w-10">
+                    <bft-input-number name="Qty" [required]="true" [(ngModel)]="element.Qty" [skeleton]="isDataLoading"
+                        (change)="getTAmt(element)" />
+                </td>
+                <td class="py-0 px-2 border-r border-l w-20">
+                    <bft-input-currency name="TAmt" [(ngModel)]="element.TAmt" [skeleton]="isDataLoading"
+                        [disabled]="true" />
+                </td>
+                <td class="py-0 px-2 border-r border-l w-10 text-center">
+                    <div [ngClass]="element.ApplyDiscount ? 'flex justify-between items-center' : ''">
+                        <bft-checkbox name="ApplyDiscount" [(ngModel)]="element.ApplyDiscount"
+                            [skeleton]="isDataLoading" (onChange)="onApplyDisChange(element)" />
+                        @if(element.ApplyDiscount) {
+                        <div class="flex flex-col items-start space-y-1 mt-1">
+                            <bft-input-number suffixText="%" name="DiscountPer" [(ngModel)]="element.DiscountPer"
+                                label="Discount %" [skeleton]="isDataLoading" (change)="getDiscount(element)" />
+                            @if (element.DiscountPer > 0) {
+                            <span class="text-red-500 text-sm" style="margin-top: 0 !important;">{{
+                                element.DiscountAmt |
+                                currency:'PKR ' }}</span>
+                            }
+
+                        </div>
+                        }
+                    </div>
+                </td>
+                <td class="py-0 px-2 border-r border-l w-10 text-center">
+                    <div [ngClass]="element.ApplySaleTax ? 'flex justify-between items-center' : ''">
+                        <bft-checkbox name="ApplySaleTax" [(ngModel)]="element.ApplySaleTax" [skeleton]="isDataLoading"
+                            (onChange)="onApplyTaxChange(element)" />
+
+                        @if(element.ApplySaleTax){
+                        <div class="flex flex-col items-start space-y-1 mt-1">
+                            <bft-input-number name="SalePer" suffixText="%" [(ngModel)]="element.SalePer"
+                                [skeleton]="isDataLoading" label="Sale %" (change)="getSalePercent(element)" />
+                            @if(element.SalePer > 0){
+                            <span class="text-green-500 text-sm" style="margin-top: 0 !important;">
+                                {{element.SaleAmt | currency:'PKR ' }}
+                            </span>
+                            }
+
+                        </div>
+
+                        }
+                    </div>
+                </td>
+                <td class="py-0 px-2 border-r border-l w-20">
+                    <bft-input-currency name="NetAmt" [(ngModel)]="element.NetAmt" [skeleton]="isDataLoading"
+                        label="Net Amt" [disabled]="true" />
+                </td>
+
+                @if (formData.Order_Detail.length > 1) {
+                <td class="py-0 px-2 border-r w-10">
+                    <div class="flex items-center justify-center h-10">
+                        <mat-icon class="text-red-500 cursor-pointer" fontIcon="delete"
+                            (click)="deleteDetailRow($index)"></mat-icon>
+                    </div>
+                </td>
+                }
+            </tr>
+            }
+            <tr>
+                <td colspan="12" class="h-1"></td>
+            </tr>
+        </tbody>
+        <tfoot class="sticky bottom-0 bg-white z-10 border">
+            <tr class="text-[15px] border-t">
+
+                <td colspan="2" class="pl-4 px-1 py-1">
+                    <div class="flex items-center align-center space-x-6">
+
+                        <div class="flex items-center">
+                            <mat-icon svgIcon="heroicons_outline:square-3-stack-3d"
+                                class="text-blue-400 text-xs "></mat-icon>
+                            <span>Total Items:</span>
+                            <span class="font-semibold pl-1">{{ getTotalItems() }}</span>
+                        </div>
+
+                        <div class="flex items-center">
+                            <mat-icon svgIcon="heroicons_outline:wallet" class="text-lime-500"></mat-icon>
+                            <span>Total Qty: </span>
+                            <span class="font-semibold pl-1">{{ getTotalQty() }}</span>
+                        </div>
+
+                    </div>
+                </td>
+
+                <td colspan="4"></td>
+
+                <td colspan="4">
+                    <div class="flex px-4 w-fit ml-auto text-right">
+                        <div>Total: </div>
+                        <div class="pl-1 font-semibold">
+                            {{ getTotalAmt() | currency:'PKR ' }}
+                        </div>
+                    </div>
+                </td>
+
+            </tr>
+        </tfoot>
+    </table>
+</div>

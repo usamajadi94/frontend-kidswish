@@ -1,0 +1,43 @@
+<div class="w-full max-w-3xl">
+
+
+    <form #form="ngForm">
+        <div>
+            <div class="text-xl">Change your password</div>
+            <div class="text-secondary">
+                You can only change your password twice within 24 hours!
+            </div>
+        </div>
+
+        <div class="mt-8 grid gap-2 sm:grid-cols-4">
+            <div class="sm:col-span-4">
+                <bft-input-password name="currentPassword" label="Current password" prefixSvgIcon="heroicons_solid:key"
+                    [(ngModel)]="formData.CurrentPassword" required></bft-input-password>
+            </div>
+
+            <div class="sm:col-span-4">
+                <bft-input-password name="newPassword" label="New password" prefixSvgIcon="heroicons_solid:key"
+                    [(ngModel)]="formData.NewPassword" required minlength="8"></bft-input-password>
+
+                <div class="mt-1 text-md text-hint">
+                    Minimum 8 characters. Must include numbers, letters and special characters.
+                </div>
+
+                @if (errors.newPassword) {
+                <div class="mt-1 text-sm text-red-500">
+                    {{ errors.newPassword }}
+                </div>
+                }
+            </div>
+        </div>
+
+        <div class="my-10 border-t"></div>
+
+        <div class="flex items-center justify-end">
+            <button class="ml-4" mat-flat-button type="submit" [color]="'primary'" [disabled]="form.invalid"
+                (click)="changePassword()">
+                Save
+            </button>
+        </div>
+    </form>
+</div>

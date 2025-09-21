@@ -1,0 +1,210 @@
+<div class="absolute inset-0 flex min-w-0 flex-col overflow-y-auto p-6 md:p-8" cdkScrollable>
+    <div class="flex-0">
+        <div class="mb-7">
+            <div class="text-3xl font-semibold leading-8 tracking-tight">
+                Purchase Return Invoice
+            </div>
+        </div>
+
+        <!-- A4 Size Wrapper -->
+        <app-report-viewer-tool pageSize="A4" (filter)="open($event)" (exportPdf)="onPdfGenerate()"
+            (doprint)="onPrintReport()" (pageIndexChanged)="onPageIndexChanged($event)">
+            @if(records && records.length > 0) {
+
+            <!-- Header -->
+            @for (element of records; track $index) {
+            <div #pageContent class="flex items-start justify-between invoice-block my-4 page-break-avoid">
+                <!-- Left: Logo, Company Name, Address & Phone -->
+                <div class="flex items-start gap-4 w-2/3">
+                    <img style="width: 65px;" src="images/logo/trackcloud/icon.png" alt="Logo image" />
+                    <div class="space-y-0.5">
+                        <div class="text-xl font-bold text-gray-800 uppercase">{{element?.ClientName}}</div>
+
+                        <div class="text-sm text-gray-600">
+                            <span class="font-semibold">Address:</span> {{element?.ClientAddress ? element.ClientAddress
+                            : '-' }}
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <span class="font-semibold">Contact:</span> {{element?.ClientContactNo ?
+                            element.ClientContactNo : '-' }}
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="w-1/3 text-right text-sm">
+                    <h1 class="text-2xl font-bold tracking-wider uppercase text-[#105ec6] leading-6">Purchase Return Invoice
+                    </h1>
+                    <div class="font-semibold text-base leading-5">{{element.InvoiceNo}}</div>
+                    <div><strong>Invoice Date:</strong> {{element.InvoiceDate | date:'MM/dd/yyyy'}}</div>
+                </div>
+            </div>
+
+
+            <div #pageContent class="grid grid-cols-2 gap-8 text-sm mb-4 page-break-avoid">
+                <!-- Left: Bill To -->
+                <div>
+                    <!-- <div class="text-lg text-[#105ec6] mb-2 font-semibold">Bill To</div> -->
+
+                    <div class="flex mb-1">
+                        <div class="w-24 font-semibold">Supplier:</div>
+                        <div class="flex-1">{{element.Supplier}}</div>
+                    </div>
+
+                    <!-- <div class="flex mb-1">
+                        <div class="w-24 font-semibold">Contact:</div>
+                        <div class="flex-1">{{element.Customer}}</div>
+                    </div>
+
+                    <div class="flex mb-1">
+                        <div class="w-24 font-semibold">Route:</div>
+                        <div class="flex-1">{{element.Route}},{{element.Area}},{{element.City}}</div>
+                    </div> -->
+                </div>
+
+                <!-- Right: Order Info aligned vertically with left side -->
+                <div>
+                    <!-- <div class="text-lg text-[#105ec6] mb-2 font-semibold invisible">Placeholder</div> -->
+                    <!-- To align vertically with Bill To heading -->
+
+                    <!-- <div class="flex mb-1">
+                        <div class="w-28 font-semibold">Order Booker:</div>
+                        <div class="flex-1">{{element.OrderBooker}}</div>
+                    </div>
+
+                    <div class="flex mb-1">
+                        <div class="w-28 font-semibold">Salesman:</div>
+                        <div class="flex-1">{{element.Salesman}}</div>
+                    </div>
+
+                    <div class="flex mb-1">
+                        <div class="w-28 font-semibold">Vehicle:</div>
+                        <div class="flex-1">{{element.Vehicle}}</div>
+                    </div> -->
+                </div>
+            </div>
+
+
+
+
+
+
+            <div #pageContent class="text-sm mt-3 page-break-avoid">
+                <!-- Header -->
+                <div class="grid grid-cols-12 font-semibold text-gray-600 border-b pb-2">
+                    <div class="col-span-1 ">S.No</div>
+                    <div class="col-span-3 ">Item</div>
+                    <div class="col-span-2 ">Buy In</div>
+                    <div class="col-span-2 ">Cost Price</div>
+                    <div class="col-span-1 ">QTY</div>
+                    <div class="col-span-3 ">TOTAL</div>
+                </div>
+
+            </div>
+            <!-- Item Rows -->
+            <!-- <div class="divide-y mt-2"> -->
+
+
+            @for (item of element.items; track $index) {
+
+            <div #pageContent class="grid  grid-cols-12 text-sm  page-break-avoid report-items">
+                <div class="col-span-1 ">{{$index + 1}}</div>
+                <div class="col-span-3">{{item.Item}}</div>
+                <div class="col-span-2">{{item.BuyIn}}</div>
+                <div class="col-span-2 ">{{item.Cost | currency:' '}}</div>
+                <div class="col-span-1 ">{{item.Qty}}</div>
+                <div class="col-span-3 ">{{item.NetAmt}}</div>
+            </div>
+            }
+
+            <!-- </div> -->
+            <!-- Summary Row -->
+
+            <div #pageContent class="mt-4 space-y-1 text-sm page-break-avoid">
+
+
+                <div class="flex items-center grid grid-cols-12 bg-gray-100 py-1 font-bold text-gray-700">
+                    <div class="col-span-6 text-left pl-2 text-md">TOTAL (PKR)</div>
+                    <div class="col-span-2 "> {{ getTotal(element,'Cost') | currency : ' ' }} </div>
+                    <div class="col-span-1 "> {{ getTotal(element,'Qty')}} </div>
+                    <div class="col-span-2 "> {{ getTotal(element,'NetAmt') | currency : ' ' }} </div>
+                </div>
+            </div>
+
+            <div #pageContent
+                class="flex justify-between items-center mt-4 page-break-avoid text-sm font-semibold text-gray-700 space-x-4">
+                <div class="flex items-center space-x-2">
+                    <span>ACCOUNTANT:</span>
+                    <div class="border-b border-black w-40 h-5">{{user?.FullName}}</div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span>SUPPLIER:</span>
+                    <div class="border-b border-black w-40 h-5"></div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span>RECEIVER:</span>
+                    <div class="border-b border-black w-40 h-5"></div>
+                </div>
+            </div>
+
+            <hr #pageContent class="border-t border-gray-..500 mt-5 page-break-avoid" />
+            }
+
+
+
+            }
+        </app-report-viewer-tool>
+    </div>
+</div>
+
+
+<nz-drawer nzWrapClassName="filter-modal" [nzClosable]="false" [nzVisible]="IsFilterDrawerVisible"
+    [nzPlacement]="'right'" (nzOnClose)="close()" #drawer>
+
+    <ng-container *nzDrawerContent>
+
+        <div class="flex items-center justify-between w-full filters mb-2">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-[#E6F4F3] flex items-center justify-center pt-1">
+                    <mat-icon svgIcon="mat_solid:filter_alt" class="text-[#3AAFA9]"></mat-icon>
+                </div>
+                <h5 class="text-base font-medium mb-0">Filters</h5>
+            </div>
+            <mat-icon svgIcon="heroicons_solid:x-mark" (click)="close()" class="text-red-600 cursor-pointer"></mat-icon>
+        </div>
+        <div class="border-b-2 mb-3"></div>
+
+
+        <div class="grid grid-cols-1">
+            <div class="w-full">
+                <bft-input-text name="InvoiceNo" label="Invoice No" [(ngModel)]="invoiceNo" />
+            </div>
+        </div>
+        <div class="grid grid-cols-1">
+            <div class="w-full">
+                <bft-select name="SupplierID" [displayList]="suppliers" label="Supplier" valueField="ID"
+                    displayField="Description" [(ngModel)]="supplierID" />
+            </div>
+        </div>
+        <div class="grid grid-cols-1">
+            <div class="w-full">
+                <bft-input-date name="FromDate" label="From Date" [(ngModel)]="fromDate" />
+            </div>
+        </div>
+        <div class="grid grid-cols-1">
+            <div class="w-full">
+                <bft-input-date name="EndDate" label="End Date" [(ngModel)]="endDate" />
+            </div>
+        </div>
+
+
+        <div class="grid grid-cols-1 mt-4">
+            <div class="w-full">
+                <bft-button name="Generate" icon="settings" (onClick)="onGenerate()" />
+                <bft-button name="Reset" icon="close" class="ml-2" (onClick)="onReset()" />
+            </div>
+        </div>
+
+    </ng-container>
+
+</nz-drawer>

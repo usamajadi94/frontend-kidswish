@@ -1,0 +1,14 @@
+<div class="grid grid-cols-2 gap-2">
+    <div class="w-full first">
+        <bft-input-text name="Code" label="Code" [(ngModel)]="formData.Code" [skeleton]="isDataLoading" disabled />
+    </div>
+    <div class="w-full">
+        <bft-input-text name="Description" label="Name" [(ngModel)]="formData.Description" [required]="true" [skeleton]="isDataLoading" />
+    </div>
+</div>
+<div class="grid grid-cols-2 gap-2">
+    <div class="w-full">
+        <bft-select name="CityID" [(ngModel)]="formData.AreaID" [displayList]="areaList" label="Area" valueField="ID" displayField="Description" [skeleton]="isDataLoading" [required]="true" [enableAddFeature]="true" (onAddNewItem)="addArea()" [SCode]="componentRegister.area.SCode"/>
+    </div>
+
+</div>

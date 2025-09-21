@@ -1,0 +1,95 @@
+<div class="w-full max-w-3xl">
+  <div>
+    <div class="text-xl">Profile</div>
+    <div class="text-secondary">
+      Following information is publicly displayed, be careful!
+    </div>
+  </div>
+
+  <form #accountNgForm="ngForm">
+    <div class="mt-8 grid gap-2 sm:grid-cols-4">
+      <div class="sm:col-span-2">
+        <bft-input-text
+          name="firstname"
+          label="First Name"
+          required="true"
+          prefixSvgIcon="heroicons_solid:user"
+          [(ngModel)]="formData.FirstName"
+        ></bft-input-text>
+      </div>
+
+      <div class="sm:col-span-2">
+        <bft-input-text
+          name="lastname"
+          label="Last Name"
+          required="true"
+          prefixSvgIcon="heroicons_solid:user"
+          [(ngModel)]="formData.LastName"
+        ></bft-input-text>
+      </div>
+
+      <div class="sm:col-span-4">
+        <bft-input-text
+          name="username"
+          label="User Name"
+          prefixSvgIcon="heroicons_solid:user"
+          [(ngModel)]="formData.UserName"
+        ></bft-input-text>
+      </div>
+
+      <div class="sm:col-span-4">
+        <bft-textarea
+          name="address"
+          label="Address"
+          [(ngModel)]="formData.Address"
+        ></bft-textarea>
+      </div>
+    </div>
+
+    <div class="my-10 border-t"></div>
+
+    <div>
+      <div class="text-xl">Personal Information</div>
+      <div class="text-secondary">
+        Communication details in case we want to connect with you. These will be kept private.
+      </div>
+    </div>
+
+    <div class="mt-8 grid gap-6 sm:grid-cols-4">
+      <div class="sm:col-span-2">
+        <bft-input-email
+          name="email"
+          label="Email"
+          prefixSvgIcon="heroicons_solid:envelope"
+          [(ngModel)]="formData.Email"
+          disabled
+        ></bft-input-email>
+      </div>
+
+      <div class="sm:col-span-2">
+        <bft-input-phone
+          name="phone"
+          label="Phone"
+          mask="(000)000-0000"
+          prefixSvgIcon="heroicons_solid:phone"
+          [(ngModel)]="formData.PhoneNo"
+        ></bft-input-phone>
+      </div>
+    </div>
+
+    <div class="mb-10 mt-11 border-t"></div>
+  </form>
+
+  <div class="flex items-center justify-end">
+    <button
+      class="ml-4"
+      mat-flat-button
+      type="button"
+      [color]="'primary'"
+      [disabled]="accountNgForm.invalid"
+      (click)="updateMyProfile()"
+    >
+      Save
+    </button>
+  </div>
+</div>

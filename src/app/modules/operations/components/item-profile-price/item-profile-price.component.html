@@ -1,0 +1,91 @@
+<div class="flex justify-end mt-2">
+    <bft-button name="Add Row" icon="add" class="py-1" (click)="addPriceRow()" />
+</div>
+<table class="w-full form-table mt-1">
+    <thead>
+        <tr class="">
+            <th class="table-header border-r border-l w-40">Item</th>
+            <!-- <th class="table-header border-r border-l w-20">Buy In</th> -->
+            <th class="table-header border-r border-l w-20">Size (kg)</th>
+            <th class="table-header border-r w-30">Cost Pr</th>
+            <th class="table-header border-r w-30">Sale Pr</th>
+            <th class="table-header border-r w-30">Pcs Pack</th>
+            <th class="table-header border-r w-30">Pack Cost</th>
+            <th class="table-header border-r w-30">Pack Sale</th>
+            <th class="table-header border-r w-30">Pack Ctn</th>
+            <th class="table-header border-r w-30">Ctn Cost</th>
+            <th class="table-header border-r w-30">Ctn Sale</th>
+            @if (formData.length > 0) {
+            <th class="table-header border-r"></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @for (element of formData; track $index) {
+        <tr class="border-b py-2">
+            <td class="py-0 px-2 border-r border-l w-40">
+                <bft-select name="ItemID" [(ngModel)]="element.ItemID" [displayList]="items" displayField="Description"
+                    valueField="ID" [skeleton]="isDataLoading" (onChange)="onItemSelect(element)" />
+            </td>
+            <td class="py-0 px-2 border-r border-l w-20">
+                <bft-input-text name="SizeUnitGm" [(ngModel)]="element.SizeUnitGm" [skeleton]="isDataLoading" />
+            </td>
+            <td class="py-0 px-2 border-r border-l w-30">
+                <bft-input-currency name="CostPr" [(ngModel)]="element.CostPr" [skeleton]="isDataLoading"
+                    (onChange)="calculateValues(element)" />
+            </td>
+            <td class="py-0 px-2 border-r border-l w-30">
+                <bft-input-currency name="SalePr" [(ngModel)]="element.SalePr" [skeleton]="isDataLoading"
+                    (onChange)="calculateValues(element)" />
+            </td>
+            <td class="py-0 px-2 border-r border-l w-30">
+                <bft-input-number name="PackPcs" [(ngModel)]="element.PackPcs" [skeleton]="isDataLoading"
+                    (onChange)="calculateValues(element)" />
+            </td>
+            <td class="py-0 px-2 border-r border-l w-30">
+                <bft-input-currency name="PackPcsCost" [(ngModel)]="element.PackPcsCost" [skeleton]="isDataLoading" />
+            </td>
+            <td class="py-0 px-2 border-r border-l w-30">
+                <bft-input-currency name="PackPcsSale" [(ngModel)]="element.PackPcsSale" [skeleton]="isDataLoading" />
+            </td>
+            <td class="py-0 px-2 border-r border-l w-30">
+                <bft-input-number name="Ctn" [(ngModel)]="element.Ctn" [skeleton]="isDataLoading"
+                    (onChange)="calculateValues(element)" />
+            </td>
+            <td class="py-0 px-2 border-r border-l w-30">
+                <bft-input-currency name="CtnCost" [(ngModel)]="element.CtnCost" [skeleton]="isDataLoading" />
+            </td>
+            <td class="py-0 px-2 border-r border-l w-30">
+                <bft-input-currency name="CtnSale" [(ngModel)]="element.CtnSale" [skeleton]="isDataLoading" />
+            </td>
+            @if (formData.length > 0) {
+
+            <td class="py-0 px-2 border-r w-10">
+                <div class="flex items-center justify-center h-10">
+                    <mat-icon class="text-red-500 cursor-pointer" fontIcon="delete"
+                        (click)="deleteDetailRow($index)"></mat-icon>
+                </div>
+            </td>
+            }
+        </tr>
+        }
+        <tr>
+            <td colspan="12"></td>
+        </tr>
+    </tbody>
+    <tfoot class="border mt-2">
+        <tr class="text-[15px] border-t">
+            <td colspan="2" class="pl-4">
+                <div class="flex items-center align-center space-x-6">
+
+                    <div class="flex items-center">
+                        <mat-icon svgIcon="heroicons_outline:square-3-stack-3d"
+                            class="text-blue-400 text-xs "></mat-icon>
+                        <span>Total Items:</span>
+                        <span class="font-semibold pl-1">{{ getTotalItems() }}</span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tfoot>
+</table>

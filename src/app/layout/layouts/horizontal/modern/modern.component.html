@@ -1,0 +1,29 @@
+<!-- Loading bar -->
+<fuse-loading-bar></fuse-loading-bar>
+
+
+<!-- Wrapper -->
+<div class="flex w-full min-w-0 flex-auto flex-col">
+    <!-- Header -->
+    <div
+        class="bg-card relative z-49 flex h-16 w-full flex-0 items-center px-4 shadow dark:border-b dark:bg-transparent dark:shadow-none sm:h-20 md:px-6 print:hidden">
+        <!-- Logo -->
+        <div class="mx-2 flex items-center lg:mr-8">
+            <div class="hidden lg:flex">
+                <!-- <img  src="images/logo/logo.svg" style="width: 180px !important" /> -->
+            </div>
+        </div>
+        <!-- Components -->
+        <div class="ml-auto flex items-center space-x-0.5 pl-2 sm:space-x-2">
+            <fuse-fullscreen class="hidden md:block"></fuse-fullscreen>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="flex w-full flex-auto flex-col">
+        @if (true) {
+        <router-outlet></router-outlet>
+        }
+    </div>
+
+</div>

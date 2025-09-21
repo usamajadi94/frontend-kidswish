@@ -1,0 +1,41 @@
+<div class="grid grid-cols-2 gap-2">
+  <div class="w-full first">
+    <bft-input-text name="Code" label="Code" [(ngModel)]="formData.Code" [skeleton]="isDataLoading" />
+  </div>
+  <div class="w-full">
+    <bft-input-text name="Description" [required]="true" label="Name" [(ngModel)]="formData.Description"
+      [skeleton]="isDataLoading" />
+  </div>
+</div>
+
+<div class="grid grid-cols-2 gap-2">
+  <div class="w-full">
+    <bft-input-phone name="PhoneNo" label="Phone No" [(ngModel)]="formData.PhoneNo" [skeleton]="isDataLoading"
+      mask="(000)000-0000" flagImg="https://cdn.kcak11.com/CountryFlags/countries/pk.svg" />
+  </div>
+  <div class="w-full">
+    <bft-input-phone name="MobileNo" label="Mobile No" [(ngModel)]="formData.MobileNo" [skeleton]="isDataLoading"
+      mask="(000)000-0000" flagImg="https://cdn.kcak11.com/CountryFlags/countries/pk.svg" />
+  </div>
+</div>
+
+
+
+<div class="grid grid-cols-2 gap-2">
+  <div class="w-full">
+    <bft-input-text name="FaxNo" label="Fax No" [(ngModel)]="formData.FaxNo" [skeleton]="isDataLoading" />
+  </div>
+  <div class="w-full">
+    <bft-textarea name="Address" label="Address" [(ngModel)]="formData.Address" [skeleton]="isDataLoading" />
+  </div>
+
+  
+
+
+</div>
+
+<div class="grid grid-cols-2 gap-2 mt-2">
+  <div class="w-full">
+    <bft-checkbox name="IsActive" label="Active" [(ngModel)]="formData.IsActive" [skeleton]="isDataLoading" />
+  </div>
+</div>

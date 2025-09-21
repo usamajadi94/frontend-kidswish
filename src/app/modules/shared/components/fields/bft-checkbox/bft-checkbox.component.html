@@ -1,0 +1,32 @@
+@if(skeleton){
+
+<bft-skeleton />
+}
+
+@else {
+
+ <label
+  nz-checkbox
+  [(ngModel)]="model"
+  #inputName="ngModel"
+  (ngModelChange)="onValueChange(model)"
+  [nzIndeterminate]="nzIndeterminate" 
+  [disabled]="disabled"
+>
+  @if (label != '') {
+    {{label}}
+  }
+</label>
+
+<!-- <label nz-checkbox [(ngModel)]="model" #inputName="ngModel" (ngModelChange)="onValueChange(model)" [disabled]="disabled">
+
+    @if (label != '') {
+    {{label}}
+    }
+
+
+</label> -->
+
+
+
+}

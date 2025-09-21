@@ -1,0 +1,120 @@
+.grp {
+
+  ::ng-deep .mat-mdc-tab-list {
+    height: 63px !important;
+    display: flex;
+    align-items: center;
+    background-color: #f9fafb;
+    border: 1px solid rgb(229, 231, 235);
+    border-bottom: none;
+    line-height: 14px;
+  }
+
+  ::ng-deep .mat-mdc-tab.mdc-tab--active {
+    background-color: #fff;
+    border-top: 1px solid rgb(229, 231, 235);
+    border-bottom: 4px solid rgb(99 102 241 / var(--tw-border-opacity, 1));
+    z-index: 1;
+    height: 63px;
+    line-height: 14px;
+    
+  .tab,
+  .tab * {
+    color: #111827 !important; 
+  }
+
+  .icon {
+    color: #111827 !important;
+  }
+
+  }
+
+  ::ng-deep .mat-mdc-tab.mdc-tab {
+    height: 63px !important;
+  }
+
+  ::ng-deep .mdc-tab-indicator {
+    display: none !important;
+  }
+
+  ::ng-deep.mat-icon {
+    min-height: 16px;
+    min-width: 16px;
+    height: 16px;
+    width: 16px;
+  }
+}
+
+
+@media (max-width: 768px) {
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-spacing: 0;
+    border-collapse: collapse;
+  }
+
+  thead,
+  tbody,
+  tfoot,
+  th,
+  td,
+  tr {
+    white-space: nowrap !important;
+  }
+
+  th.table-header {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    min-width: 80px;
+  }
+
+  td:first-child {
+    min-width: 180px !important;
+    padding-left: 12px;
+    font-size: 13px;
+  }
+
+  td.text-center,
+  th.text-center {
+    min-width: 60px !important;
+    padding: 6px 8px !important;
+  }
+
+  bft-checkbox {
+    transform: scale(0.9);
+  }
+
+  .grp .mat-tab-label {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem !important;
+  }
+
+  .grp .tab span {
+    font-size: 12px !important;
+  }
+
+  .grp .tab .mat-icon {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .grp .mat-tab-label span.inline-flex {
+    font-size: 11px !important;
+    padding: 0.2rem 0.4rem !important;
+  }
+
+  table::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  table::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+  }
+}
+

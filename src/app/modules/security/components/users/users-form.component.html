@@ -1,0 +1,107 @@
+<mat-vertical-stepper [linear]="true" #verticalStepper>
+    <mat-step #verticalStepperStep1>
+        <ng-template matStepLabel>Basic information
+            <p class="text-xs">
+                Personal details and credentials
+            </p>
+        </ng-template>
+
+        <form #form1="ngForm">
+            <div class="grid grid-cols-2 gap-2">
+                <div class="w-full ">
+                    <bft-input-text name="FirstName" [required]="true" label="First Name"
+                        [(ngModel)]="formData.FirstName" [skeleton]="isDataLoading" />
+                </div>
+                <div class="w-full ">
+                    <bft-input-text name="LastName" [required]="true" label="Last Name" [required]="true"
+                        [(ngModel)]="formData.LastName" [skeleton]="isDataLoading" />
+                </div>
+            </div>
+
+            <div class="grid  gap-2" [ngClass]="primaryKey == 0 ? 'grid-cols-2' : 'grid-cols-1'">
+                <div class="w-full">
+                    <bft-input-text name="UserName" [required]="true" [(ngModel)]="formData.UserName" label="User Name"
+                        [skeleton]="isDataLoading" />
+                </div>
+                @if(primaryKey == 0){
+                    <div class="w-full">
+                    <bft-input-password name="Password" [required]="true" label="Password"
+                        [(ngModel)]="formData.Password" [skeleton]="isDataLoading" />
+                </div>
+                }
+                
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div class="w-full ">
+                    <bft-input-email name="Email" [(ngModel)]="formData.Email" label="Email"
+                        [skeleton]="isDataLoading" />
+                </div>
+                <div class="w-full">
+                    <bft-input-phone name="PhoneNo" label="Phone No" [(ngModel)]="formData.PhoneNo"
+                        [skeleton]="isDataLoading" mask="(000)000-0000"
+                        flagImg="https://cdn.kcak11.com/CountryFlags/countries/pk.svg" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1">
+                <div class="w-full">
+                    <bft-textarea name="Address" label="Address" [(ngModel)]="formData.Address"
+                        [skeleton]="isDataLoading" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 mt-4">
+                <div class="w-full ">
+                    <bft-checkbox name="IsPasswordChange"
+                        label="Require this user to change their password when they first sign in"
+                        [(ngModel)]="formData.IsPasswordChange" [skeleton]="isDataLoading" />
+                </div>
+                <div class="w-full flex justify-end">
+
+                    <!-- <bft-button shape="circle" edges="round" name="Next" icon="close" class="mr-2"
+                        (onClick)="verticalStepper.next()" /> -->
+                    <button class="ml-4" mat-flat-button type="button" [color]="'primary'" (click)="verticalStepper.next()">
+                        Next
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+    </mat-step>
+
+    <mat-step #verticalStepperStep2>
+        <ng-template matStepLabel>
+            Assign Permissions
+            <p class="text-xs">
+                Set user access levels
+            </p>
+
+        </ng-template>
+
+        <div>
+            <div class="grid grid-cols-4 gap-2">
+                @for (group of permissionGroups; track $index) {
+                <div class="flex items-center justify-between border rounded p-4 h-10" (click)="group.selected = !group.selected;updateSelectedCount()">
+                    <div class="flex items-center space-x-2">
+                        <bft-checkbox name="IsPasswordChange" [(ngModel)]="group.selected" [skeleton]="isDataLoading"
+                            (change)="updateSelectedCount()" />
+                        <label>{{ group.Name }}</label>
+                    </div>
+
+
+                </div>
+                }
+
+            </div>
+
+            <div class="mt-4 p-4 bg-blue-50 rounded text-sm">
+                <span class="font-semibold">Selected:</span>
+                {{ selectedCount }} permission group(s) assigned
+            </div>
+
+        </div>
+    </mat-step>
+
+</mat-vertical-stepper>

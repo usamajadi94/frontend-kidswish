@@ -1,0 +1,30 @@
+<div class="grid grid-cols-2 gap-2 mt-2">
+        <div class="w-full">
+        <bft-input-date name="Date" label="Date" [(ngModel)]="formData.Date" [skeleton]="isDataLoading" [required]="true"/>
+    </div>
+     <div class="w-full">
+        <bft-input-text name="Description" label="Description" [(ngModel)]="formData.Description" [skeleton]="isDataLoading"  [required]="true"/>
+    </div>
+
+</div>
+
+<div class="grid grid-cols-2 gap-2 mt-2">
+    <div class="w-full">
+        <bft-select name="ExpenseCategoryID" label="Category" [displayList]="expenseCategory"
+            valueField="ID" displayField="Description" [(ngModel)]="formData.ExpenseCategoryID" [skeleton]="isDataLoading" [required]="true"/>
+    </div>
+    <div class="w-full">
+        <bft-select name="PaymentMethodID" label="Payment Method" [displayList]="paymentMethod"
+            valueField="ID" displayField="Description" [(ngModel)]="formData.PaymentMethodID" [skeleton]="isDataLoading" />
+    </div>
+</div>
+
+<div class="grid grid-cols-2 gap-2 mt-2">
+    <div class="w-full">
+          <bft-input-currency name="Amount" label="Amount" symbol="RD$" [(ngModel)]="formData.Amount" [skeleton]="isDataLoading"/>
+    </div>
+    <div class="w-full">
+        <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes" [skeleton]="isDataLoading" />
+    </div>
+</div>
+

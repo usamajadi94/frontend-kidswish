@@ -1,0 +1,41 @@
+@if(ExistingComponent?.instance?.isView || ExistingComponent?.instance?.isEdit || !ExistingComponent?.instance?.isView){
+    <div class="form-modal-title">{{ExistingComponent?.instance?.heading}}</div>
+
+    <div class="bft-form-header">
+        <!-- <bft-button name="New" accessKey="n" icon="add" accessKey="n"></bft-button> -->
+        @if(!ExistingComponent?.instance?.isView){
+            
+            @if(ExistingComponent?.instance?.formData?.ID > 0){
+                <wrapper-update [SCode]="sCode">
+                    
+                    <bft-button name="Save" icon="save" accessKey="s" class="ml-2" (onClick)="save()" 
+                    [skeleton]="ExistingComponent?.instance?.isDataLoading" [loading]="ExistingComponent?.instance?.isSubmitLoading"/>
+                </wrapper-update>
+            } 
+            @else {
+                <wrapper-add [SCode]="sCode">
+                    <bft-button name="Save" icon="save" accessKey="s" class="ml-2" (onClick)="save()" 
+                    [skeleton]="ExistingComponent?.instance?.isDataLoading" [loading]="ExistingComponent?.instance?.isSubmitLoading"/>
+                </wrapper-add>
+            }
+
+        }
+        @if(ExistingComponent?.instance?.primaryKey > 0 && ExistingComponent?.instance?.isView){
+            <wrapper-update [SCode]="sCode">
+                <bft-button name="Edit" icon="edit" accessKey="i" class="ml-2" (onClick)="edit()"/>
+            </wrapper-update>
+        }
+        @if(ExistingComponent?.instance?.primaryKey > 0 ){
+            <wrapper-delete [SCode]="sCode">
+                <bft-button name="Delete" icon="delete" accessKey="d" class="ml-2" (onClick)="delete()"
+                [skeleton]="ExistingComponent?.instance?.isDataLoading" [loading]="ExistingComponent?.instance?.isDeleteLoading" />
+            </wrapper-delete>
+        }
+    </div>
+}
+
+
+
+<div class="bft-form-content py-4 px-[1.5rem]">
+    <div #dynamicContent></div>
+</div>

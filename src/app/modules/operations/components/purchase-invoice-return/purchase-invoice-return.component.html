@@ -1,0 +1,201 @@
+<div class="flex  justify-end  gap-4 items-center w-full">
+    @if (formData.InvoiceNo && primaryKey > 0) {
+    <div class="flex-shrink-0">
+        <span
+            class="rounded-full px-3 py-0.5 text-md font-semibold bg-green-100 text-green-800 dark:bg-green-500 dark:text-green-50 flex items-center gap-1">
+            <mat-icon svgIcon="heroicons_outline:clipboard-document-list" class="icon-size-4"></mat-icon>
+            {{ formData.InvoiceNo }}
+        </span>
+    </div>
+    }
+
+</div>
+
+<div class="mt-2 grid grid-cols-4 gap-2">
+    <div class="w-full">
+        <bft-input-text name="PurchaseInvoiceNo" [required]="true" label="Purchase Invoice No"
+            [(ngModel)]="formData.PurchaseInvoiceNo" [skeleton]="isDataLoading" (keyup.enter)="fetchInvoice()" prefixIcon="search"/>
+    </div>
+    <!-- <div class="w-full">
+        <bft-input-text name="InvoiceNo"  label="Invoice No" [(ngModel)]="formData.InvoiceNo"
+            [skeleton]="isDataLoading" />
+    </div> -->
+    <div class="w-full">
+        <bft-input-date name="InvoiceDate" [required]="true" label="Invoice Date" [(ngModel)]="formData.InvoiceDate"
+            [skeleton]="isDataLoading" />
+    </div>
+     <div class="w-full">
+        <bft-select name="SupplierID" [(ngModel)]="formData.SupplierID" [displayList]="suppliers" label="Supplier"
+            valueField="ID" displayField="Description" [skeleton]="isDataLoading" disabled />
+    </div>
+    <div class="w-full">
+        <bft-select name="CompanyID" [(ngModel)]="formData.CompanyID" [displayList]="companies" label="Company"
+            valueField="ID" displayField="Description" [skeleton]="isDataLoading" disabled />
+        <!-- <bft-select name="CategoryID" [(ngModel)]="formData.CategoryID" [displayList]="categories" label="Category"
+            valueField="ID" displayField="Description" [skeleton]="isDataLoading" disabled /> -->
+    </div>
+</div>
+
+<!-- <div class="grid grid-cols-2 gap-2">
+    <div class="w-full">
+        <bft-input-text name="DcNo" label="Dc No" [(ngModel)]="formData.DcNo" [skeleton]="isDataLoading" disabled />
+    </div>
+    <div class="w-full">
+        <bft-input-date name="DcDt" label="Dc Date" [(ngModel)]="formData.DcDt" [skeleton]="isDataLoading" disabled />
+    </div>
+</div> -->
+
+<div class="grid grid-cols-1">
+   
+    
+    <div class="w-full">
+
+        <bft-textarea name="Remarks" label="Remarks" [(ngModel)]="formData.Remarks" [skeleton]="isDataLoading" />
+    </div>
+</div>
+
+@if(formData.Pur_Inv_Detail_Ret.length > 0){
+
+
+<div class="overflow-x-auto overflow-y-auto max-h-[378px]">
+    <table class="w-full form-table mt-2 min-w-[1100px]">
+        <thead class="sticky top-0 bg-white z-10">
+            <tr class="">
+                <th class="table-header border-r border-l w-15">Item</th>
+                <th class="table-header border-r border-l w-5">Buy In</th>
+                <th class="table-header border-r w-20">Cost Pr</th>
+                <th class="table-header border-r w-20">Sale Pr</th>
+                <th class="table-header border-r w-10">Qty</th>
+                <th class="table-header border-r w-5">Bonus</th>
+                <th class="table-header border-r w-20">T Amount</th>
+                <th class="table-header border-r w-10">Discount</th>
+                <th class="table-header border-r w-10">Sale Tax</th>
+                <th class="table-header border-r w-20">Net Amount</th>
+                @if (formData.Pur_Inv_Detail_Ret.length > 0) {
+                <th class="table-header border-r"></th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for (element of formData.Pur_Inv_Detail_Ret; track $index) {
+            <tr class="border-b py-2">
+                <td class="py-0 px-2 border-r border-l w-15">
+                    <bft-select name="ItemID" [(ngModel)]="element.ItemID" [displayList]="items"
+                        displayField="Description" valueField="ID" [skeleton]="isDataLoading"
+                         disabled />
+                </td>
+                <td class="py-0 px-2 border-r border-l w-5">
+                    <bft-select name="BuyIn" [(ngModel)]="element.BuyIn" [displayList]="buyInList"
+                        displayField="Description" valueField="Description" [skeleton]="isDataLoading"
+                         disabled />
+                </td>
+                <td class="py-0 px-2 border-r border-l w-20">
+                    <bft-input-currency name="Cost" [(ngModel)]="element.Cost" [skeleton]="isDataLoading"
+                         disabled />
+                </td>
+                <td class="py-0 px-2 border-r border-l w-20">
+                    <bft-input-currency name="Sale" [(ngModel)]="element.Sale" [skeleton]="isDataLoading" disabled />
+                </td>
+                <td class="py-0 px-2 border-r border-l w-10">
+                    <bft-input-number name="Qty" [required]="true" [(ngModel)]="element.Qty" [skeleton]="isDataLoading"
+                        (change)="getTAmt(element)" />
+                </td>
+                <td class="py-0 px-2 border-r border-l w-5">
+                    <bft-input-number name="Bonus" [(ngModel)]="element.Bonus" [skeleton]="isDataLoading" disabled />
+                </td>
+                <td class="py-0 px-2 border-r border-l w-20">
+                    <bft-input-currency name="TAmt" [(ngModel)]="element.TAmt" [skeleton]="isDataLoading" disabled />
+                </td>
+                <td class="py-0 px-2 border-r border-l w-10 text-center">
+                    <div [ngClass]="element.ApplyDiscount ? 'flex justify-between items-center' : ''">
+                        <bft-checkbox name="ApplyDiscount" [(ngModel)]="element.ApplyDiscount"
+                            [skeleton]="isDataLoading" disabled />
+                        @if(element.ApplyDiscount) {
+                        <div class="flex flex-col items-start space-y-1 mt-1">
+                            <bft-input-number suffixText="%" name="DiscountPer" [(ngModel)]="element.DiscountPer"
+                                label="Discount %" [skeleton]="isDataLoading" 
+                                disabled />
+                            <span class="text-red-500 text-sm" style="margin-top: 0 !important;">- {{
+                                element.DiscountAmt |
+                                currency:'PKR ' }}</span>
+                        </div>
+                        }
+                    </div>
+                </td>
+                <td class="py-0 px-2 border-r border-l w-10 text-center">
+                    <div [ngClass]="element.ApplySaleTax ? 'flex justify-between items-center' : ''">
+                        <bft-checkbox name="ApplySaleTax" [(ngModel)]="element.ApplySaleTax" [skeleton]="isDataLoading"
+                            disabled />
+
+                        @if(element.ApplySaleTax){
+                        <div class="flex flex-col items-start space-y-1 mt-1">
+                            <bft-input-number name="SalePer" suffixText="%" [(ngModel)]="element.SalePer"
+                                [skeleton]="isDataLoading" label="Sale %" disabled />
+                            <span class="text-green-500 text-sm" style="margin-top: 0 !important;">
+                                + {{element.SaleAmt | currency:'PKR ' }}
+                            </span>
+                        </div>
+
+                        }
+                    </div>
+                </td>
+                <td class="py-0 px-2 border-r border-l w-20">
+                    <bft-input-currency name="NetAmt" [(ngModel)]="element.NetAmt" [skeleton]="isDataLoading"
+                        label="Net Amt" [disabled]="true" />
+                </td>
+                @if (formData.Pur_Inv_Detail_Ret.length > 0) {
+
+                <td class="py-0 px-2 border-r w-10">
+                    <div class="flex items-center justify-center h-10">
+                        <mat-icon class="text-red-500 cursor-pointer" fontIcon="delete"
+                            (click)="deleteDetailRow($index)"></mat-icon>
+                    </div>
+                </td>
+                }
+            </tr>
+            }
+
+            <tr>
+                <td colspan="9" class="h-1"></td>
+            </tr>
+        </tbody>
+
+        <!-- Footer -->
+        <tfoot class="sticky bottom-0 bg-white z-10 border">
+            <tr class="text-[15px] border-t">
+
+                <td colspan="2" class="pl-4 px-1 py-1">
+                    <div class="flex items-center align-center space-x-6">
+
+                        <div class="flex items-center">
+                            <mat-icon svgIcon="heroicons_outline:square-3-stack-3d"
+                                class="text-blue-400 text-xs "></mat-icon>
+                            <span>Total Items:</span>
+                            <span class="font-semibold pl-1">{{ getTotalItems() }}</span>
+                        </div>
+
+                        <div class="flex items-center">
+                            <mat-icon svgIcon="heroicons_outline:wallet" class="text-lime-500"></mat-icon>
+                            <span>Total Qty: </span>
+                            <span class="font-semibold pl-1">{{ getTotalQty() }}</span>
+                        </div>
+
+                    </div>
+                </td>
+
+                <td colspan="4"></td>
+
+                <td colspan="4">
+                    <div class="flex px-4 w-fit ml-auto text-right">
+                        <div>Total: </div>
+                        <div class="pl-1 font-semibold">
+                            {{ getTotalAmt() | currency:'PKR ' }}
+                        </div>
+                    </div>
+                </td>
+
+            </tr>
+        </tfoot>
+
+    </table>
+</div>}

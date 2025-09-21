@@ -1,0 +1,25 @@
+<mat-form-field class="w-full" >
+
+    @if (label != '') {
+        <mat-label>{{label}}</mat-label>
+    }
+
+    <input matInput type="text" [name]="name"  [mask]="mask" [showMaskTyped]="true" [placeholder]="placholder"  [disabled]="disabled"   [required]="required" 
+        #inputName="ngModel" [(ngModel)]="model" (ngModelChange)="onValueChange(model)" >
+    
+    @if (suffixText != null && suffixIcon == null) {
+        <span matSuffix>{{suffixText}}</span>
+    }
+    @else if(suffixText == null && suffixIcon !=null ){
+        <mat-icon matSuffix>{{suffixIcon}}</mat-icon>
+    }
+    
+    @if (flagImg != null ) {
+        <img [src]="flagImg" alt="" srcset="" style="    height: 20px;
+               width: 23px;" matPrefix>
+    }
+
+    @if (inputName.errors && inputName.errors.required) {
+        <mat-error>This field is required</mat-error>
+    }
+</mat-form-field>

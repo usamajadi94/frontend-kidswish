@@ -1,0 +1,38 @@
+<div class="grid grid-cols-2 gap-2 mt-2">
+    <div class="w-full">
+        <bft-input-text name="Code" label="Code" [(ngModel)]="formData.Code" [required]="true" [skeleton]="isDataLoading"/>
+    </div>
+    <div class="w-full">
+        <bft-input-text name="Description" label="Name" [(ngModel)]="formData.Description" [required]="true" [skeleton]="isDataLoading"/>
+    </div>
+</div>
+
+<div class="grid grid-cols-2 gap-2">
+    
+
+    <div class="w-full">
+        <bft-input-email name="Email" [(ngModel)]="formData.Email" label="Email" [skeleton]="isDataLoading" />
+    </div>
+
+    <div class="w-full">
+        <bft-input-phone name="PhoneNo" label="Phone No" [(ngModel)]="formData.PhoneNo" [skeleton]="isDataLoading"
+            mask="(000)000-0000" flagImg="https://cdn.kcak11.com/CountryFlags/countries/pk.svg" />
+    </div>
+</div>
+
+
+<div class="grid grid-cols-2 gap-2 mt-2">
+    <div class="w-full">
+        <bft-textarea name="Address" label="Address" [(ngModel)]="formData.Address" [skeleton]="isDataLoading" />
+    </div>
+    <div class="w-full">
+        <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes" [skeleton]="isDataLoading" />
+    </div>
+</div>
+
+<div class="grid grid-cols-1 mt-1">
+    <div class="w-full">
+        <bft-checkbox name="IsActive" label="Active" [(ngModel)]="formData.IsActive" [skeleton]="isDataLoading" />
+    </div>
+</div>
+

@@ -1,0 +1,215 @@
+<div class="flex  justify-end  gap-4 items-center w-full">
+    @if (formData.InvoiceNo && primaryKey > 0) {
+
+     <div>
+        <bft-button name="Print" icon="print"  class="py-1" (onClick)="onPrint()"/>
+    </div>
+    <div class="flex-shrink-0">
+        <span
+            class="rounded-full px-3 py-0.5 text-md font-semibold bg-green-100 text-green-800 dark:bg-green-500 dark:text-green-50 flex items-center gap-1">
+            <mat-icon svgIcon="heroicons_outline:clipboard-document-list" class="icon-size-4"></mat-icon>
+            {{ formData.InvoiceNo }}
+        </span>
+
+    </div>
+   
+    }
+
+</div>
+
+
+<div class="grid grid-cols-3 gap-2 mt-2">
+    <div class="w-full">
+        <bft-input-date name="InvoiceDate" [required]="true" label="Invoice Date" [(ngModel)]="formData.InvoiceDate"
+            [skeleton]="isDataLoading" />
+    </div>
+    <div class="w-full">
+        <bft-select name="CustomerID" [required]="true" [(ngModel)]="formData.CustomerID" [displayList]="customers"
+            label="Customer" valueField="ID" displayField="Description" [skeleton]="isDataLoading" />
+    </div>
+    <div class="w-full">
+        <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes" [skeleton]="isDataLoading" />
+    </div>
+</div>
+
+
+<div class="flex gap-4">
+
+    <div class=" w-4/5 overflow-x-auto" style="max-height: 325px;">
+        <div class="justify-end flex">
+            <bft-button name="Add Row" icon="add" class="py-1" (click)="addDetailRow()" />
+
+        </div>
+        <table class="w-full form-table mt-1 min-w-[780px]">
+            <colgroup>
+                <col style="width:10%"> <!-- Item -->
+                <col style="width:25%"> <!-- Item -->
+                <col style="width:10%"> <!-- Case Qty -->
+                <col style="width:15%"> <!-- Qty -->
+                <col style="width:15%"> <!-- Sale Price -->
+                <col style="width:15%"> <!-- Total Amount -->
+                <col style="width:10%"> <!-- Action -->
+            </colgroup>
+
+            <thead class="sticky top-0 bg-white z-10">
+                <tr>
+                    <th class="table-header border-r border-l">Case</th>
+                    <th class="table-header border-r border-l">Flavor*</th>
+                    <th class="table-header border-r ">Case Qty</th>
+                    <th class="table-header border-r ">Total Qty*</th>
+                    <th class="table-header border-r ">Sale Pr*</th>
+                    <th class="table-header border-r ">Total Amount</th>
+                    <th class="table-header border-r">Action</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @for (element of formData.Invoice_Detail; track $index) {
+                <tr class="border-b py-2">
+
+                    <td class="py-0 px-2 border-r border-l">
+                        <bft-input-number name="Cases" [(ngModel)]="element.Cases" [skeleton]="isDataLoading"
+                            (change)="getQty(element)" />
+                    </td>
+                    <td class="py-0 px-2 border-r border-l">
+
+                        @if(isDataLoading){
+                        <bft-skeleton />
+                        }
+                        @else {
+                        <nz-form-item>
+                            <nz-form-control>
+                                <nz-input-group class="non-prefix-select">
+                                    <nz-select nzAllowClear nzShowSearch nzPlaceHolder="Select Flavor" class="w-full"
+                                        [(ngModel)]="element.FlavorID">
+                                        @for (product of items; track product.ProductID) {
+                                        <nz-option-group [nzLabel]="product.name">
+                                            @for (flavour of product.flavours; track flavour.FlavorID) {
+                                            <nz-option [nzValue]="flavour.FlavorID"
+                                                [nzLabel]="flavour.name"></nz-option>
+                                            }
+                                        </nz-option-group>
+                                        }
+                                    </nz-select>
+                                </nz-input-group>
+                            </nz-form-control>
+                        </nz-form-item>
+                        }
+                    </td>
+
+                    <td class="py-0 px-2 border-r border-l">
+                        <bft-input-number name="CaseQty" [(ngModel)]="element.CaseQty" [skeleton]="isDataLoading"
+                            (change)="getQty(element)" />
+                    </td>
+
+                    <td class="py-0 px-2 border-r border-l">
+                        <bft-input-number name="Qty" [required]="true" [(ngModel)]="element.Qty"
+                            [skeleton]="isDataLoading" (change)="getTAmt(element)" />
+                    </td>
+                    <td class="py-0 px-2 border-r border-l">
+                        <bft-input-currency name="Price" [required]="true" [(ngModel)]="element.Price"
+                            [skeleton]="isDataLoading" symbol="$" (change)="getTAmt(element)" />
+                    </td>
+                    <td class="py-0 px-2 border-r border-l">
+                        <bft-input-currency name="NetAmt" [(ngModel)]="element.NetAmt" [skeleton]="isDataLoading"
+                            [disabled]="true" symbol="$" />
+                    </td>
+
+                    <td class="py-0 px-2 border-r">
+                        @if(formData.Invoice_Detail.length > 1) {
+                        <div class="flex items-center justify-center h-10">
+                            <mat-icon class="text-red-500 cursor-pointer" fontIcon="delete"
+                                (click)="deleteDetailRow($index)"></mat-icon>
+                        </div>
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+    <div class="w-2/5">
+        <table class="w-full invoice-table  mt-1 ">
+            <colgroup>
+                <col style="width:50%"> <!-- Item -->
+                <col style="width:50%"> <!-- Action -->
+            </colgroup>
+            <thead class="sticky top-0 bg-white z-10">
+                <tr class="">
+
+                    <td class=" px-3 font-semibold  py-2 ">
+                        Subtotal
+                    </td>
+
+                    <td class=" px-3 py-2">
+                        <bft-input-currency name="subTotal" symbol="$" [disabled]="true" [(ngModel)]="subTotal"
+                            [skeleton]="isDataLoading" />
+                    </td>
+                </tr>
+
+                <tr class="">
+                    <td class=" px-3 font-semibold py-2 ">
+                        Taxable
+                    </td>
+                    <td class=" px-3 py-2">
+                        <bft-input-currency name="Taxable" symbol="$" [(ngModel)]="formData.Taxable"
+                            (change)="calculateTotals()" [skeleton]="isDataLoading" />
+                    </td>
+                </tr>
+
+                <tr class="">
+                    <td class=" px-3 font-semibold py-2 ">
+                        Tax Rate (%)
+                    </td>
+                    <td class=" px-3 py-2">
+                        <bft-input-number name="TaxRate" suffixText="%" [(ngModel)]="formData.TaxRate"
+                            (change)="calculateTotals()" [skeleton]="isDataLoading" />
+                    </td>
+                </tr>
+
+                <tr class="">
+                    <td class=" px-3 font-semibold py-2 ">
+                        Tax
+                    </td>
+                    <td class=" px-3 py-2">
+                        <bft-input-currency name="Tax" symbol="$" [(ngModel)]="formData.Tax"
+                            (change)="calculateTotals()" [disabled]="true" [skeleton]="isDataLoading" />
+                    </td>
+                </tr>
+
+                <tr class="">
+                    <td class=" px-3 font-semibold  py-2">
+                        S & H
+                    </td>
+                    <td class=" px-3 py-2">
+                        <bft-input-currency name="SH" symbol="$" [(ngModel)]="formData.SH" (change)="calculateTotals()"
+                            [skeleton]="isDataLoading" />
+                    </td>
+                </tr>
+
+                <tr class="">
+
+                    <td class=" px-3 font-semibold  py-2">
+                        Others
+                    </td>
+                    <td class=" px-3 py-2">
+                        <bft-input-currency name="Others" symbol="$" [(ngModel)]="formData.Others"
+                            (change)="calculateTotals()" [skeleton]="isDataLoading" />
+                    </td>
+                </tr>
+
+                <tr class=" ">
+
+                    <td class=" px-3 font-semibold py-2 ">
+                        Total:
+                    </td>
+                    <td class=" px-3 py-2">
+                        <bft-input-currency name="Total" [(ngModel)]="formData.Total" (change)="calculateTotals()"
+                            [skeleton]="isDataLoading" symbol="$" [disabled]="true" />
+                    </td>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>

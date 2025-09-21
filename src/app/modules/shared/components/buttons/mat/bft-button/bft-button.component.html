@@ -1,0 +1,48 @@
+@if(type == 'default'){
+<button class="w-full" mat-button [class]="size == 'large' ? 'fuse-mat-button-large' : ''" [disabled]="disabled"
+    (click)="btnClick()">
+
+    <span class="flex items-center justify-center">
+        @if(beforeIcon != ''){
+            <mat-icon>{{beforeIcon}}</mat-icon>
+        }
+        <span class="ml-1 mr-1">{{name}}</span>
+
+        @if(afterIcon != ''){
+            <mat-icon>{{afterIcon}}</mat-icon>
+        }
+    </span>
+</button>
+}
+@else if(type == 'stroked'){
+<button class="w-full" mat-stroked-button [class]="size == 'large' ? 'fuse-mat-button-large' : ''" [disabled]="disabled"
+    (click)="btnClick()">
+
+    <span class="flex items-center justify-center">
+        @if(beforeIcon != ''){
+        <mat-icon>{{beforeIcon}}</mat-icon>
+        }
+        <span class="ml-1 mr-1">{{name}}</span>
+
+        @if(afterIcon != ''){
+        <mat-icon>{{afterIcon}}</mat-icon>
+        }
+    </span>
+</button>
+}
+@else if(type == 'flat'){
+<button class="w-full" mat-flat-button [color]="'primary'" [class]="size == 'large' ? 'fuse-mat-button-large' : ''"
+    [disabled]="disabled" (click)="btnClick()">
+
+    <span class="flex items-center justify-center">
+        @if(beforeIcon != ''){
+        <mat-icon>{{beforeIcon}}</mat-icon>
+        }
+        <span class="ml-1 mr-1">{{name}}</span>
+
+        @if(afterIcon != ''){
+        <mat-icon>{{afterIcon}}</mat-icon>
+        }
+    </span>
+</button>
+}

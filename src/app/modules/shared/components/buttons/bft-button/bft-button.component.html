@@ -1,0 +1,41 @@
+@if(skeleton){
+
+<bft-skeleton type="button" />
+}
+
+@else {
+<button nz-button [nzSize]="size" [nzShape]="edges" (click)="btnClick()" [disabled]="loading ? true : disabled"
+    [accessKey]="accessKey">
+    <!-- [class]="type == 'info' ? theme.buttonInfo : theme.button" -->
+    @if(loading){
+
+
+    <mat-progress-spinner color="accent" [diameter]="18" [mode]="'indeterminate'"></mat-progress-spinner>
+    }
+    @else {
+    <span class="flex justify-center items-center">
+        @if(svgIcon != ''){
+
+        <mat-icon class="icon-clr icon-size-4" [svgIcon]="svgIcon"></mat-icon>
+        }
+        @else if (icon != '') {
+        <mat-icon class="icon-clr " style="height: 1rem; width: 1rem; font-size: 1rem;">{{icon}}</mat-icon>
+        }
+        @if (name != '') {
+
+        <span [class]="icon != '' || svgIcon != '' ? 'ml-1' : iconSuffix !='' || svgIconSuffix != '' ? 'mr-1' : ''">{{name}}</span>
+        }
+
+        @if(svgIconSuffix != ''){
+
+        <mat-icon class="icon-clr icon-size-4" [svgIcon]="svgIconSuffix"></mat-icon>
+        }
+        @else if (iconSuffix != '') {
+        <mat-icon class="icon-clr " style="height: 1rem; width: 1rem; font-size: 1rem;">{{iconSuffix}}</mat-icon>
+        }
+
+    </span>
+    }
+</button>
+}
+<!-- <as-skeleton type="button" *ngIf="skeleton"></as-skeleton> -->

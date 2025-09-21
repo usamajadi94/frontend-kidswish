@@ -1,0 +1,16 @@
+<div class="confirm-modal-body">
+    <div class="confirm-content" style="display: flex;
+    align-items: center;
+    margin-top: 20px;
+    font-weight: 700;">
+        <mat-icon svgIcon="heroicons_outline:question-mark-circle" />
+        <span nz-icon nzType="question-circle" class="me-3 text-warning" style="font-size: 22px;" nzTheme="outline"></span>
+        <span class="description">
+            Are you sure you want to delete this?
+        </span>
+    </div>
+    <div class="confirm-buttons flex items-center justify-end mt-4">
+        <bft-button name="Yes" class="me-2" (onClick)="onYesClick()" />
+        <bft-button name="No" type="info" (onClick)="onNoClick()" />
+    </div>
+</div>

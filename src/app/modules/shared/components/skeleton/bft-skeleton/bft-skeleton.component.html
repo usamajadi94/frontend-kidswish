@@ -1,0 +1,21 @@
+
+<div class="w-full">
+    <nz-space nzSize="middle" class="mt-3 mb-3 w-full">
+        <div class="w-full">
+            @if (type == 'input') {
+    
+                <nz-skeleton-element nzType="input" [nzActive]="true"></nz-skeleton-element>
+                }
+                @else if(type == 'button'){
+                <nz-skeleton-element nzType="button" [nzActive]="true"></nz-skeleton-element>
+                }
+                @else if (type == 'avatar') {
+                <nz-skeleton-element nzType="avatar" [nzActive]="true"></nz-skeleton-element>
+                }
+                @else if (type == 'image') {
+                <nz-skeleton-element nzType="image" [nzActive]="true"></nz-skeleton-element>
+                }
+        </div>
+        
+    </nz-space>
+</div>

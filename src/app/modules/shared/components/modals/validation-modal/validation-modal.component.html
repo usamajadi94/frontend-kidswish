@@ -1,0 +1,25 @@
+<div class="confirm-modal-body" style = "margin:-1rem 0rem 1rem -1rem;">
+    <div class="confirm-content">
+
+        @for (item of validationInfo; track $index) {
+        <div class="flex items-center bg-red-50 border border-red-100 rounded-md p-1.5 m-2 text-red-600">
+            <mat-icon svgIcon="heroicons_outline:information-circle"
+                class="mr-2 text-red-600 font-extrabold"></mat-icon>
+            <div>
+                <div class="text-[12px] font-medium">{{ item }}</div>
+            </div>
+        </div>
+        }
+
+        <!-- <div class="flex justify-end mt-4 ">
+            <button type="button"
+                class="flex justify-center items-center text-white border bg-red-600 border-red-600 hover:bg-red-500 font-medium rounded-lg text-sm px-5 py-1.5 text-center me-2"
+                (click)="onClose()">
+                Got it
+            </button>
+        </div> -->
+
+
+
+    </div>
+</div>

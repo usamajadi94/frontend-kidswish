@@ -1,0 +1,80 @@
+<div class="grid grid-cols-4 gap-2 mt-2">
+  <div class="w-full">
+    <bft-input-text name="name" label="Product Name" required="true" [(ngModel)]="formData.ProductName"
+      [skeleton]="isDataLoading" />
+  </div>
+
+  <div class="w-full">
+    <bft-select name="CategoryID" [(ngModel)]="formData.CategoryID" [displayList]="categories" label="Category"
+      valueField="ID" displayField="Description" [skeleton]="isDataLoading" [enableAddFeature]="true"
+      (onAddNewItem)="addCategory()" [SCode]="componentRegister.itemType.SCode" />
+  </div>
+   <div class="w-full">
+    <bft-input-number name="BoxCase" label="Box Case"  [(ngModel)]="formData.BoxCase"
+      [skeleton]="isDataLoading" />
+  </div>
+  <div class="w-full">
+    <bft-input-number name="PouchCase" label="Pouch Case"  [(ngModel)]="formData.PouchCase"
+      [skeleton]="isDataLoading" />
+  </div>
+</div>
+
+<div class="grid grid-cols-4 gap-4 mt-2 items-end">
+  <div class="w-full">
+    <bft-input-number name="StickerCase" label="Sticker Case"  [(ngModel)]="formData.StickerCase"
+      [skeleton]="isDataLoading" />
+  </div>
+ 
+  <div class="w-full mb-3">
+    <bft-checkbox name="IsActive" label="Active" [(ngModel)]="formData.IsActive" [skeleton]="isDataLoading" />
+  </div>
+</div>
+
+
+<!-- Header -->
+<div class="flex justify-end items-center">
+  <bft-button name="Add Row" icon="add" class="py-1" (click)="addRow()" />
+</div>
+
+<!-- Flavors Table -->
+<div class="overflow-x-auto overflow-y-auto" style="max-height: 370px;">
+  <table class="w-full form-table mt-1 min-w-[1100px]">
+    <thead class="sticky top-0 bg-white z-10">
+    <tr>
+      <th class="table-header border-r border-l w-90">Flavor Name</th>
+      <th class="table-header border-r w-10">Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @for (item of formData.Flavor_Information; track item; let i = $index) {
+    <tr class="border-b hover:bg-gray-50 transition-colors duration-200">
+      <!-- Flavor Name -->
+      <td class="py-2 px-3 border-r border-l">
+        <bft-input-text name="FlavorName{{i}}" [(ngModel)]="item.FlavorName" />
+      </td>
+
+      <!-- Delete -->
+      <td class="py-2 px-3 border-r text-center">
+        <mat-icon class="text-red-500 cursor-pointer" fontIcon="delete" (click)="removeFlavor(i)">
+        </mat-icon>
+      </td>
+    </tr>
+    }
+  </tbody>
+
+  <!-- Footer -->
+  <tfoot class="sticky bottom-0 bg-white z-10 border">
+    <tr class="text-[15px]">
+
+      <td colspan="5" class="pl-4 py-3 text-gray-700">
+
+        <div class="flex items-center">
+          <mat-icon svgIcon="heroicons_outline:wallet" class="text-lime-500"></mat-icon>
+          <span>Total Flavors:</span>
+          <span class="font-semibold pl-1">{{ formData.Flavor_Information.length }}</span>
+        </div>
+      </td>
+    </tr>
+  </tfoot>
+</table>

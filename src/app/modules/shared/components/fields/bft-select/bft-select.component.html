@@ -1,0 +1,57 @@
+@if(skeleton){
+
+<bft-skeleton />
+}
+
+@else {
+<nz-form-item>
+    @if (label != '') {
+    <nz-form-label [nzRequired]="required">
+        {{label}}
+    </nz-form-label>
+    }
+    <nz-form-control [nzErrorTip]="required ? errorTpl : ''">
+
+        <nz-input-group class="non-prefix-select">
+
+            <nz-select [name]="name" [nzMode]="mode" [nzPlaceHolder]="placeholder" nzAllowClear nzShowSearch
+                [disabled]="disabled" [(ngModel)]="model" (focusout)="onFocusOut(inputName)" [required]="required"
+                #inputName="ngModel" (ngModelChange)="onValueChange(model)" [nzDropdownRender]="(enableAddFeature)? renderTemplate: ''">
+
+
+                @for (o of displayList; track o) {
+                <nz-option [nzValue]="valueField !='' ? o[valueField] : o"
+                    [nzLabel]="displayField !='' ? o[displayField] : o"></nz-option>
+                }
+
+            </nz-select>
+        </nz-input-group>
+
+        <ng-template #errorTpl let-control>
+
+            @if (control.invalid && (control.dirty || control.touched)) {
+            <ng-container>
+                This field is required
+            </ng-container>
+            }
+
+        </ng-template>
+
+        <ng-template #renderTemplate>
+            <!-- <mat-divider class="my-2"></mat-divider> -->
+            <wrapper-add [SCode]="SCode">
+
+                <div class="container">
+                    <a class="add-item" (click)="onAddClick()">
+                        <mat-icon svgIcon="heroicons_solid:plus" class="icon-size-4" style="color: #1890ff;"></mat-icon>
+                        Add New
+                    </a>
+                </div>
+            </wrapper-add>
+        </ng-template>
+
+
+
+    </nz-form-control>
+</nz-form-item>
+}

@@ -1,0 +1,46 @@
+.grp {
+
+  ::ng-deep .mat-mdc-tab-list {
+    height: 63px !important;
+    display: flex;
+    align-items: center;
+    background-color: #f9fafb;
+    border: 1px solid rgb(229, 231, 235);
+    border-bottom: none;
+    line-height: 14px;
+  }
+
+  ::ng-deep .mat-mdc-tab.mdc-tab--active {
+    background-color: #fff;
+    border-top: 1px solid rgb(229, 231, 235);
+    border-bottom: 4px solid rgb(99 102 241 / var(--tw-border-opacity, 1));
+    z-index: 1;
+    height: 63px;
+    line-height: 14px;
+    
+  .tab,
+  .tab * {
+    color: #111827 !important; 
+  }
+
+  .icon {
+    color: #111827 !important;
+  }
+
+  }
+
+  ::ng-deep .mat-mdc-tab.mdc-tab {
+    height: 63px !important;
+  }
+
+  ::ng-deep .mdc-tab-indicator {
+    display: none !important;
+  }
+
+  ::ng-deep.mat-icon {
+    min-height: 16px;
+    min-width: 16px;
+    height: 16px;
+    width: 16px;
+  }
+}

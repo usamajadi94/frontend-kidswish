@@ -1,0 +1,102 @@
+<mat-tab-group class="grp" [(selectedIndex)]="selectedTabIndex" mat-stretch-tabs="true" [animationDuration]="'0'">
+    @for (group of formData.groups; track $index) {
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <div
+                class="justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-all flex items-center space-x-2 px-6 py-4 rounded-none border-b-2 border-transparent">
+                <div class="flex items-center gap-2 tab">
+                    <mat-icon [svgIcon]="'heroicons_outline:' + group.icon"
+                        class="text-gray-600 icon h-3 w-3 text-[13px] focus:text-gray-900 active:text-gray-900"></mat-icon>
+                    <span class="font-medium text-[13px]">{{ group.tabName }}</span>
+                </div>
+                <span
+                    class="inline-flex items-center rounded-full border px-3 py-0.5 h-6 font-semibold transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 text-gray-800 ml-2 text-xs "
+                    [ngClass]="{'text-gray-900 ': selectedTabIndex === $index, 'text-gray-600 ': selectedTabIndex !== $index}">
+                    {{ group.permissions.length }}
+                </span>
+            </div>
+        </ng-template>
+
+        <ng-template matTabContent>
+            <table class="w-full border table-fixed border-collapse">
+                <thead class="border bg-gray-50">
+                    <tr>
+                        <th class=" table-header py-6 w-[340px] text-gray-900">
+                            <div class="flex items-center px-5 gap-y-1 font-semibold text-gray-900 ">
+                                <mat-icon svgIcon="heroicons_outline:cog-6-tooth" class="text-gray-900"></mat-icon>
+                                <span class="pl-2 text-[16px]">Entity</span>
+                            </div>
+                        </th>
+
+                        <th
+                            class="table-header font-semibold w-45 text-[#374151] cursor-pointer hover:bg-gray-100 transition-colors">
+                            <div class="flex flex-col items-center gap-y-1">
+                                <mat-icon svgIcon="heroicons_outline:plus"
+                                    class="text-[#374151] text-[12px]"></mat-icon>
+                                <span class="text-[12px] text-[#374151]">Create</span>
+                            </div>
+                        </th>
+
+                        <th
+                            class="table-header font-semibold w-45 text-[#374151] cursor-pointer hover:bg-gray-100 transition-colors">
+                            <div class="flex flex-col items-center gap-y-1">
+                                <mat-icon svgIcon="heroicons_outline:eye" class="text-[#374151] text-[12px]"></mat-icon>
+                                <span class="text-[12px] text-[#374151]">Read</span>
+                            </div>
+                        </th>
+
+                        <th
+                            class="table-header font-semibold w-45 text-[#374151] cursor-pointer hover:bg-gray-100 transition-colors">
+                            <div class="flex flex-col items-center gap-y-1">
+                                <mat-icon svgIcon="heroicons_outline:pencil-square"
+                                    class="text-[#374151] text-[12px]"></mat-icon>
+                                <span class="text-[12px] text-[#374151]">Write</span>
+                            </div>
+                        </th>
+                        <th
+                            class="table-header font-semibold w-45 text-[#374151] cursor-pointer hover:bg-gray-100 transition-colors">
+                            <div class="flex flex-col items-center gap-y-1"><mat-icon svgIcon="heroicons_outline:trash"
+                                    class="text-[#374151] text-[12px]"></mat-icon><span
+                                    class="text=[12px] text-[#374151]">Delete</span></div>
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (permission of group.permissions; track $index) {
+                    <tr class="border-b py-2 hover:bg-gray-50 transition-colors duration-200">
+                        <td class="py-4 px-3 flex items-center gap-2 font-medium text-gray-900">
+                            <bft-checkbox [ngModel]="isAllChecked(permission)"
+                                (ngModelChange)="setAll(permission, $event)" [skeleton]="isDataLoading" class="px-3" />
+                            {{ permission.name }}
+                        </td>
+
+                        <td class="text-center">
+                            <bft-checkbox [(ngModel)]="permission.create" [skeleton]="isDataLoading" />
+                        </td>
+                        <td class="text-center">
+                            <bft-checkbox [(ngModel)]="permission.read" [skeleton]="isDataLoading" />
+                        </td>
+                        <td class="text-center">
+                            <bft-checkbox [(ngModel)]="permission.write" [skeleton]="isDataLoading" />
+                        </td>
+                        <td class="text-center">
+                            <bft-checkbox [(ngModel)]="permission.delete" [skeleton]="isDataLoading" />
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <td colspan="5"
+                            class="py-4 pl-6 bg-gray-50 p-4 border-t border-l border-r border-b text-sm text-gray-600">
+                            {{ group.permissions.length }} entities configured
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </ng-template>
+    </mat-tab>
+    }
+</mat-tab-group>

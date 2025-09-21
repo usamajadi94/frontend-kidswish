@@ -1,0 +1,19 @@
+/* Custom tab green theme */
+::ng-deep .custom-tabs .mat-mdc-tab .mdc-tab__text-label {
+  color: #2d7a78; /* green-500 text */
+  font-weight: 500;
+}
+
+::ng-deep .custom-tabs .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: #35928f; /* darker green when active */
+  font-weight: 600;
+}
+
+::ng-deep .custom-tabs .mat-mdc-tab .mdc-tab-indicator__content--underline {
+  border-color: #2d7a78 !important; /* active underline */
+}
+
+::ng-deep .custom-tabs .mat-mdc-tab:hover .mdc-tab__text-label {
+  color: #35928f; /* hover state */
+}
+

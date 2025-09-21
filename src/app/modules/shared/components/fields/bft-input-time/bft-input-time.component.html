@@ -1,0 +1,45 @@
+@if(skeleton){
+
+    <bft-skeleton />
+}
+
+@else {
+<nz-form-item>
+
+    @if (label != '') {
+    <nz-form-label [nzRequired]="required">
+        {{label}}
+    </nz-form-label>
+    }
+
+    <nz-form-control [nzErrorTip]="required ? errorTpl : ''">
+
+        <nz-input-group [nzSuffix]="suffixTemplate" class="non-prefix-date">
+            <nz-time-picker [nzFormat]="format" [name]="name" [(ngModel)]="model" #inputName="ngModel"
+            [required]="required" [disabled]="disabled" (focusout)="onFocusOut(inputName)"
+            (ngModelChange)="onValueChange(model)" nzUse12Hours></nz-time-picker>
+
+
+        </nz-input-group>
+
+        <ng-template #errorTpl let-control>
+            @if (control.invalid && (control.dirty || control.touched)) {
+                <ng-container >
+                    This field is required
+                </ng-container>
+            }
+        </ng-template>
+
+        <ng-template #suffixTemplate>
+
+            @if (suffixText != null && suffixIcon == null) {
+                <span>{{suffixText}}</span>
+            }
+            @else if(suffixText == null && suffixIcon !=null ){
+                <mat-icon>{{suffixIcon}}</mat-icon>
+            }
+
+        </ng-template>
+    </nz-form-control>
+</nz-form-item>
+}

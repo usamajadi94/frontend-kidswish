@@ -1,0 +1,62 @@
+@if(skeleton){
+    <div class="w-full">
+
+        <bft-skeleton />
+    </div>
+}
+
+@else {
+<nz-form-item>
+    @if (label != '') {
+    <nz-form-label [nzRequired]="required">
+        {{label}}
+    </nz-form-label>
+    }
+
+    <nz-form-control [nzErrorTip]="required ? errorTpl : ''">
+        <nz-input-group [nzSuffix]="suffixTemplate" [nzPrefix]="prefixTemplate">
+            
+            <input nz-input type="email" [name]="name" [(ngModel)]="model" #inputName="ngModel" [required]="required"
+                [disabled]="disabled" pattern="^\w+([\.-]?\w+)*\+?\d*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+                (focusout)="onFocusOut(inputName)" (ngModelChange)="onValueChange(model)" />
+
+        </nz-input-group>
+        <ng-template #errorTpl let-control>
+
+            @if (control.errors && control.errors.required && (control.dirty || control.touched)) {
+            <ng-container>
+                This field is required
+            </ng-container>
+            }
+            @if (control.errors && control.errors.pattern) {
+            <ng-container>
+                Please enter a valid Email
+            </ng-container>
+            }
+        </ng-template>
+
+        <ng-template #prefixTemplate>
+            @if (prefixText != null && prefixIcon == null && prefixSvgIcon == null) {
+            <span>{{prefixText}}</span>
+            }
+            @else if(prefixText == null && prefixIcon == null && prefixSvgIcon != null ){
+            <mat-icon [svgIcon]="prefixSvgIcon"  class="icon-size-4"></mat-icon>
+            }
+            @else if(prefixText == null && prefixIcon !=null && prefixSvgIcon == null ){
+            <mat-icon>{{prefixIcon}}</mat-icon>
+            }
+        </ng-template>
+
+        <ng-template #suffixTemplate>
+
+            @if (suffixText != null && suffixIcon == null) {
+                <span >{{suffixText}}</span>
+            }
+            @else if(suffixText == null && suffixIcon !=null ){
+                <mat-icon >{{suffixIcon}}</mat-icon>
+            }
+
+        </ng-template>
+    </nz-form-control>
+</nz-form-item>
+}

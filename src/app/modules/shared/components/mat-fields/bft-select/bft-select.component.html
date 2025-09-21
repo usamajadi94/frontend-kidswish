@@ -1,0 +1,32 @@
+<mat-form-field class="w-full">
+
+    @if (label != '') {
+    <mat-label>{{label}}</mat-label>
+    }
+
+    <mat-select [(ngModel)]="model" [name]="name" (ngModelChange)="onValueChange(model)" [disabled]="disabled"
+        [required]="required" #inputName="ngModel" [multiple]="multiple" [placeholder]="placeholder">
+
+        @if(search){
+            <mat-option [hidden]="!search">
+                <ngx-mat-select-search [(ngModel)]="searchLead" (ngModelChange)="SearchAutoComplete.search.next($event)"
+                    placeholderLabel="Search..." noEntriesFoundLabel="Not Found!" />
+            </mat-option>
+        }
+
+        @for (item of SearchAutoComplete.results | async; track item) {
+            <mat-option 
+                [value]="valueField ? item[valueField] : item">
+                {{displayField != '' ? item[displayField] : item}}
+            </mat-option>
+        }
+
+    </mat-select>
+
+    @if (search) {
+        <mat-icon matPrefix>search</mat-icon>
+    }
+    @if (inputName.errors && inputName.errors.required) {
+    <mat-error>This field is required</mat-error>
+    }
+</mat-form-field>

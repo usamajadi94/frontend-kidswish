@@ -1,0 +1,30 @@
+<!-- Action Bar -->
+<div class="flex flex-wrap items-center justify-between list-header-row mb-4">
+    <!-- Left Side: Filter + Export Buttons -->
+    <div class="flex items-center gap-2 flex-wrap">
+        <bft-button name="Filter" icon="filter_alt" accessKey="f" (onClick)="openFilterDrawer()" />
+        <!-- <bft-button name="Export Excel" icon="grid_on" (onClick)="export('excel')" /> -->
+        <bft-button name="Export PDF" icon="picture_as_pdf" accessKey="x" (onClick)="onExportPdf()" />
+        <bft-button name="Print" icon="print" accessKey="p" (onClick)="onPrint()" />
+    </div>
+
+    <!-- Right Side: Pagination -->
+
+    <div class="flex items-center gap-1">
+        <button class="px-2 py-1 border rounded" (click)="previousPage()"
+            [disabled]="currentPageIndex === 0">Prev</button>
+        <span class="text-sm font-medium">Page {{ currentPageIndex + 1 }} / {{ totalPages }}</span>
+        <button class="px-2 py-1 border rounded" (click)="nextPage()"
+            [disabled]="currentPageIndex + 1 >= totalPages">Next</button>
+    </div>
+</div>
+
+
+<!-- Hidden wrapper where content is projected -->
+<div #contentWrapper style="display: none" class="mt-4">
+    <ng-content></ng-content>
+</div>
+
+<!-- Visible area for paginated pages -->
+<div #paginatedView class="paginated-view"></div>
+

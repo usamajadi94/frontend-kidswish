@@ -1,0 +1,60 @@
+<!-- <nz-form-item>
+  @if (label) {
+  <nz-form-label [nzRequired]="required">{{ label }}</nz-form-label>
+  }
+  <nz-form-control>
+    <nz-input-group [nzPrefix]="prefixTemplate">
+      <input nz-input [placeholder]="placeholder" [(ngModel)]="value" [nzAutocomplete]="auto"
+        (ngModelChange)="onInputChange($event)" [disabled]="disabled" (input)="Input($event)" />
+    </nz-input-group>
+
+    <nz-autocomplete #auto (selectionChange)="onOptionSelect($event)"  [nzBackfill]="true"   >
+      @for (opt of options; track $index) {
+      <nz-auto-option [nzValue]="opt" [nzLabel]="opt[displayField]">
+        {{ opt[displayField] }}
+      </nz-auto-option>
+      }
+    </nz-autocomplete>
+
+    <ng-template #prefixTemplate>
+      @if (prefixIcon) {
+      <mat-icon>{{ prefixIcon }}</mat-icon>
+      }
+    </ng-template>
+  </nz-form-control>
+</nz-form-item> -->
+
+
+<nz-form-item>
+  @if (label) {
+    <nz-form-label [nzRequired]="required">{{ label }}</nz-form-label>
+  }
+  <nz-form-control>
+    <nz-input-group [nzPrefix]="prefixTemplate">
+      <input
+        nz-input
+        [placeholder]="placeholder"
+        [(ngModel)]="value"
+        [nzAutocomplete]="auto"
+        (ngModelChange)="onInputChange($event)"
+        [disabled]="disabled"
+        (input)="Input($event)" />
+    </nz-input-group>
+
+    <nz-autocomplete #auto (selectionChange)="onOptionSelect($event)" [nzBackfill]="true">
+      @for (opt of options; track $index) {
+        <nz-auto-option
+          [nzValue]="opt"
+          [nzLabel]="displayField ? opt[displayField] : opt">
+          {{ displayField ? opt[displayField] : opt }}
+        </nz-auto-option>
+      }
+    </nz-autocomplete>
+
+    <ng-template #prefixTemplate>
+      @if (prefixIcon) {
+        <mat-icon>{{ prefixIcon }}</mat-icon>
+      }
+    </ng-template>
+  </nz-form-control>
+</nz-form-item>
