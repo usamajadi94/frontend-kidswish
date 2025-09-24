@@ -51,6 +51,7 @@ export class apiUrls {
     static readonly orderGetController = `api/order/getorderbyordernumber?OrderNo=`;
     static readonly saleInvoiceGetController = `api/saleinvoice/getinvoicebyinvoicenumber?InvoiceNo=`;
     static readonly invoiceController = `api/invoicemaster`;
+    static readonly flavorStockController = `api/flavorstock`;
     
     // Security
     static readonly rbacGroupsController = `api/group`;

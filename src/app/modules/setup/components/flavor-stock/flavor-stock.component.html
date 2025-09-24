@@ -1,0 +1,72 @@
+<div class="flex justify-end mt-2">
+    <bft-button name="Add Row" icon="add" class="py-1" (click)="addOpeningRow()" />
+</div>
+
+<div class="overflow-x-auto overflow-y-auto max-h-[378px]">
+  <table class="w-full form-table mt-2 min-w-[1100px]">
+    <thead class="sticky top-0 bg-white z-10">
+        <tr class="">
+            <th class="table-header border-r border-l w-40">Date</th>
+            <th class="table-header border-r border-l w-40"><span class="required-asterisk">*</span> Item</th>
+            <th class="table-header border-r w-30">Current Stock</th>
+            <th class="table-header border-r w-30"><span class="required-asterisk">*</span> Qty Stock</th>
+            <th class="table-header border-r w-30">Updated Stock</th>
+            @if (formData.length > 0) {
+            <th class="table-header border-r"></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @for (element of formData; track $index) {
+        <tr class="border-b py-2">
+            <td class="py-0 px-2 border-r border-l w-20">
+                <bft-input-date name="Date" [required]="true" [(ngModel)]="element.Date" [skeleton]="isDataLoading" />
+            </td>
+            <td class="py-0 px-2 border-r border-l w-40">
+                
+                    
+                @if(isDataLoading){
+                    <bft-skeleton />
+                    }
+                    @else {
+                    <nz-form-item>
+                        <nz-form-control>
+                            <nz-input-group class="non-prefix-select">
+                                <nz-select nzAllowClear nzShowSearch nzPlaceHolder="Select Flavor" class="w-full"
+                                    [(ngModel)]="element.FlavorID" (ngModelChange)="onItemSelect(element)">
+                                    @for (product of flavors; track product.ProductID) {
+                                    <nz-option-group [nzLabel]="product.name">
+                                        @for (flavour of product.flavours; track flavour.FlavorID) {
+                                        <nz-option [nzValue]="flavour.FlavorID"
+                                            [nzLabel]="flavour.name"></nz-option>
+                                        }
+                                    </nz-option-group>
+                                    }
+                                </nz-select>
+                            </nz-input-group>
+                        </nz-form-control>
+                    </nz-form-item>
+                    }
+            </td>
+            <td class="py-0 px-2 border-r border-l w-30">
+                <bft-input-number name="CurrentStock" [(ngModel)]="element.CurrentStock" [skeleton]="isDataLoading" disabled />
+            </td>
+            <td class="py-0 px-2 border-r border-l w-30">
+                <bft-input-number name="Qty" [required]="true" [(ngModel)]="element.Qty" [skeleton]="isDataLoading" (onChange)="stockDiff(element)" />
+            </td>
+            <td class="py-0 px-2 border-r border-l w-30">
+                <bft-input-number name="UpdatedStock" [(ngModel)]="element.UpdatedStock" [skeleton]="isDataLoading" disabled />
+            </td>
+            @if (formData.length > 0) {
+            <td class="py-0 px-2 border-r w-10">
+                <div class="flex items-center justify-center h-10">
+                    <mat-icon class="text-red-500 cursor-pointer" fontIcon="delete"
+                        (click)="deleteDetailRow($index)"></mat-icon>
+                </div>
+            </td>
+            }
+        </tr>
+        }
+    </tbody>
+</table>
+</div>

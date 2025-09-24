@@ -21,6 +21,7 @@ import { componentRegister } from '../shared/services/component-register';
 import { ProductsListComponent } from './components/products/products-list/products-list.component';
 import { ExpenseCategoryListComponent } from './components/expense-category/expense-category-list/expense-category-list.component';
 import { ExpenseDrListComponent } from './components/expense-dr/expense-dr-list/expense-dr-list.component';
+import { FlavorStockListComponent } from './components/flavor-stock/flavor-stock-list/flavor-stock-list.component';
 
 export default [
     {
@@ -111,6 +112,10 @@ export default [
     },
     {
         path:'expense-dr-list', component:ExpenseDrListComponent, data: { SCode: componentRegister.expenseDr.SCode },
+        canActivate: [permissionGuard]
+    },
+    {
+        path:'flavor-stock-list', component:FlavorStockListComponent, data: { SCode: componentRegister.flavorStock.SCode },
         canActivate: [permissionGuard]
     }
 ] as Routes;

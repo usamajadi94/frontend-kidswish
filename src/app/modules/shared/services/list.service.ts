@@ -120,4 +120,8 @@ export class ListService {
             todate: todate || '',
         });
     }
+
+    getFlavorStock() {
+        return this._QueryService.getQuery('getFlavorStock');
+    }
 }
