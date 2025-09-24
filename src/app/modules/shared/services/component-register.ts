@@ -19,7 +19,7 @@ export class componentRegister {
     static readonly expenseCategory:IComponentRegister = {Title:'Expense Category',SCode:"set_19"};
     static readonly expenseDr:IComponentRegister = {Title:'Expense DR',SCode:"set_20"};
     static readonly flavorOrder:IComponentRegister = {Title:'Flavor Order',SCode:""};
-    static readonly flavorStock:IComponentRegister = {Title:'Flavor Stock',SCode:"set_21"};
+    static readonly flavorStock:IComponentRegister = {Title:'Product Flavor Stock',SCode:"set_21"};
 
     // Operations
     static readonly purchaseInvoice:IComponentRegister = {Title:'Purchase Invoice',SCode:"dms_01"};

@@ -103,7 +103,24 @@ export class ProductsFormComponent extends BaseComponent<
     }
 
     public BeforeInsert(formData: Product): void {
-        debugger
-        console.log(formData);
     }
+
+
+    updateCaseQty() {
+  if (this.formData.BoxCase && this.formData.BoxPcs) {
+    // Box case already given
+    this.formData.BoxCase = this.formData.BoxCase;
+
+    // pouch case = box case × pouch pcs (if available)
+    if (this.formData.PouchPcs) {
+      this.formData.PouchCase = this.formData.BoxCase * this.formData.PouchPcs;
+    }
+
+    // sticker case = box case × sticker pcs (if available)
+    if (this.formData.StickerPcs) {
+      this.formData.StickerCase = this.formData.BoxCase * this.formData.StickerPcs;
+    }
+  }
+}
+
 }

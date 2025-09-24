@@ -4,9 +4,12 @@ export class Product {
     CategoryID: number | null = null;
     IsActive: boolean = true;
     Flavor_Information: Flavour[] = [];
-    BoxCase: number | null = null;
+    BoxCase: number | null = 24;
     PouchCase: number | null = null;
     StickerCase: number | null = null;
+    BoxPcs: number | null = 1;
+    PouchPcs: number | null = null;
+    StickerPcs: number | null = null;
 }
 
 export class Flavour {

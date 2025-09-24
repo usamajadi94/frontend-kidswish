@@ -1,19 +1,84 @@
 <div class="absolute inset-0 flex min-w-0 flex-col overflow-y-auto p-6 md:p-8" cdkScrollable>
-    <div class="flex-0">
-      <div class="mb-7">
-        <div class="text-3xl font-semibold leading-8 tracking-tight">
-          {{title}} List
-        </div>
+  <div class="flex-0">
+    <div class="mb-7">
+      <div class="text-3xl font-semibold leading-8 tracking-tight">
+        {{title}}
       </div>
-  
-      <bft-table [dataSource]="data" [(isVisible)]="isVisible" [columns]="columns" (view)="onView($event)">
-        <wrapper-add [SCode]="SCode">
-          <bft-button name="New" accessKey="n" svgIcon="mat_solid:add" (onClick)="onAdd()" />
-        </wrapper-add>
-        
-        <bft-button class="ml-3" name="Setting" svgIcon="mat_solid:settings" (onClick)="isVisible = true" />
-        <bft-button class="ml-3" name="Export" svgIcon="feather:file" />
-      </bft-table>
     </div>
+
+    <mat-tab-group mat-stretch-tabs="false" [animationDuration]="'0'">
+
+      <mat-tab label="List View">
+        <ng-template matTabContent >
+          <div class="mt-4">
+          <bft-table  [dataSource]="data" [(isVisible)]="isVisible" [columns]="columns" (view)="onView($event)">
+            <wrapper-add [SCode]="SCode">
+              <bft-button name="New" accessKey="n" svgIcon="mat_solid:add" (onClick)="onAdd()" />
+            </wrapper-add>
+
+            <bft-button class="ml-3" name="Setting" svgIcon="mat_solid:settings" (onClick)="isVisible = true" />
+            <bft-button class="ml-3" name="Export" svgIcon="feather:file" />
+          </bft-table>
+          </div>
+
+        </ng-template>
+      </mat-tab>
+
+       <mat-tab label="Product Stock">
+        <ng-template matTabContent >
+          <nz-collapse nzBordered="false" class="main-collapse mt-4">
+            @for (pack of groupedPacks; track $index) {
+            <nz-collapse-panel [nzHeader]="packHeader" [nzActive]="false"
+              class="rounded-xl shadow-sm bg-white mb-3 p-2 py-1">
+              <ng-template #packHeader>
+                <div class="flex justify-between items-center w-full">
+                  <span class="font-semibold mt-1">{{ pack.name }}</span>
+                  <span class="border px-4 py-1 rounded-full text-sm text-gray-600">
+                    {{ pack.flavours.length }} Flavours
+                  </span>
+                </div>
+              </ng-template>
+
+              <nz-collapse nzBordered="false" class="bg-white rounded-lg">
+                <div class="overflow-x-auto overflow-y-auto max-h-[272px] mt-3">
+                  <table class="w-full form-table min-w-[1100px] border-collapse">
+                    <thead class="sticky top-0 bg-white z-10 p-2">
+                      <tr>
+                        <th class="table-header border border-t-0 w-2/5 text-left ps-5">Flavour</th>
+                        <th class="table-header border border-t-0 w-2/5 text-left ps-5">Stock</th>
+                       
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      @for (flavour of pack.flavours;track $index) {
+                      <tr class="border-b text-center">
+                        <!-- Flavour Name -->
+                        <td class="py-3 px-4 border-l border-r w-2/5 text-left">
+                          {{ flavour.name }}
+                        </td>
+                        <td class="py-3 px-4 border-l border-r w-2/5 text-left">
+                          {{ flavour.Stock }}
+                        </td>
+
+                        
+                      </tr>
+
+                      }
+                    </tbody>
+
+                  </table>
+                </div>
+
+              </nz-collapse>
+            </nz-collapse-panel>
+            }
+          </nz-collapse>
+        </ng-template>
+        </mat-tab>
+    </mat-tab-group>
+
+
+
   </div>
-  
+</div>

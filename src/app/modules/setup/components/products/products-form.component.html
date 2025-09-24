@@ -1,4 +1,4 @@
-<div class="grid grid-cols-4 gap-2 mt-2">
+<div class="grid grid-cols-2 gap-2 mt-2">
   <div class="w-full">
     <bft-input-text name="name" label="Product Name" required="true" [(ngModel)]="formData.ProductName"
       [skeleton]="isDataLoading" />
@@ -9,27 +9,72 @@
       valueField="ID" displayField="Description" [skeleton]="isDataLoading" [enableAddFeature]="true"
       (onAddNewItem)="addCategory()" [SCode]="componentRegister.itemType.SCode" />
   </div>
-   <div class="w-full">
-    <bft-input-number name="BoxCase" label="Box Case"  [(ngModel)]="formData.BoxCase"
-      [skeleton]="isDataLoading" />
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-2">
+  <!-- By Pcs -->
+  <div>
+    <h2 class="text-lg font-semibold border-b pb-2">By Pcs</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+      <bft-input-number
+        name="BoxPcs"
+        label="Box"
+         (keyup)="updateCaseQty()"
+        [(ngModel)]="formData.BoxPcs"
+        [skeleton]="isDataLoading"
+      />
+      <bft-input-number
+        name="PouchPcs"
+        label="Pouch"
+         (keyup)="updateCaseQty()"
+        [(ngModel)]="formData.PouchPcs"
+        [skeleton]="isDataLoading"
+      />
+      <bft-input-number
+        name="StickerPcs"
+        label="Sticker"
+         (keyup)="updateCaseQty()"
+        [(ngModel)]="formData.StickerPcs"
+        [skeleton]="isDataLoading"
+      />
+    </div>
   </div>
-  <div class="w-full">
-    <bft-input-number name="PouchCase" label="Pouch Case"  [(ngModel)]="formData.PouchCase"
-      [skeleton]="isDataLoading" />
+
+  <!-- By Cases -->
+  <div>
+    <h2 class="text-lg font-semibold border-b pb-2">By Cases</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+       <bft-input-number
+        name="BoxCase"
+        label="Box"
+         (keyup)="updateCaseQty()"
+        [(ngModel)]="formData.BoxCase"
+        [skeleton]="isDataLoading"
+      />
+    
+     
+      <bft-input-number
+        name="PouchCase"
+        label="Pouch"
+         (keyup)="updateCaseQty()"
+        [(ngModel)]="formData.PouchCase"
+        [skeleton]="isDataLoading"
+      />
+
+        <bft-input-number
+        name="StickerCase"
+        label="Sticker"
+         (keyup)="updateCaseQty()"
+        [(ngModel)]="formData.StickerCase"
+        [skeleton]="isDataLoading"
+      />
+    </div>
   </div>
 </div>
 
-<div class="grid grid-cols-4 gap-4 mt-2 items-end">
-  <div class="w-full">
-    <bft-input-number name="StickerCase" label="Sticker Case"  [(ngModel)]="formData.StickerCase"
-      [skeleton]="isDataLoading" />
-  </div>
- 
   <div class="w-full mb-3">
     <bft-checkbox name="IsActive" label="Active" [(ngModel)]="formData.IsActive" [skeleton]="isDataLoading" />
   </div>
-</div>
-
 
 <!-- Header -->
 <div class="flex justify-end items-center">
