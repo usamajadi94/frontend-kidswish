@@ -65,6 +65,7 @@ export class FlavorStockListComponent
             isSort: true,
             isFilterList: true,
             type: 'number',
+            total:true
         },
         {
             header: 'Qty',
@@ -72,6 +73,15 @@ export class FlavorStockListComponent
             isSort: true,
             isFilterList: true,
             type: 'number',
+             total:true
+        },
+        {
+            header: 'Cases',
+            name: 'Cases',
+            isSort: true,
+            isFilterList: true,
+            type: 'number',
+             total:true
         },
         {
             header: 'Updated Stock',
@@ -79,6 +89,7 @@ export class FlavorStockListComponent
             isSort: true,
             isFilterList: true,
             type: 'number',
+             total:true
         },
         {
             header: 'Modified By',

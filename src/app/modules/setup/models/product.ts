@@ -19,4 +19,5 @@ export class Flavour {
     Box: number | null = null;
     Pouch: number | null = null;
     Sticker: number | null = null;
+    Stock: number | null = null;
 }

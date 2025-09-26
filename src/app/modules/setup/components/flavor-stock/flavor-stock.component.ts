@@ -20,19 +20,19 @@ import { BftSelectComponent } from 'app/modules/shared/components/fields/bft-sel
 import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @Component({
-  selector: 'app-flavor-stock',
-  standalone: true,
-  imports: [
-    BftButtonComponent,
-    BftInputDateComponent,
-    BftSelectComponent,
-    BftInputNumberComponent,
-    FormsModule,
-    MatIcon,
-     NzSelectModule,
-  ],
-  templateUrl: './flavor-stock.component.html',
-  styleUrl: './flavor-stock.component.scss'
+    selector: 'app-flavor-stock',
+    standalone: true,
+    imports: [
+        BftButtonComponent,
+        BftInputDateComponent,
+        BftSelectComponent,
+        BftInputNumberComponent,
+        FormsModule,
+        MatIcon,
+        NzSelectModule,
+    ],
+    templateUrl: './flavor-stock.component.html',
+    styleUrl: './flavor-stock.component.scss',
 })
 export class FlavorStockComponent extends BaseComponent<
     Array<FlavorStock>,
@@ -41,7 +41,7 @@ export class FlavorStockComponent extends BaseComponent<
     private _DrpService = inject(DrpService);
     private listService = inject(ListService);
     items: Array<any> = [];
-    flavors: Array<any> = [];
+    flavors: any = [];
     constructor(
         private genSer: GenericService,
         private msgSer: MessageModalService,
@@ -51,7 +51,7 @@ export class FlavorStockComponent extends BaseComponent<
     ) {
         super(genSer, msgSer, modalSer, toasterSer, activatedRoute);
         this.setControllerName(apiUrls.flavorStockController);
-         this.setFormTitle(componentRegister.flavorStock.Title);
+        this.setFormTitle(componentRegister.flavorStock.Title);
     }
 
     ngOnInit(): void {
@@ -79,10 +79,12 @@ export class FlavorStockComponent extends BaseComponent<
     }
 
     onItemSelect(element: FlavorStock) {
-      debugger
+        debugger;
         this.resetFields(element);
         if (element.FlavorID != null) {
-            let item: any = this.items.filter((x) => x.FlavorID == element.FlavorID);
+            let item: any = this.items.filter(
+                (x) => x.FlavorID == element.FlavorID
+            );
             if (item.length > 0) {
                 element.CurrentStock = item[0].Stock || 0;
                 element.ProductID = item[0].ProductID;
@@ -98,9 +100,15 @@ export class FlavorStockComponent extends BaseComponent<
     }
 
     stockDiff(element: FlavorStock): void {
+        let item: any = this.items.filter(
+            (x) => x.FlavorID == element.FlavorID
+        );
+         if (item && item[0].BoxCase) {
+        // Round off to 2 decimal places
+            element.Cases = Number((element.Qty / item[0].BoxCase).toFixed(2));
+        }
         element.UpdatedStock = element.Qty + element.CurrentStock;
     }
-
 
     override ValidateBeforeSave(formData: FlavorStock[]): boolean {
         this.validation = []; // Clear previous validation errors
@@ -111,10 +119,7 @@ export class FlavorStockComponent extends BaseComponent<
             hasError = true;
         } else {
             for (const detail of formData) {
-                if (
-                    !detail.FlavorID ||
-                    !detail.Qty 
-                ) {
+                if (!detail.FlavorID || !detail.Qty) {
                     hasError = true;
                     break; // No need to continue checking once we find an error
                 }
@@ -125,11 +130,20 @@ export class FlavorStockComponent extends BaseComponent<
             this.validation.push('Kindly fill your required fields.');
         }
 
-        const selectedItems = formData.map(item => ({ FlavorID: item.FlavorID, FlavorName: this.items.find(x => x.FlavorID === item.FlavorID)?.FlavorName || '' }));
-        const duplicateItems = selectedItems.filter((item, index) => selectedItems.findIndex(x => x.FlavorID === item.FlavorID) !== index);
+        const selectedItems = formData.map((item) => ({
+            FlavorID: item.FlavorID,
+            FlavorName:
+                this.items.find((x) => x.FlavorID === item.FlavorID)
+                    ?.FlavorName || '',
+        }));
+        const duplicateItems = selectedItems.filter(
+            (item, index) =>
+                selectedItems.findIndex((x) => x.FlavorID === item.FlavorID) !==
+                index
+        );
 
         if (duplicateItems.length > 0) {
-            duplicateItems.forEach(item => {
+            duplicateItems.forEach((item) => {
                 this.validation.push(`"${item.FlavorName}" is already added`);
             });
         }
@@ -137,7 +151,7 @@ export class FlavorStockComponent extends BaseComponent<
         return this.validation.length > 0;
     }
 
-     getItems() {
+    getItems() {
         this.listService.getProductWithFlavor().subscribe({
             next: (res: any) => {
                 this.items = res;
@@ -165,6 +179,7 @@ export class FlavorStockComponent extends BaseComponent<
                 ProductID: `${item.ProductID}`,
                 FlavorID: item.FlavorID,
                 name: item.FlavorName,
+                BoxCases: item.BoxCases || 0,
             });
         });
 

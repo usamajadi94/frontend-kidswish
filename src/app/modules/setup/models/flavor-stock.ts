@@ -7,6 +7,7 @@ export class FlavorStock {
     FlavorID:number = null;
     CurrentStock:number = 0;
     Qty:number = 0;
+    Cases: number = 0;
     UpdatedStock:number = 0;
     SCode:string = componentRegister.flavorStock.SCode;
 }
