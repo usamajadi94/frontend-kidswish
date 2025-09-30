@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { NzSkeletonInputSize, NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 
@@ -6,6 +7,7 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
   selector: 'bft-skeleton',
   standalone: true,
   imports: [
+    CommonModule,
     NzSkeletonModule,
     NzSpaceModule
   ],
@@ -14,5 +16,7 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 })
 export class BftSkeletonComponent {
   @Input() size:NzSkeletonInputSize  = 'default';
-  @Input() type:'button' | 'input' | 'avatar' | 'image' = 'input';
+  @Input() type:'button' | 'input' | 'avatar' | 'image' | 'table' = 'input';
+  @Input() columns: number = 5;
+  @Input() rows: number = 5;
 }

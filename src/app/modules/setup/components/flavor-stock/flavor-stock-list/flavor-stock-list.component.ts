@@ -11,6 +11,7 @@ import { ModalService } from 'app/modules/shared/services/modal.service';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { FlavorStockComponent } from '../flavor-stock.component';
+import { BftSkeletonComponent } from 'app/modules/shared/components/skeleton/bft-skeleton/bft-skeleton.component';
 import { NzCardModule } from 'ng-zorro-antd/card';
 
 @Component({
@@ -25,6 +26,7 @@ import { NzCardModule } from 'ng-zorro-antd/card';
         NzTableModule,
         NzCollapseModule,
         NzCardModule,
+        BftSkeletonComponent,
     ],
     templateUrl: './flavor-stock-list.component.html',
     styleUrl: './flavor-stock-list.component.scss',
@@ -37,6 +39,8 @@ export class FlavorStockListComponent
     private _listService = inject(ListService);
 
     groupedPacks: any[] = [];
+    displayedPacks: any[] = [];
+    private displayedPacksMap: Record<string | number, any[]> = {};
     async ngOnInit() {
         await this.getData();
         await this.getProductFlavorData();
@@ -107,20 +111,24 @@ export class FlavorStockListComponent
         },
     ];
     data: any[] = [];
+    isLoadingStock: boolean = false;
+    isLoadingProducts: boolean = false;
+    get isLoading(): boolean { return this.isLoadingStock || this.isLoadingProducts; }
 
     getData() {
+        this.isLoadingStock = true;
         this._listService.getFlavorStock().subscribe({
             next: (res: any) => {
                 this.data = res;
+                // Recompute merged view if products already loaded
+                if (this.groupedPacks?.length) {
+                    this.combineProductAndStock();
+                }
             },
             error: (err) => {
                 console.error('Error fetching Flavor Stock:', err);
             },
         });
-    }
-
-    onView(row: any) {
-        return;
     }
 
     onAdd() {
@@ -138,10 +146,11 @@ export class FlavorStockListComponent
     }
 
     getProductFlavorData() {
+        this.isLoadingProducts = true;
         this._listService.getProductWithFlavor().subscribe({
             next: (res) => {
                 this.groupedPacks = this.groupByProduct(res);
-                console.log(this.groupedPacks);
+                this.combineProductAndStock();
             },
             error: (err) => {
                 console.error('Error fetching products with Flavor:', err);
@@ -170,5 +179,31 @@ export class FlavorStockListComponent
         });
 
         return Object.values(grouped);
+    }
+    // Merge product->flavours with stock coming from getFlavorStock
+    private combineProductAndStock(): void {
+        if (!this.groupedPacks?.length) return;    
+
+        this.displayedPacks = (this.groupedPacks || []).map((pack: any) => {
+            const { flavours, ...rest } = pack || {};
+            return {
+                ...rest,
+                data: (this.data || [])
+                    .filter((item: any) => item.ProductID === pack.ProductID)
+                    .sort((a: any, b: any) => {
+                        const da = new Date(a?.ModifiedDate || a?.Date || 0).getTime();
+                        const db = new Date(b?.ModifiedDate || b?.Date || 0).getTime();
+                        return db - da; // desc by ModifiedDate
+                    }),
+            };
+        });
+
+        this.isLoadingStock = false;
+        this.isLoadingProducts = false;
+    }
+
+    getPackData(productId: string | number): any[] {
+        const pack = (this.displayedPacks || []).find((p: any) => p?.ProductID === productId);
+        return pack?.data || [];
     }
 }

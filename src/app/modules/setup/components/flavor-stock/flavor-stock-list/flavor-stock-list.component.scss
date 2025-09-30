@@ -1,3 +1,9 @@
+/* Match table filter-row UI like Employee Management list */
+:host ::ng-deep .list-header-row {
+  box-shadow: 0px 0px 1px 0.5px rgba(0, 0, 0, 0.0509803922) !important;
+
+}
+
 .main-collapse{
     background: none;
 }

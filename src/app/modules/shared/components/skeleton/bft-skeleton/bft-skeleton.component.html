@@ -15,6 +15,26 @@
                 @else if (type == 'image') {
                 <nz-skeleton-element nzType="image" [nzActive]="true"></nz-skeleton-element>
                 }
+                @else if (type == 'table') {
+                <div class="w-full">
+                    <div class="flex gap-3 mb-3">
+                        @for (c of [].constructor(columns); track $index) {
+                        <div class="flex-1">
+                            <nz-skeleton-element nzType="input" [nzActive]="true"></nz-skeleton-element>
+                        </div>
+                        }
+                    </div>
+                    <div class="space-y-2">
+                        @for (r of [].constructor(rows); track $index) {
+                        <div class="grid" [ngStyle]="{'grid-template-columns': 'repeat(' + columns + ', minmax(0, 1fr))', 'gap.px': 12}">
+                            @for (c of [].constructor(columns); track $index) {
+                            <nz-skeleton-element nzType="input" [nzActive]="true"></nz-skeleton-element>
+                            }
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
         </div>
         
     </nz-space>
