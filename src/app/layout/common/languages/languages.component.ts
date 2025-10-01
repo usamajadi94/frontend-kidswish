@@ -29,6 +29,7 @@ export class LanguagesComponent implements OnInit, OnDestroy {
     availableLangs: AvailableLangs;
     activeLang: string;
     flagCodes: any;
+    private _lastGoogleTarget: string | null = null;
 
     /**
      * Constructor
@@ -62,7 +63,7 @@ export class LanguagesComponent implements OnInit, OnDestroy {
         // Set the country iso codes for languages for flags
         this.flagCodes = {
             en: 'us',
-            tr: 'tr',
+            es: 'es',
         };
     }
 
@@ -83,6 +84,65 @@ export class LanguagesComponent implements OnInit, OnDestroy {
     setActiveLang(lang: string): void {
         // Set the active lang
         this._translocoService.setActiveLang(lang);
+
+        // Also trigger Google Translate if available
+        try {
+            const win: any = window as any;
+            const gt = win.google && win.google.translate;
+            const targetMap: Record<string, string> = {
+                en: 'en',
+                es: 'es'
+            };
+            const target = targetMap[lang] || 'en';
+
+            const setGoogleCookie = (from: string, to: string) => {
+                try {
+                    // Use /auto/ to avoid fighting with current page language
+                    const cookieVal = `/auto/${to}`;
+                    document.cookie = `googtrans=${cookieVal};path=/;`; // path scoped
+                    document.cookie = `googtrans=${cookieVal};domain=${window.location.hostname};path=/;`; // domain scoped
+                } catch {}
+            };
+
+            const applyTranslate = () => {
+                const select = document.querySelector(
+                    'select.goog-te-combo'
+                ) as HTMLSelectElement | null;
+                if (!select) return false;
+                // Set cookie to help GT detect desired language
+                setGoogleCookie('auto', target);
+                // If this target is already applied and dropdown already shows it, do nothing
+                if (this._lastGoogleTarget === target && select.value === target) {
+                    return true;
+                }
+                // Apply target and dispatch multiple times to ensure GT picks it up
+                const fire = () => {
+                    select.value = target;
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                };
+                fire();
+                // Schedule retries to survive widget re-render
+                setTimeout(fire, 100);
+                requestAnimationFrame(() => fire());
+                this._lastGoogleTarget = target;
+                return true;
+            };
+
+            if (!applyTranslate()) {
+                let tries = 0;
+                const interval = setInterval(() => {
+                    tries++;
+                    if (applyTranslate() || tries > 40) {
+                        clearInterval(interval);
+                    }
+                }, 200);
+                // Fire a couple of delayed attempts to overcome late DOM swaps
+                setTimeout(applyTranslate, 500);
+                setTimeout(applyTranslate, 1500);
+            }
+        } catch (e) {
+            // no-op
+        }
     }
 
     /**

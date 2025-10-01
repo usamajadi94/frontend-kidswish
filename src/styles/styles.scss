@@ -26,3 +26,22 @@
     font-size: 13px !important;
 }
 
+/* Hide Google Translate default UI/banners */
+.goog-logo-link,
+.goog-te-gadget,
+.goog-te-banner-frame,
+#\:1\.container, /* some variants use :1.container iframe id */
+#\:0\.container,
+#goog-gt-tt,
+#google_translate_element {
+    display: none !important;
+}
+body {
+    top: 0 !important;
+}
+
+/* Hide banner iframe forcibly */
+iframe[id^="goog-gt-"],
+iframe.goog-te-banner-frame { display: none !important; }
+html body { top: 0px !important; }
+

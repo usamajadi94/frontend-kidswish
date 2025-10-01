@@ -43,6 +43,41 @@
 
         <!-- Splash screen styles -->
         <link href="styles/splash-screen.css" rel="stylesheet" />
+        
+        <!-- Google Translate -->
+        <style>
+            #google_translate_element { display: none; }
+        </style>
+        <script>
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'en',
+                    autoDisplay: false,
+                    includedLanguages: 'en,es'
+                }, 'google_translate_element');
+
+                var browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+                var langMap = {
+                    'en': 'en',
+                    'es': 'es'
+                };
+                var short = browserLang.split('-')[0];
+                var target = langMap[browserLang] || langMap[short] || 'en';
+
+                if (target !== 'en') {
+                    var interval = setInterval(function () {
+                        var select = document.querySelector('select.goog-te-combo');
+                        if (select) {
+                            select.value = target;
+                            select.dispatchEvent(new Event('change'));
+                            clearInterval(interval);
+                        }
+                    }, 500);
+                    setTimeout(function(){ clearInterval(interval); }, 100);
+                }
+            }
+        </script>
+        <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     </head>
 
     <body>
@@ -58,5 +93,6 @@
 
         <!-- App root -->
         <app-root></app-root>
+        <div id="google_translate_element"></div>
     </body>
 </html>

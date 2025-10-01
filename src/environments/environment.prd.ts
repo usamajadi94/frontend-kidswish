@@ -2,7 +2,7 @@ import { IEnvironmentalVariables } from '../app/EnvironmentalVariables';
 
 export const environment: IEnvironmentalVariables = {
     production: true,
-    apiRoot: 'https://dmsapi.browsefytech.com/',
+    apiRoot: 'http://cloudfusion-001-site10.qtempurl.com/',
     env: 'prd',
     site: {
         baseUrl: '',
