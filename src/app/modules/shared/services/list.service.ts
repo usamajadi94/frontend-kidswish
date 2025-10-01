@@ -124,4 +124,10 @@ export class ListService {
     getFlavorStock() {
         return this._QueryService.getQuery('getFlavorStock');
     }
+
+    getEmployeePayRoll(month: Date | null) {
+        return this._QueryService.getQuery('getEmployeePayRoll', {
+            month: month || '',
+        });
+    }
 }

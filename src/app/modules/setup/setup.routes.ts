@@ -22,6 +22,7 @@ import { ProductsListComponent } from './components/products/products-list/produ
 import { ExpenseCategoryListComponent } from './components/expense-category/expense-category-list/expense-category-list.component';
 import { ExpenseDrListComponent } from './components/expense-dr/expense-dr-list/expense-dr-list.component';
 import { FlavorStockListComponent } from './components/flavor-stock/flavor-stock-list/flavor-stock-list.component';
+import { PayrollListComponent } from './components/payroll-management/payroll-list/payroll-list.component';
 
 export default [
     {
@@ -116,6 +117,10 @@ export default [
     },
     {
         path:'flavor-stock-list', component:FlavorStockListComponent, data: { SCode: componentRegister.flavorStock.SCode },
+        canActivate: [permissionGuard]
+    },
+    {
+        path:'emp-payroll-list', component:PayrollListComponent, data: { SCode: componentRegister.payroll.SCode },
         canActivate: [permissionGuard]
     }
 ] as Routes;

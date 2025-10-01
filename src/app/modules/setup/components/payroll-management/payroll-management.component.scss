@@ -1,0 +1,17 @@
+.divide-y > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-y-reverse: 0;
+  border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
+  border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
+}
+
+
+.form-table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+// Custom header color for employee table
+.form-table .grid.grid-cols-12.gap-1.py-2.font-semibold.text-slate-600.border-b.sticky.top-0 {
+  background-color: #f8f8f8 !important;
+}

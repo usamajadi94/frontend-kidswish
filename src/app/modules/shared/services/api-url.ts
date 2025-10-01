@@ -32,6 +32,7 @@ export class apiUrls {
     static readonly vehicleInformationController = `api/vehicleinformation`;
     static readonly expenseController = `api/expense`;
     static readonly employeeController = `api/employee`;
+    static readonly payrollController = `api/payroll`;
     static readonly productController = `api/product`;
     static readonly flavorOrder = `api/flavor/order`;
     static readonly flavorOrderStatus = `${apiUrls.server}api/flavor/order/status`;

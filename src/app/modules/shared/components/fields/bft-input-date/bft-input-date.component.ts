@@ -33,6 +33,7 @@ export class BftInputDateComponent implements ControlValueAccessor {
   @Input({ required: true }) name: string = '';
   @Input() placholder: string = '';
   @Input() required: boolean = false;
+  @Input() nzMode: string = '';
   @Input() disabled: boolean = false;
   @Input() hint: boolean = false;
   @Input() skeleton: boolean = false;

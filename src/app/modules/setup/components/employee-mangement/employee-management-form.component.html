@@ -27,8 +27,15 @@
 
 </div>
 
-<div class="grid grid-cols-2 gap-2 mt-2">
+<div class="grid grid-cols-1">
     <div class="w-full">
+        <bft-input-currency name="Salary" label="Salary" [(ngModel)]="formData.Salary" [skeleton]="isDataLoading" />
+    </div>
+  
+</div>
+<div class="grid grid-cols-2 gap-2 mt-2">
+   
+    <div class="w-full ">
         <bft-checkbox name="IsActive" label="Active" [(ngModel)]="formData.IsActive" [skeleton]="isDataLoading" />
     </div>
 </div>

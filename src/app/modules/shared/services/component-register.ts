@@ -14,6 +14,7 @@ export class componentRegister {
     static readonly vehicle:IComponentRegister = {Title:'Vehicle',SCode:"set_12"};
     static readonly expense:IComponentRegister = {Title:'Expense US',SCode:"set_14"};
     static readonly employee:IComponentRegister = {Title:'Employee Management',SCode:"set_13"};
+    static readonly payroll:IComponentRegister = {Title:'Payroll Management',SCode:"set_22"};
     static readonly product:IComponentRegister = {Title:'Product Management',SCode:"set_16"};
     static readonly packagingStock:IComponentRegister = {Title:'Packaging Stock Management',SCode:"set_17"};
     static readonly expenseCategory:IComponentRegister = {Title:'Expense Category',SCode:"set_19"};

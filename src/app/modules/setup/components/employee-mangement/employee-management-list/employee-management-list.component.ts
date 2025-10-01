@@ -7,6 +7,7 @@ import { componentRegister } from 'app/modules/shared/services/component-registe
 import { ListService } from 'app/modules/shared/services/list.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { EmployeeManagementFormComponent } from '../employee-management-form.component';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
     selector: 'app-employee-management-list',
@@ -17,6 +18,7 @@ import { EmployeeManagementFormComponent } from '../employee-management-form.com
 })
 export class EmployeeManagementListComponent extends BaseRoutedComponent {
     private modalService = inject(ModalService);
+    private nzModal = inject(NzModalService);
     private _listService = inject(ListService);
     title: string = componentRegister.employee.Title;
     isVisible: boolean = false;
@@ -29,12 +31,20 @@ export class EmployeeManagementListComponent extends BaseRoutedComponent {
             isFilterList: true,
             type: 'date',
         },
+       
         {
             header: 'Employee Name',
             name: 'Description',
             isSort: true,
             isFilterList: true,
             type: 'text',
+        },
+        {
+            header: 'Salary',
+            name: 'Salary',
+            isSort: true,
+            isFilterList: true,
+            type: 'currency',
         },
         {
             header: 'Email',
@@ -113,4 +123,5 @@ export class EmployeeManagementListComponent extends BaseRoutedComponent {
                 }
             });
     }
+
 }

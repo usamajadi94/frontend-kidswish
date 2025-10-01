@@ -14,6 +14,7 @@ import { MessageModalService } from 'app/modules/shared/services/message.service
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { Employee } from '../../models/employee';
 import { BftInputPhoneComponent } from 'app/modules/shared/components/fields/bft-input-phone/bft-input-phone.component';
+import { BftInputCurrencyComponent } from 'app/modules/shared/components/fields/bft-input-currency/bft-input-currency.component';
 
 @Component({
     selector: 'app-employee-management-form',
@@ -24,7 +25,8 @@ import { BftInputPhoneComponent } from 'app/modules/shared/components/fields/bft
         BftInputEmailComponent,
         BftInputDateComponent,
         BftCheckboxComponent,
-        BftInputPhoneComponent
+        BftInputPhoneComponent,
+        BftInputCurrencyComponent
     ],
     templateUrl: './employee-management-form.component.html',
     styleUrl: './employee-management-form.component.scss',

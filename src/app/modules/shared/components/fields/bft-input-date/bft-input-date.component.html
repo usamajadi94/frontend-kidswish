@@ -15,7 +15,7 @@
     <nz-form-control [nzErrorTip]="required ? errorTpl : ''">
 
         <nz-input-group [nzSuffix]="suffixTemplate" class="non-prefix-date">
-            <nz-date-picker [nzFormat]="format" [name]="name" [(ngModel)]="model" #inputName="ngModel"
+            <nz-date-picker [nzFormat]="format" [name]="name" [(ngModel)]="model" #inputName="ngModel" [nzMode]="nzMode"
                 [required]="required" [disabled]="disabled" (focusout)="onFocusOut(inputName)"
                 (ngModelChange)="onValueChange(model)"></nz-date-picker>
         </nz-input-group>

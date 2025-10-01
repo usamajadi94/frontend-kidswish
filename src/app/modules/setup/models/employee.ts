@@ -5,5 +5,6 @@ export class Employee {
     Description: string = "";
     Email: string = "";
     PhoneNo: string = "";
+    Salary: number = 0;
     IsActive: boolean = true;
 }
