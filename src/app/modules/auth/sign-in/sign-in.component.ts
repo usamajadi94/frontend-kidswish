@@ -106,7 +106,7 @@ export class AuthSignInComponent implements OnInit {
                                     const redirectURL =
                                         this._activatedRoute.snapshot.queryParamMap.get(
                                             'redirectURL'
-                                        ) || '/setup/company-list';
+                                        ) || '/pages/settings';
                                     this._router.navigateByUrl(redirectURL);
                                 }
                             });

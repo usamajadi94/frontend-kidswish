@@ -100,6 +100,9 @@ export class UsersFormComponent extends BaseComponent<
         if (formData.Password == null || formData.Password.trim() == '') {
             this.validation.push('Password is required.');
         }
+        if (formData.Email == null || formData.Email.trim() == '') {
+            this.validation.push('Email is required.');
+        }
         return this.validation.length > 0;
     }
 

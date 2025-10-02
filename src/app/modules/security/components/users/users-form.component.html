@@ -35,7 +35,7 @@
             <div class="grid grid-cols-2 gap-2">
                 <div class="w-full ">
                     <bft-input-email name="Email" [(ngModel)]="formData.Email" label="Email"
-                        [skeleton]="isDataLoading" />
+                        [skeleton]="isDataLoading" [required]="true" />
                 </div>
                 <div class="w-full">
                     <bft-input-phone name="PhoneNo" label="Phone No" [(ngModel)]="formData.PhoneNo"
@@ -56,6 +56,14 @@
                     <bft-checkbox name="IsPasswordChange"
                         label="Require this user to change their password when they first sign in"
                         [(ngModel)]="formData.IsPasswordChange" [skeleton]="isDataLoading" />
+                </div>
+               
+            </div>
+            <div class="grid grid-cols-2 mt-4">
+                <div class="w-full ">
+                    <bft-checkbox name="IsCustomer"
+                        label="Is this user also a customer?"
+                        [(ngModel)]="formData.IsCustomer" [skeleton]="isDataLoading" />
                 </div>
                 <div class="w-full flex justify-end">
 
