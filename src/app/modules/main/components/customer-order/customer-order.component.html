@@ -3,9 +3,14 @@
         <bft-input-date name="OrderDate" label="Order Date" [(ngModel)]="formData.OrderDate" [required]="true" />
     </div>
     <div class="col-span-6">
+      <bft-input-text name="Customer" label="Customer Name" [(ngModel)]="user.FullName" disabled required="true"></bft-input-text> 
+        <!-- <bft-select name="CustomerID" label="Customer" [displayList]="customers" valueField="ID"
+            displayField="Description" [(ngModel)]="formData.CustomerID" [required]="true"/> -->
+    </div>
+    <!-- <div class="col-span-6">
         <bft-select name="CustomerID" label="Customer" [displayList]="customers" valueField="ID"
             displayField="Description" [(ngModel)]="formData.CustomerID" [required]="true"/>
-    </div>
+    </div> -->
 </div>
 
 
