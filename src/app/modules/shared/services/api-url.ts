@@ -61,4 +61,8 @@ export class apiUrls {
     
     // Main
     static readonly customerOrderController = `api/customerorder`;
+
+    // Factory
+        static readonly productionOrder = `${apiUrls.server}api/factoryproduction`;
+
 }

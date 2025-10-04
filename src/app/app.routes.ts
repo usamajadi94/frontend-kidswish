@@ -88,7 +88,7 @@ export const appRoutes: Route[] = [
             {path: 'report', loadChildren: () => import('app/modules/reports-generator/report.routes')},
             {path: 'security', loadChildren: () => import('app/modules/security/security.routes')},
             {path: 'main', loadChildren: () => import('app/modules/main/main.routes')},
-
+            {path: 'factory', loadChildren: () => import('app/modules/factory/factory.routes')},
             // Pages
             {path: 'pages', children: [
 

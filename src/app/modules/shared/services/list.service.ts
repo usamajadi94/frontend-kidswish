@@ -130,4 +130,16 @@ export class ListService {
             month: month || '',
         });
     }
+
+    getPipeLineOrder(month: Date | null) {
+        return this._QueryService.getQuery('getPipeLineOrder', {
+            month: month || '',
+        });
+    }
+
+        getProductionDetail(month: Date | null) {
+        return this._QueryService.getQuery('getProductionInformation', {
+            month: month || '',
+        });
+    }
 }

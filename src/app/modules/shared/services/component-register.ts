@@ -41,6 +41,9 @@ export class componentRegister {
     static readonly customerOrder:IComponentRegister = {Title:'Customer Order',SCode:"main_01"};
     static readonly invoice:IComponentRegister = {Title:'Invoice',SCode:"inv_01"};
 
+    // Factory
+    static readonly pipelineOrders:IComponentRegister = {Title:'Factory Dashboard',SCode:"fac_01"};
+
 }
 
 export interface IComponentRegister {
