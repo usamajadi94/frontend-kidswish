@@ -129,10 +129,10 @@ export class OrderViewComponent {
         this._listService.getProductWithFlavor().subscribe({
             next: (res: any) => {
                 this.groupedProducts = this.groupByProduct(res);
-                this.productOptions = this.groupedProducts.map((product) => ({
-                    value: product.productID,
-                    text: product.name,
-                }));
+                // this.productOptions = this.groupedProducts.map((product) => ({
+                //     value: product.productID,
+                //     text: product.name,
+                // }));
                 this.updateOrderQuantities();
             },
             error: (err) => {
@@ -145,6 +145,18 @@ export class OrderViewComponent {
         this._listService.getPipeLineOrder(this.currentMonth).subscribe({
             next: (res: any) => {
                 this.pipelineOrders = res || [];
+                this.productOptions = [
+                    ...new Map(
+                        this.pipelineOrders.map((product) => [
+                            product.ProductID,
+                            {
+                                value: product.ProductID,
+                                text: product.ProductName,
+                            },
+                        ])
+                    ).values(),
+                ];
+
                 this.processCustomerOrders();
                 this.updateOrderQuantities();
             },
@@ -155,10 +167,8 @@ export class OrderViewComponent {
     }
 
     processCustomerOrders() {
-        debugger
         // Group orders by CustomerName and CustomerOrderNo
         const customerOrdersMap = new Map();
-        debugger;
         this.pipelineOrders.forEach((order) => {
             const key = `${order.CustomerName}_${order.CustomerOrderNo}`;
 
@@ -179,7 +189,7 @@ export class OrderViewComponent {
             customerOrder.Details.push({
                 ...order,
                 ProductName: order.ProductName,
-                FlavorName:  order.FlavorName,
+                FlavorName: order.FlavorName,
             });
         });
 
@@ -212,7 +222,8 @@ export class OrderViewComponent {
 
         this.productionRecords.forEach((record) => {
             const key = `${record.ProductID}_${record.FlavourID}`;
-            producedSummary[key] = (producedSummary[key] || 0) + (record.Qty || 0);
+            producedSummary[key] =
+                (producedSummary[key] || 0) + (record.Qty || 0);
         });
 
         // Update the grouped products with order quantities and produced quantities
@@ -221,7 +232,7 @@ export class OrderViewComponent {
                 const key = `${product.productID}_${flavor.id}`;
                 const orderQty = orderSummary[key] || 0;
                 const producedQty = producedSummary[key] || 0;
-                
+
                 flavor.targetQuantity = orderQty;
                 flavor.produced = producedQty;
                 flavor.remaining = orderQty - producedQty;
@@ -263,18 +274,22 @@ export class OrderViewComponent {
     onProductChange() {
         this.productionForm.FlavourID = null;
         this.flavorOptions = [];
-
         if (this.productionForm.ProductID) {
-            const selectedProduct = this.groupedProducts.find(
-                (p) => p.productID == this.productionForm.ProductID
+            const selectedProduct = this.pipelineOrders.filter(
+                (p) => p.ProductID == this.productionForm.ProductID
             );
             if (selectedProduct) {
-                this.flavorOptions = selectedProduct.flavours.map(
-                    (flavor: any) => ({
-                        value: flavor.id,
-                        text: flavor.name,
-                    })
-                );
+                this.flavorOptions = [
+                    ...new Map(
+                       selectedProduct.map((product) => [
+                            product.FlavorID,
+                            {
+                                value: product.FlavorID,
+                                text: product.FlavorName,
+                            },
+                        ])
+                    ).values(),
+                ];
             }
         }
     }
@@ -390,7 +405,6 @@ export class OrderViewComponent {
     }
 
     editProduction(record: FactorProductionForm) {
-        debugger;
         const selectedProduct = this.groupedProducts.find(
             (p) => p.productID == record.ProductID
         );
