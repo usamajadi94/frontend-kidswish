@@ -103,6 +103,16 @@ export class OrderViewComponent {
     totalProductionRecords: number = 0;
     totalProductionQty: number = 0;
 
+    // Shipment data
+    totalShipment: number = 0;
+    shipmentRecords: any[] = [];
+
+    // Shipment form data
+    shipmentFormData: any = {
+        Date: new Date()
+    };
+    shipmentQuantities: { [key: string]: number } = {};
+
     // Mat-table columns
     displayedColumns: string[] = [
         'expand',
@@ -119,20 +129,22 @@ export class OrderViewComponent {
         this.getProductWithFlavors();
         this.getPipelineOrders();
         this.fetchProductionDetail();
+        this.fetchShipmentData();
     }
 
     onMonthChange() {
         this.getPipelineOrders();
         this.fetchProductionDetail();
+        this.fetchShipmentData();
     }
     getProductWithFlavors() {
         this._listService.getProductWithFlavor().subscribe({
             next: (res: any) => {
                 this.groupedProducts = this.groupByProduct(res);
-                // this.productOptions = this.groupedProducts.map((product) => ({
-                //     value: product.productID,
-                //     text: product.name,
-                // }));
+                this.productOptions = this.groupedProducts.map((product) => ({
+                    value: product.productID,
+                    text: product.name,
+                }));
                 this.updateOrderQuantities();
             },
             error: (err) => {
@@ -145,17 +157,17 @@ export class OrderViewComponent {
         this._listService.getPipeLineOrder(this.currentMonth).subscribe({
             next: (res: any) => {
                 this.pipelineOrders = res || [];
-                this.productOptions = [
-                    ...new Map(
-                        this.pipelineOrders.map((product) => [
-                            product.ProductID,
-                            {
-                                value: product.ProductID,
-                                text: product.ProductName,
-                            },
-                        ])
-                    ).values(),
-                ];
+                // this.productOptions = [
+                //     ...new Map(
+                //         this.pipelineOrders.map((product) => [
+                //             product.ProductID,
+                //             {
+                //                 value: product.ProductID,
+                //                 text: product.ProductName,
+                //             },
+                //         ])
+                //     ).values(),
+                // ];
 
                 this.processCustomerOrders();
                 this.updateOrderQuantities();
@@ -275,21 +287,16 @@ export class OrderViewComponent {
         this.productionForm.FlavourID = null;
         this.flavorOptions = [];
         if (this.productionForm.ProductID) {
-            const selectedProduct = this.pipelineOrders.filter(
-                (p) => p.ProductID == this.productionForm.ProductID
+            const selectedProduct = this.groupedProducts.find(
+                (p) => p.productID == this.productionForm.ProductID
             );
             if (selectedProduct) {
-                this.flavorOptions = [
-                    ...new Map(
-                       selectedProduct.map((product) => [
-                            product.FlavorID,
-                            {
-                                value: product.FlavorID,
-                                text: product.FlavorName,
-                            },
-                        ])
-                    ).values(),
-                ];
+                this.flavorOptions = selectedProduct.flavours.map(
+                    (flavor: any) => ({
+                        value: flavor.id,
+                        text: flavor.name,
+                    })
+                );
             }
         }
     }
@@ -319,15 +326,15 @@ export class OrderViewComponent {
                 });
         } else {
             // Create new record
-            this._http
-                .post(apiUrls.productionOrder, this.productionForm)
+        this._http
+            .post(apiUrls.productionOrder, this.productionForm)
                 .subscribe({
                     next: (res: any) => {
                         this._MessageModalService.success(
                             'Production record created successfully!'
                         );
-                        this.productionForm = new FactoryProduction();
-                        this.fetchProductionDetail();
+                this.productionForm = new FactoryProduction();
+                this.fetchProductionDetail();
                     },
                     error: (err) => {
                         this._MessageModalService.error(
@@ -357,7 +364,7 @@ export class OrderViewComponent {
                 this.producedThisMonth =
                     this.calculateTotalProductionForMonth();
                 this.updateOrderQuantities();
-                console.log('productionDetail', res);
+            console.log('productionDetail', res);
             });
     }
 
@@ -479,5 +486,79 @@ export class OrderViewComponent {
                 quantity,
             })
         );
+    }
+
+    // ============================================
+    // SHIPMENT TAB METHODS
+    // ============================================
+
+    saveShipment() {
+        // Create shipment records only for flavors with quantities > 0
+        const shipmentRecords: any[] = [];
+        
+        Object.keys(this.shipmentQuantities).forEach(key => {
+            const quantity = this.shipmentQuantities[key];
+            if (quantity && quantity > 0) {
+                const [productID, flavourID] = key.split('_');
+                shipmentRecords.push({
+                    ProductID: parseInt(productID),
+                    FlavourID: parseInt(flavourID),
+                    Qty: quantity,
+                    Date: this.shipmentFormData.Date
+                });
+            }
+        });
+
+        if (shipmentRecords.length === 0) {
+            this._MessageModalService.warning('Please enter quantities for at least one flavor');
+            return;
+        }
+
+        // Save each record individually (same as production)
+        let completedRequests = 0;
+        const totalRequests = shipmentRecords.length;
+        
+        shipmentRecords.forEach(record => {
+            this._http.post(apiUrls.shipmentController, record)
+                .subscribe({
+                    next: (res: any) => {
+                        completedRequests++;
+                        if (completedRequests === totalRequests) {
+                            this._MessageModalService.success('Shipment saved successfully!');
+                            this.fetchShipmentData();
+                            this.clearShipmentForm();
+                        }
+                    },
+                    error: (err) => {
+                        this._MessageModalService.error('Error saving shipment');
+                        console.error('Shipment save error:', err);
+                    }
+                });
+        });
+    }
+
+    clearShipmentForm() {
+        this.shipmentFormData = {
+            Date: new Date()
+        };
+        this.shipmentQuantities = {};
+    }
+
+    // ============================================
+    // SHIPMENT DATA FETCH METHODS
+    // ============================================
+
+    fetchShipmentData() {
+        this._listService.getShipmentDetail(this.currentMonth).subscribe({
+            next: (res: any) => {
+                this.shipmentRecords = res || [];
+               this.totalShipment = res && res.length > 0 ? res[0].Qty || 0 : 0;
+            },
+            error: (err) => {
+                console.error('Error fetching shipment data:', err);
+                this.totalShipment = 0;
+                this.shipmentRecords = [];
+            }
+        });
     }
 }

@@ -24,7 +24,7 @@
         </div>
 
         <!-- Stock Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Total Stock Card -->
             <div
                 class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-200">
@@ -83,11 +83,31 @@
                 </div>
             </div>
 
+            <!-- Shipment Card -->
+            <div
+                class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center">
+                            <p class="text-1xl font-medium text-gray-600">Shipment
+                            </p>
+                        </div>
+                        <p class="text-3xl font-bold text-purple-600">{{ totalShipment }}</p>
+                        <p class="text-md text-gray-500 mt-1">Units shipped</p>
+                    </div>
+                    <div
+                        class="w-14 h-14 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <mat-icon class="text-white text-xl">local_shipping</mat-icon>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
 
         <mat-tab-group mat-stretch-tabs="false" [animationDuration]="'0'" mat-align-tabs="center">
 
+            <!-- OVERVIEW TAB -->
             <mat-tab label="Overview">
                 <ng-template matTabContent>
                     <div class="space-y-6 mt-2">
@@ -151,6 +171,7 @@
                 </ng-template>
             </mat-tab>
 
+            <!-- CUSTOMER ORDERS TAB -->
             <mat-tab label="Customer Orders">
                 <ng-template matTabContent>
                     <div class="space-y-6 mt-6">
@@ -310,6 +331,7 @@
                 </ng-template>
             </mat-tab>
 
+            <!-- RECORD PRODUCTION TAB -->
             <mat-tab label="Record Production">
                 <ng-template matTabContent>
                     <div class="space-y-6 mt-6">
@@ -515,6 +537,94 @@
                                 <p class="text-sm">Start recording production to see history here</p>
                             </div>
                             }
+                        </div>
+                    </div>
+                </ng-template>
+            </mat-tab>
+
+            <!-- SHIPMENT TAB -->
+            <mat-tab label="Shipment">
+                <ng-template matTabContent>
+                    <div class="space-y-6 mt-6">
+                        <!-- Shipment Form -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <mat-icon class="text-purple-600">local_shipping</mat-icon>
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-900">Shipment Details</h2>
+                                    <p class="text-sm text-gray-600">Record shipment information and quantities</p>
+                                </div>
+                            </div>
+
+                            <form #shipmentForm="ngForm">
+                                <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-6">
+                                    <!-- Shipment Date -->
+                                    <div>
+                                        <bft-input-date name="shipmentDate" label="Shipment Date"
+                                            [(ngModel)]="shipmentFormData.Date" required />
+                                    </div>
+                                </div>
+
+                                <!-- Products and Flavors Section -->
+                                <div class="mb-6">
+                                    
+                                    <nz-collapse nzBordered="false" class="main-collapse">
+                                        @for (product of groupedProducts; track product.productID) {
+                                            <nz-collapse-panel [nzHeader]="shipmentPackHeader" [nzActive]="false"
+                                                class="rounded-xl shadow-sm bg-white mb-3 p-2 py-1">
+                                                <ng-template #shipmentPackHeader>
+                                                    <div class="flex justify-between items-center w-full">
+                                                        <span class="font-semibold">{{ product.name }}</span>
+                                                        <span class="border px-4 py-1 rounded-full text-sm text-gray-600">
+                                                            {{ product.flavours.length }} Flavours
+                                                        </span>
+                                                    </div>
+                                                </ng-template>
+
+                                                <div class="overflow-x-auto overflow-y-auto max-h-[270px] mt-3">
+                                                    <table class="w-full form-table min-w-[1100px] border-collapse">
+                                                        <thead class="sticky top-0 bg-white z-10 p-2">
+                                                            <tr>
+                                                                <th class="table-header border border-t-0 w-4/5 text-left ps-5">Flavour</th>
+                                                                <th class="table-header border border-t-0 w-1/5 text-center">Quantity</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            @for (flavor of product.flavours; track flavor.id) {
+                                                            <tr class="border-b">
+                                                                <td class="py-2 px-2 border-r border-l w-2/5">
+                                                                    <span class="flex items-center">
+                                                                        <span class="ml-2">{{ flavor.name }}</span>
+                                                                    </span>
+                                                                </td>
+                                                                <td class="py-2 px-2 border-r w-1/5 text-center">
+                                                                    <bft-input-number 
+                                                                        name="quantity_{{product.productID}}_{{flavor.id}}"
+                                                                        [(ngModel)]="shipmentQuantities[product.productID + '_' + flavor.id]"
+                                                                        placeholder="0"
+                                                                        [min]="0" />
+                                                                </td>
+                                                            </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </nz-collapse-panel>
+                                        }
+                                    </nz-collapse>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex gap-2">
+                                    <bft-button name="Save Shipment" svgIcon="heroicons_solid:check"
+                                        [disabled]="!shipmentForm.valid" (click)="saveShipment()" />
+                                    <bft-button name="Clear" svgIcon="heroicons_outline:x-mark"
+                                        (click)="clearShipmentForm()" />
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </ng-template>

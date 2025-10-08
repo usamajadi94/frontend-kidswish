@@ -142,4 +142,10 @@ export class ListService {
             month: month || '',
         });
     }
+
+    getShipmentDetail(month: Date | null) {
+        return this._QueryService.getQuery('GetShipmentInformation', {
+            month: month || '',
+        });
+    }
 }
