@@ -1,0 +1,105 @@
+<div class="">
+    <div class="grid grid-cols-12 gap-3 items-end">
+        <div class="col-span-3">
+            <bft-select name="SalaryTypeID" label="Type" [(ngModel)]="formData.SalaryTypeID" [displayList]="salaryTypes"
+               displayField="Description" valueField="ID" (ngModelChange)="onTypeChange()" />
+        </div>
+        <div class="col-span-3">
+            <bft-input-date name="Date" label="Payroll Date" [(ngModel)]="formData.Date" />
+        </div>
+        <div class="col-span-">  
+            <bft-input-date name="PayrollMonth" label="Salary Month" [(ngModel)]="formData.PayrollMonth" format="MM/yyyy"  nzMode="month" (ngModelChange)="onPayrollMonthChange()" />
+        </div>
+      
+       <div class="col-span-3">
+         <bft-select name="PayrollCycle" label="Payment Cycle" [(ngModel)]="formData.PayrollCycle" [displayList]="cycles"
+           placeholder="Select cycle" (ngModelChange)="onPaymentCycleChange()" />
+       </div>
+
+    </div>
+  
+    <div class="flex justify-end  mt-2">
+      <div>
+        <nz-input-group nzPrefixIcon="search">
+          <input nz-input placeholder="Search employee" [(ngModel)]="searchText" (ngModelChange)="onSearchChange()" />
+        </nz-input-group>
+      </div>
+    </div>
+  
+    <div class="mt-2 border rounded-lg form-table">
+      <div class="w-full">
+        <div class="px-4">
+          <div [class]="'grid gap-1 py-2 font-semibold text-slate-600 border-b sticky top-0 bg-white z-10 ' + (formData.SalaryTypeID === salaryTypeEnum.Cash ? 'grid-cols-12' : 'grid-cols-16')">
+            <div class="col-span-1"><bft-checkbox name="selectAll" [(ngModel)]="selectAll" (ngModelChange)="toggleAll($event)" /></div>
+            <div class="col-span-2 text-left">Employee Name</div>
+            <div class="col-span-1 text-left">Salary</div>
+            <div class="col-span-1 text-left">Fortnightly</div>
+            <div class="col-span-1 text-left">Daily</div>
+            <div class="col-span-1 text-left">Hourly</div>
+            <div class="col-span-1 text-left">Worked Day</div>
+            <div class="col-span-1 text-left">Subtract Hrs</div>
+            <div class="col-span-1 text-left">Hrs Deduction</div>
+            <div class="col-span-1 text-left">Processed</div>
+            <div class="col-span-1 text-left" *ngIf="formData.SalaryTypeID !== salaryTypeEnum.Cash">Pension</div>
+            <div class="col-span-1 text-left" *ngIf="formData.SalaryTypeID !== salaryTypeEnum.Cash">Insurance</div>
+            <div class="col-span-1 text-left" *ngIf="formData.SalaryTypeID !== salaryTypeEnum.Cash">PlanComp</div>
+            <div class="col-span-1 text-left" *ngIf="formData.SalaryTypeID !== salaryTypeEnum.Cash">Tax</div>
+            <div class="col-span-1 text-left" *ngIf="formData.SalaryTypeID !== salaryTypeEnum.Cash">Net Salary</div>
+          </div>
+  
+          <div class="overflow-y-auto max-h-[280px]">
+            @for (emp of pagedEmployees; track emp) {
+            <div [class]="'grid gap-1 items-center py-1 border-b bg-slate-25 hover:bg-slate-50 transition-colors ' + (formData.SalaryTypeID === 1 ? 'grid-cols-12' : 'grid-cols-16')">
+              <div class="col-span-1"><bft-checkbox [name]="'chk_'+emp.EmployeeID" [(ngModel)]="selectedMap[emp.EmployeeID]" /></div>
+              <div class="col-span-2 text-left">
+                <div class="font-medium text-[15px]">{{ emp.EmployeeName }}</div>
+                <div class="text-xs text-slate-500">{{ emp.EmployeeID }}</div>
+              </div>
+              <div class="col-span-1 text-left font-medium">{{ emp.Salary | currency }}</div>
+              <div class="col-span-1 text-left">{{ emp.Fortnightly | currency }}</div>
+              <div class="col-span-1 text-left">{{ emp.Daily | currency }}</div>
+              <div class="col-span-1 text-left">{{ emp.HourlySalary | currency }}</div>
+              <div class="col-span-1 text-left">{{ emp.WorkedDay }}</div>
+              <div class="col-span-1 text-left">
+                <input nz-input type="number" min="0" [name]="'subhr_'+emp.EmployeeID" [(ngModel)]="emp.SubtractHR" (ngModelChange)="onWorkedOrHoursChange(emp)" />
+              </div>
+              <div class="col-span-1 text-left font-medium">{{ emp.DeductAmount | currency }}</div>
+              <div class="col-span-1 text-left">
+                <bft-input-currency [name]="'process_'+emp.EmployeeID" [(ngModel)]="emp.ProcessSalary" symbol="$" [skeleton]="false" [required]="false" [disabled]="false" />
+              </div>
+              <div class="col-span-1 text-left font-medium" *ngIf="formData.SalaryTypeID !== salaryTypeEnum.Cash">{{ emp.Pension | currency }}</div>
+              <div class="col-span-1 text-left font-medium" *ngIf="formData.SalaryTypeID !== salaryTypeEnum.Cash">{{ emp.Insurance | currency }}</div>
+              <div class="col-span-1 text-left" *ngIf="formData.SalaryTypeID !== salaryTypeEnum.Cash">
+                <bft-input-currency [name]="'plancomp_'+emp.EmployeeID" [(ngModel)]="emp.PlanComp" symbol="$" [skeleton]="false" [required]="false" [disabled]="false" (ngModelChange)="onAllowanceOrTaxChange(emp)" />
+              </div>
+              <div class="col-span-1 text-left" *ngIf="formData.SalaryTypeID !== salaryTypeEnum.Cash">
+                <bft-input-currency [name]="'tax_'+emp.EmployeeID" [(ngModel)]="emp.Tax" symbol="$" [skeleton]="false" [required]="false" [disabled]="false" (ngModelChange)="onAllowanceOrTaxChange(emp)" />
+              </div>
+              <div class="col-span-1 text-left font-semibold" *ngIf="formData.SalaryTypeID !== salaryTypeEnum.Cash">{{ emp.NetSalary | currency }}</div>
+            </div>
+            }
+          </div>
+  
+          <div class="flex items-center justify-between py-3">
+            <!-- <div class="text-sm text-slate-600">
+              <span class="font-medium">From:</span> {{ formData.FromDate | date:'dd-MMM-yyyy' }}
+              <span class="mx-2">|</span>
+              <span class="font-medium">To:</span> {{ formData.ToDate | date:'dd-MMM-yyyy' }}
+            </div> -->
+            <nz-pagination [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize" [nzTotal]="filteredEmployees.length"></nz-pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="flex items-center justify-end gap-3 mt-6">
+      <div class="mr-auto text-slate-600 flex items-center gap-2">
+        <mat-icon svgIcon="heroicons_solid:users" class="icon-size-5 text-[#3aafa9]"></mat-icon>
+        <span class="text-lg font-medium">Selected Employees: <span class="font-bold text-slate-800">{{ selectedCount }}</span></span>
+      </div>
+      <bft-button name="Cancel" (onClick)="cancel()" />
+    </div>
+  </div>
+  
+  
+  

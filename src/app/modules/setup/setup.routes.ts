@@ -23,6 +23,8 @@ import { ExpenseCategoryListComponent } from './components/expense-category/expe
 import { ExpenseDrListComponent } from './components/expense-dr/expense-dr-list/expense-dr-list.component';
 import { FlavorStockListComponent } from './components/flavor-stock/flavor-stock-list/flavor-stock-list.component';
 import { PayrollListComponent } from './components/payroll-management/payroll-list/payroll-list.component';
+import { EmployeeAttendanceComponent } from './components/employee-attendance/employee-attendance.component';
+import { EmployeeAttendanceListComponent } from './components/employee-attendance/employee-attendance-list/employee-attendance-list.component';
 
 export default [
     {
@@ -121,6 +123,10 @@ export default [
     },
     {
         path:'emp-payroll-list', component:PayrollListComponent, data: { SCode: componentRegister.payroll.SCode },
+        canActivate: [permissionGuard]
+    },
+    {
+        path:'emp-attendance', component:EmployeeAttendanceListComponent, data: { SCode: componentRegister.employeeAttendance.SCode },
         canActivate: [permissionGuard]
     }
 ] as Routes;

@@ -7,4 +7,5 @@ export class Employee {
     PhoneNo: string = "";
     Salary: number = 0;
     IsActive: boolean = true;
+    SalaryTypeID: number = null;
 }

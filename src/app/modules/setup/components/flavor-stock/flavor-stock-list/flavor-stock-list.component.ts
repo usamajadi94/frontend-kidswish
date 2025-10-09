@@ -203,7 +203,7 @@ export class FlavorStockListComponent
     }
 
     getPackData(productId: string | number): any[] {
-        const pack = (this.displayedPacks || []).find((p: any) => p?.ProductID === productId);
-        return pack?.data || [];
+        const pack = (this.groupedPacks || []).find((p: any) => p?.ProductID === productId);
+        return pack?.flavours || [];
     }
 }

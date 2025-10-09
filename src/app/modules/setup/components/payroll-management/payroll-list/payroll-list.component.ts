@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { PayrollManagementComponent } from '../payroll-management.component';
 import { BftInputDateComponent } from 'app/modules/shared/components/fields/bft-input-date/bft-input-date.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { PayrollManagementCashComponent } from '../payroll-management-cash/payroll-management-cash.component';
 
 @Component({
     selector: 'app-payroll-list',
@@ -40,6 +41,13 @@ export class PayrollListComponent extends BaseRoutedComponent {
         {
             header: 'Employee Name',
             name: 'EmployeeName',
+            isSort: true,
+            isFilterList: true,
+            type: 'text',
+        },
+        {
+            header: 'Salary Type',
+            name: 'SalaryType',
             isSort: true,
             isFilterList: true,
             type: 'text',
@@ -122,6 +130,19 @@ export class PayrollListComponent extends BaseRoutedComponent {
                 title: this.title,
                 ID: null,
             })
+            .afterClose.subscribe((res: boolean) => {
+                if (res) {
+                    this.getData();
+                }
+            });
+    }
+    openFormCash() {
+        this.modalService
+            .openModal({
+                component: PayrollManagementCashComponent,
+                title: this.title,
+                ID: null,
+            },1600)
             .afterClose.subscribe((res: boolean) => {
                 if (res) {
                     this.getData();

@@ -22,13 +22,13 @@ export class ModalService {
   constructor(
   ) { }
 
-  openModal(config: FormConfig): NzModalRef {
+  openModal(config: FormConfig,width:number = 1450): NzModalRef {
   const modalRef = this.modal.create({
     nzContent: BftFormComponent,
     nzData: this.dataInfo(config.ID, config.component, config?.Data),
     nzFooter: null,
     nzClassName: 'bft-form',
-    nzWidth: 1450,
+    nzWidth: width,
     nzMaskClosable: false,
   });
   return modalRef;

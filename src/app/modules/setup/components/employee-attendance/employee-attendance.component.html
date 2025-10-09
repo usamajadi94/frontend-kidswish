@@ -1,0 +1,55 @@
+<div class="grid grid-cols-3 gap-2 mt-2">
+    <div class="w-full">
+        <bft-input-date name="Date" [required]="true" label="Date" [(ngModel)]="formData.Date" [skeleton]="isDataLoading" />
+    </div>
+</div>
+
+<div class="mt-2 border rounded-lg form-table">
+    <div class="w-full">
+        <div class="px-4">
+            <div class="grid grid-cols-12 gap-1 py-2 font-semibold text-slate-600 border-b sticky top-0 bg-white z-10">
+                <div class="col-span-6 text-left">Employee</div>
+                <div class="col-span-2 text-left">Present</div>
+                <div class="col-span-2 text-left">On Vacation</div>
+                <div class="col-span-2 text-left">Absent Hours</div>
+            </div>
+
+            <div class="overflow-y-auto max-h-[280px]">
+                @for (row of pagedRows; track $index) {
+                <div class="grid grid-cols-12 gap-1 items-center py-1 border-b bg-slate-25 hover:bg-slate-50 transition-colors">
+                    <div class="col-span-6 text-left">
+                        <div class="font-medium text-[15px]">{{ employeeIdToName[row.EmployeeID] || '-' }}</div>
+                    </div>
+                    <div class="col-span-2 text-left">
+                        <bft-checkbox [name]="'IsPresent_'+$index" [(ngModel)]="row.IsPresent" />
+                    </div>
+                    <div class="col-span-2 text-left">
+                        <bft-checkbox [name]="'OnVacation_'+$index" [(ngModel)]="row.OnVacation" />
+                    </div>
+                    <div class="col-span-2 text-left">
+                        <bft-input-number [name]="'AbsentHours_'+$index" [(ngModel)]="row.AbsentHours" />
+                    </div>
+                </div>
+                }
+            </div>
+
+            <div class="flex items-center justify-end py-3">
+                <nz-pagination [(nzPageIndex)]="pageIndex" (nzPageIndexChange)="updatePagedRows()"
+                               [(nzPageSize)]="pageSize" (nzPageSizeChange)="updatePagedRows()"
+                               [nzTotal]="formData?.Emp_Attendance_Detail?.length || 0"></nz-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="flex items-center justify-end gap-3 mt-6">
+    <div class="mr-auto text-slate-600 flex items-center gap-2">
+        <mat-icon svgIcon="heroicons_solid:users" class="icon-size-5 text-[#3aafa9]"></mat-icon>
+        <span class="text-lg font-medium">
+            Total Present: <span class="font-bold text-slate-800">{{ totalPresent }}</span>
+            <span class="mx-2">|</span>
+            Total Absent: <span class="font-bold text-slate-800">{{ totalAbsent }}</span>
+        </span>
+    </div>
+</div>
+

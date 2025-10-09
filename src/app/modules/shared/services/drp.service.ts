@@ -132,6 +132,14 @@ export class DrpService {
     getPaymentMethodDrp() {
         return this._QueryService.getQuery('getPaymentMethodDrp');
     }
+    
+    getSalaryTypes() {
+        return this._QueryService.getQuery('getSalaryTypes');
+    }
+
+    getEmployeeHistoyByEmployee(employeeID: number) {
+        return this._QueryService.getQuery('getEmployeeHistoyByEmployee',{employeeid:employeeID});
+    }
 
     private handleError(error: any) {
         console.error('API Error:', error);

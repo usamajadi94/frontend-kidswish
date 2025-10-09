@@ -85,8 +85,10 @@ export class ListService {
             todate: todate || '',
         });
     }
-    getEmployee() {
-        return this._QueryService.getQuery('getEmployee');
+    getEmployee(active:string = "") {
+        return this._QueryService.getQuery('getEmployee',{
+            active:active
+        });
     }
     getProduct() {
         return this._QueryService.getQuery('getProducts');
@@ -129,6 +131,21 @@ export class ListService {
         return this._QueryService.getQuery('getEmployeePayRoll', {
             month: month || '',
         });
+    }
+
+    getEmployeeAttendance(month:Date) {
+        return this._QueryService.getQuery('getEmployeeAttendance',{
+            month:month
+        });
+    }
+    
+    getEmployeeAbsentSummary(salarytypeid:number,fromdate:Date = new Date(),todate:Date = new Date() ){
+        return this._QueryService.getQuery('getEmployeeAbsentSummary',{
+            salarytypeid:salarytypeid,
+            fromdate:fromdate,
+            todate:todate
+        });
+
     }
 
     getPipeLineOrder(month: Date | null) {

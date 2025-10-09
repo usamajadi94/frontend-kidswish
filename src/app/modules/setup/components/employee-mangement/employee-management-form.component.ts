@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { BaseComponent } from 'app/core/Base/base/base.component';
@@ -15,18 +15,25 @@ import { ModalService } from 'app/modules/shared/services/modal.service';
 import { Employee } from '../../models/employee';
 import { BftInputPhoneComponent } from 'app/modules/shared/components/fields/bft-input-phone/bft-input-phone.component';
 import { BftInputCurrencyComponent } from 'app/modules/shared/components/fields/bft-input-currency/bft-input-currency.component';
+import { BftSelectComponent } from 'app/modules/shared/components/fields/bft-select/bft-select.component';
+import { DrpService } from 'app/modules/shared/services/drp.service';
+import { MatTabsModule } from '@angular/material/tabs';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-employee-management-form',
     standalone: true,
     imports: [
+        CommonModule,
         FormsModule,
         BftInputTextComponent,
         BftInputEmailComponent,
         BftInputDateComponent,
         BftCheckboxComponent,
         BftInputPhoneComponent,
-        BftInputCurrencyComponent
+        BftInputCurrencyComponent,
+        BftSelectComponent,
+        MatTabsModule
     ],
     templateUrl: './employee-management-form.component.html',
     styleUrl: './employee-management-form.component.scss',
@@ -35,6 +42,9 @@ export class EmployeeManagementFormComponent extends BaseComponent<
     Employee,
     EmployeeManagementFormComponent
 > {
+    private _DrpService = inject(DrpService);
+    salaryTypes: any[] = [];
+    employeeHistory: any[] = [];
     constructor(
         private genSer: GenericService,
         private msgSer: MessageModalService,
@@ -49,6 +59,29 @@ export class EmployeeManagementFormComponent extends BaseComponent<
 
     override ngOnInit(): void {
         super.ngOnInit();
+    }
+    public override async BeforeInit(): Promise<void> {
+        await this.getSalaryTypes();
+    }
+
+    public override AfterGetData(): void {
+        this.getEmployeeHistory();
+    }
+
+    getSalaryTypes() {
+        this._DrpService.getSalaryTypes().subscribe({
+            next: (res: any) => {
+                this.salaryTypes = res;
+            },
+        });
+    }
+   
+    getEmployeeHistory() {
+        this._DrpService.getEmployeeHistoyByEmployee(this.formData.ID).subscribe({
+            next: (res: any) => {
+                this.employeeHistory = res;
+            },
+        });
     }
 
     public override InitializeObject(): void {
