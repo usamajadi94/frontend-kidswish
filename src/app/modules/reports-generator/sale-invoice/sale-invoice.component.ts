@@ -384,7 +384,7 @@ export class SaleInvoiceComponent {
                             stack: [
                                 { text: 'SALE INVOICE', style: 'invoiceTitle' },
                                 {
-                                    text: 'Invoice # (£): ' + element.InvoiceNo,
+                                    text: 'Invoice # : ' + element.InvoiceNo,
                                     style: 'FontStyle',
                                     bold: true,
                                 },
@@ -499,9 +499,7 @@ export class SaleInvoiceComponent {
                                 },
                                 {
                                     text: this.currencyPipe.transform(
-                                        item?.NetAmt,
-                                        '',
-                                        ''
+                                        item?.NetAmt
                                     ),
                                     style: 'TableFontSize',
                                     alignment: 'right',
@@ -516,31 +514,30 @@ export class SaleInvoiceComponent {
                 // Totals Row
                 {
                     table: {
-                        widths: ['59%', '15%', '10%', '16%'],
+                        widths: ['8%', '36%', '15%','15%', '10%', '16%'],
                         body: [
                             [
                                 {
-                                    text: 'TOTAL ($)',
+                                    text: this.getTotal(element, 'Cases'),
                                     style: 'TotalStyle',
-                                    bold: true,
+                                },
+                                {
+                                    text: '',
+                                },
+                                {
+                                    text: '',
                                 },
                                 {
                                     text: this.getTotal(element, 'Qty'),
                                     style: 'TotalStyle',
                                 },
                                 {
-                                    text: this.currencyPipe.transform(
-                                        this.getTotal(element, 'Price'),
-                                        ' ',
-                                        ''
-                                    ),
-                                    style: 'TotalStyle',
+                                    text: '',
+                                    
                                 },
                                 {
                                     text: this.currencyPipe.transform(
                                         this.getTotal(element, 'NetAmt'),
-                                        ' ',
-                                        ''
                                     ),
                                     style: 'TotalStyle',
                                     alignment: 'right',
@@ -565,7 +562,7 @@ export class SaleInvoiceComponent {
                                     margin: [0, 0, 0, 5],
                                 },
                                 {
-                                    text: `${element.Notes}`,
+                                    text: `${element.Notes != null ? element.Notes : '-'}`,
                                     style: 'FontStyle',
                                 },
                             ],
@@ -585,7 +582,7 @@ export class SaleInvoiceComponent {
                                 ),
                                 this.makeTotalRow(
                                     'TAX RATE',
-                                    `${element.TaxRate}%`
+                                    `${element.TaxRate != null ? element.TaxRate + '%' : '-'}`
                                 ),
                                 this.makeTotalRow(
                                     'TAX',
