@@ -649,14 +649,16 @@ export class SaleInvoiceComponent {
     }
 
     formatPhoneNumber(phoneNumber) {
-        // Removing all non-digit characters
-        phoneNumber = phoneNumber.replace(/\D/g, '');
-
-        // Format it as (XXX) XXX-XXXX
-        if (phoneNumber.length === 10) {
-            return phoneNumber.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
-        } else {
-            return 'Invalid phone number'; // Agar 10 digits nahi hain
+        if(phoneNumber){
+            phoneNumber = phoneNumber.replace(/\D/g, '');
+    
+            // Format it as (XXX) XXX-XXXX
+            if (phoneNumber.length === 10) {
+                return phoneNumber.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+            } else {
+                return 'Invalid phone number'; // Agar 10 digits nahi hain
+            }
         }
+        // Removing all non-digit characters
     }
 }
