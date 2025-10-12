@@ -10,44 +10,9 @@ export class ListService {
     getItemType() {
         return this._QueryService.getQuery('getItemType');
     }
-    getCityInformation() {
-        return this._QueryService.getQuery('getCityInformation');
-    }
-    getAreaInformation() {
-        return this._QueryService.getQuery('getAreaInformation');
-    }
-    getRouteInformation() {
-        return this._QueryService.getQuery('GetRouteInformation');
-    }
 
-    getCompanyInformation() {
-        return this._QueryService.getQuery('getCompanyInformation');
-    }
     getSupplierInformation() {
         return this._QueryService.getQuery('getSupplierInformation');
-    }
-
-    getItemProfile() {
-        return this._QueryService.getQuery('getItemProfile');
-    }
-
-    getPurchaseInvoice() {
-        return this._QueryService.getQuery('getPurchaseInvoiceInformation');
-    }
-    getPurchaseInvoiceReturn() {
-        return this._QueryService.getQuery('getRetPurchaseInvoiceInformation');
-    }
-
-    getMemberTypeInformation() {
-        return this._QueryService.getQuery('getMemberTypeInformation');
-    }
-
-    getOrderBookerInformation() {
-        return this._QueryService.getQuery('getOrderBookerInformation');
-    }
-
-    getSalesmanInformation() {
-        return this._QueryService.getQuery('getSalesmanInformation');
     }
 
     getVehicleInformation() {
@@ -57,20 +22,6 @@ export class ListService {
     getCustomerInformation() {
         return this._QueryService.getQuery('getCustomerInformation');
     }
-    getOpeningStock() {
-        return this._QueryService.getQuery('getOpeningStock');
-    }
-
-    getOrders() {
-        return this._QueryService.getQuery('getOrders');
-    }
-    getSaleInovices() {
-        return this._QueryService.getQuery('getSaleInovices');
-    }
-    getSaleInovicesRet() {
-        return this._QueryService.getQuery('getSaleInovicesRet');
-    }
-
     getGroups() {
         return this._QueryService.getQuery('getGroups');
     }

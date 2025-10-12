@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { BaseComponent } from 'app/core/Base/base/base.component';
 import { GenericService } from 'app/core/Base/services/generic.service';
 import { ToastService } from 'app/core/toaster/toast.service';
-import { OpeningStock } from 'app/modules/operations/model/opening-stock';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { DrpService } from 'app/modules/shared/services/drp.service';

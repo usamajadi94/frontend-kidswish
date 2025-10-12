@@ -84,7 +84,6 @@ export const appRoutes: Route[] = [
             {path: 'example', loadChildren: () => import('app/modules/admin/example/example.routes')},
             {path: 'home', loadChildren: () => import('app/modules/landing/home/home.routes')},
             {path: 'setup', loadChildren: () => import('app/modules/setup/setup.routes')},
-            {path: 'dms', loadChildren: () => import('app/modules/operations/operation.route')},
             {path: 'report', loadChildren: () => import('app/modules/reports-generator/report.routes')},
             {path: 'security', loadChildren: () => import('app/modules/security/security.routes')},
             {path: 'main', loadChildren: () => import('app/modules/main/main.routes')},

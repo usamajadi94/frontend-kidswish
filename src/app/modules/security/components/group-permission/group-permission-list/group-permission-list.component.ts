@@ -57,14 +57,7 @@ private modalService = inject(ModalService);
     }
 
     getData() {
-        // this._listService.getOpeningStock().subscribe({
-        //     next: (res: any) => {
-        //         this.data = res;
-        //     },
-        //     error: (err) => {
-        //         console.error('Error fetching Opening Stock:', err);
-        //     },
-        // });
+        
     }
 
 
@@ -82,17 +75,7 @@ private modalService = inject(ModalService);
     }
 
     onView(row) {
-    //  this.modalService
-    //     .openModal({
-    //         component: OpeningStockComponent,
-    //         title: this.title,
-    //         ID: row.ID,
-    //     })
-    //     .afterClose.subscribe((res: boolean) => {
-    //         if (res) {
-    //             this.getData();
-    //         }
-    //     });
+   
     }
 }
 

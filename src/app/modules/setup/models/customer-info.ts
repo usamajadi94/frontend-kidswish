@@ -14,10 +14,6 @@ export class CustomerInformation{
     Payment: number = 0;
     ClosingBalance: number = 0;
     Limit: number = 0;
-    MemberTypeID: number|null = null;
-    AreaID: number | null = null;
-    CityID: number | null = null;
-    RouteID: number | null = null;
     IsActive: boolean = true;
     SCode:string = componentRegister.customer.SCode;
 }

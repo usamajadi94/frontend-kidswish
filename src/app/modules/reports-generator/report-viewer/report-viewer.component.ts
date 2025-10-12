@@ -34,8 +34,6 @@ export class ReportViewerComponent implements OnInit {
 
   ngOnInit(): void {
     this.getCustomers();
-    this.getOrderBookers();
-    this.getSalesmans();
     this.onGenerate();
   }
 
@@ -50,27 +48,6 @@ export class ReportViewerComponent implements OnInit {
     });
   }
 
-  getOrderBookers() {
-    this._DrpService.getOrderBookerInformationDrp().subscribe({
-      next: (res: any) => {
-        this.orderBookers = res;
-      },
-      error: (err) => {
-        console.error('Error fetching order bookers:', err);
-      },
-    });
-  }
-
-  getSalesmans() {
-    this._DrpService.getSalesmanInformationDrp().subscribe({
-      next: (res: any) => {
-        this.salesmans = res;
-      },
-      error: (err) => {
-        console.error('Error fetching salesmans:', err);
-      },
-    });
-  }
 
   onGenerate() {
     this._ReportService.getSaleInvoiceReport(this.invoiceNo,
