@@ -8,7 +8,10 @@ export class apiUrls {
     // Login
     static readonly me = `${apiUrls.server}api/me`;
     static readonly changePassword = `${apiUrls.server}api/me/changepassword`;
-    static readonly login = `${apiUrls.server}api/login`;
+    // API contract requires capitalized Login and token refresh
+    static readonly login = `${apiUrls.server}api/Login`;
+    static readonly signup = `${apiUrls.server}api/signup`;
+    static readonly tokenRefresh = `${apiUrls.server}api/token/refresh`;
     static readonly entity = `${apiUrls.server}api/GetUserEntities`;
     static readonly settings = `${apiUrls.server}api/me/settings`;
     static readonly companyFetch = `${apiUrls.server}api/GetCompanyByClient`;

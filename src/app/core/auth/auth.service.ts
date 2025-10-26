@@ -5,7 +5,7 @@ import { AuthUtils } from 'app/core/auth/auth.utils';
 import { UserService } from 'app/core/user/user.service';
 import { user as userData } from 'app/mock-api/common/user/data';
 import { apiUrls } from 'app/modules/shared/services/api-url';
-import { catchError, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, filter, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
 import { ApiResponse } from '../Base/interface/IResponses';
 import { LocalStorageService } from './localStorage.service';
 
@@ -18,6 +18,11 @@ export class AuthService {
     private _localStorage = inject(LocalStorageService);
     private _router = inject(Router);
     private _activatedRoute = inject(ActivatedRoute);
+
+    // Keep access token in memory for runtime
+    private _accessTokenInMemory: string = '';
+    // Signal when refresh is in progress to queue waiting calls
+    private _refreshInProgress$ = new BehaviorSubject<boolean>(false);
 
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
@@ -72,8 +77,12 @@ export class AuthService {
         }
         return this._httpClient.post(apiUrls.login, credentials).pipe(
             switchMap((response: ApiResponse<any>) => {
-                // Store the access token in the local storage
-                this.setLocalStorage(response?.Data.AccessToken);
+                const accessToken = (response as any)?.accessToken ?? (response as any)?.Data?.AccessToken;
+                const refreshToken = (response as any)?.refreshToken ?? (response as any)?.Data?.RefreshToken;
+                this.setLocalStorage(accessToken);
+                if (refreshToken) {
+                    this._localStorage.refreshToken = refreshToken;
+                }
                 // this._localStorage.accessToken = response?.Data.AccessToken;
                 // Set the authenticated flag to true
                 // this._authenticated = true;
@@ -90,7 +99,7 @@ export class AuthService {
      */
     signInUsingToken(): Observable<any> {
         // Check if access token exists in local storage
-        const accessToken = this._localStorage.accessToken;
+        const accessToken = this._accessTokenInMemory || this._localStorage.accessToken;
 
         if (!accessToken) {
             return of(false);
@@ -141,6 +150,7 @@ export class AuthService {
     signOut(): Observable<any> {
         // Remove the access token from the local storage
         this._localStorage.clearAll();
+        this._accessTokenInMemory = '';
 
         // Set the authenticated flag to false
         this._authenticated = false;
@@ -185,12 +195,13 @@ export class AuthService {
         }
 
         // Check the access token availability
-        if (!this._localStorage.accessToken) {
+        if (!(this._accessTokenInMemory || this._localStorage.accessToken)) {
             return of(false);
         }
 
         // Check the access token expire date
-        if (AuthUtils.isTokenExpired(this._localStorage.accessToken)) {
+        const tokenToCheck = this._accessTokenInMemory || this._localStorage.accessToken;
+        if (AuthUtils.isTokenExpired(tokenToCheck)) {
             return of(false);
         }
 
@@ -201,6 +212,7 @@ export class AuthService {
     setLocalStorage(AccessToken: string) {
         if (AccessToken) {
             this._localStorage.accessToken = AccessToken;
+            this._accessTokenInMemory = AccessToken;
             let tokenObj = AuthUtils._decodeToken(AccessToken);
             this._localStorage.cid = tokenObj.cid;
             this._localStorage.uid = tokenObj.uid;
@@ -214,6 +226,45 @@ export class AuthService {
                 this._localStorage.eid = tokenObj.eid;
             }
         }
+    }
+
+    /**
+     * Refresh the access token using refresh token
+     */
+    refreshAccessToken(): Observable<string> {
+        const storedRefreshToken = this._localStorage.refreshToken;
+        if (!storedRefreshToken) {
+            return throwError(() => new Error('No refresh token'));
+        }
+        if (this._refreshInProgress$.value) {
+            return this._refreshInProgress$
+                .pipe(
+                    filter((inProgress) => !inProgress),
+                    take(1),
+                    map(() => this._accessTokenInMemory || this._localStorage.accessToken)
+                );
+        }
+        this._refreshInProgress$.next(true);
+        return this._httpClient.post(apiUrls.tokenRefresh, { refreshToken: storedRefreshToken })
+            .pipe(
+                switchMap((resp: any) => {
+                    const newAccessToken = resp?.accessToken ?? resp?.Data?.accessToken;
+                    if (!newAccessToken) {
+                        throw new Error('No access token in refresh response');
+                    }
+                    this.setLocalStorage(newAccessToken);
+                    return of(newAccessToken);
+                }),
+                catchError((err) => {
+                    this.signOut();
+                    return throwError(() => err);
+                }),
+                tap({
+                    next: () => {},
+                    error: () => this._refreshInProgress$.next(false),
+                    complete: () => this._refreshInProgress$.next(false)
+                })
+            );
     }
 
     checkPasswordChange() {

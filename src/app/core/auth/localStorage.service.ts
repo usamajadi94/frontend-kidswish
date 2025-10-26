@@ -12,6 +12,14 @@ export class LocalStorageService {
         return localStorage.getItem('accessToken') ?? '';
     }
 
+    // Refresh Token (store securely; here we use localStorage, or switch to cookie)
+    set refreshToken(token: string) {
+        localStorage.setItem('refreshToken', token);
+    }
+    get refreshToken(): string {
+        return localStorage.getItem('refreshToken') ?? '';
+    }
+
     // CID
     set cid(value: string) {
         localStorage.setItem('cid', value);
@@ -55,7 +63,7 @@ export class LocalStorageService {
 
     // Clear All (Only These Keys)
     clearAll(): void {
-        ['isMultipleEntity','accessToken', 'cid', 'uid', 'eid', 'isPasswordChange'].forEach((key) =>
+        ['isMultipleEntity','accessToken','refreshToken', 'cid', 'uid', 'eid', 'isPasswordChange'].forEach((key) =>
             localStorage.removeItem(key)
         );
     }
