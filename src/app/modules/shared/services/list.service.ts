@@ -116,4 +116,12 @@ export class ListService {
             month: month || '',
         });
     }
+  
+    getSupplierItems() {
+        return this._QueryService.getQuery('getSupplierItems');
+    }
+
+    getSupplierOrders() {
+        return this._QueryService.getQuery('getSupplierOrders');
+    }
 }

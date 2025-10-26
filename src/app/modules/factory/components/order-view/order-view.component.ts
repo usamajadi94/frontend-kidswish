@@ -30,7 +30,7 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import {
     FactorProductionForm,
     FactoryProduction,
-} from '../models/factory-production';
+} from '../../models/factory-production';
 
 @Component({
     selector: 'app-order-view',
@@ -157,6 +157,7 @@ export class OrderViewComponent {
         this._listService.getPipeLineOrder(this.currentMonth).subscribe({
             next: (res: any) => {
                 this.pipelineOrders = res || [];
+                console.log(this.pipelineOrders);
                 // this.productOptions = [
                 //     ...new Map(
                 //         this.pipelineOrders.map((product) => [
@@ -264,6 +265,7 @@ export class OrderViewComponent {
                     productID: item.ProductID,
                     name: item.ProductName,
                     category: item.ProductCategory,
+                    BoxCase:item.BoxCase,
                     flavours: [],
                 };
             }
@@ -274,7 +276,8 @@ export class OrderViewComponent {
                 targetQuantity: 0, // Will be updated from pipeline orders
                 produced: 0, // Set to 0 for now
                 remaining: 0, // Will be calculated
-                currentStock: Math.floor(Math.random() * 100), // Mock data for demo
+                currentStock: Math.floor(Math.random() * 100), // Mock data for demo,
+                BoxCase:item.BoxCase
             });
         });
 
@@ -297,6 +300,7 @@ export class OrderViewComponent {
                         text: flavor.name,
                     })
                 );
+                this.updateCaseQty();
             }
         }
     }
@@ -429,6 +433,7 @@ export class OrderViewComponent {
             FlavourID: record.FlavourID,
             Qty: record.Qty,
             Date: record.Date,
+            QtyCase:record.QtyCase
         };
 
         // Scroll to form
@@ -560,5 +565,28 @@ export class OrderViewComponent {
                 this.shipmentRecords = [];
             }
         });
+    }
+
+    getCaseQty(detail: any, type: 'Box' | 'Pouch' | 'Sticker',Qty:any) {
+        if (detail[Qty] && detail[type + 'Case'] > 0) {
+            return Math.floor(detail[Qty] / detail[type + 'Case']);
+        }
+        else { return 0;}
+    }
+
+    updateCaseQty(){
+        if (this.productionForm.ProductID) {
+            const selectedProduct = this.groupedProducts.find(
+                (p) => p.productID == this.productionForm.ProductID
+            );
+        this.productionForm.QtyCase = this.getProductionFormCase(selectedProduct,"Box",this.productionForm.Qty);
+        }
+    }
+    
+    getProductionFormCase(detail: any, type: 'Box' | 'Pouch' | 'Sticker',Qty:any) {
+        if (Qty && detail[type + 'Case'] > 0) {
+            return Math.floor(Qty / detail[type + 'Case']);
+        }
+        else { return 0;}
     }
 }

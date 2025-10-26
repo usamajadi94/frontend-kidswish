@@ -8,7 +8,7 @@
 
     <mat-tab-group mat-stretch-tabs="false" [animationDuration]="'0'">
 
-      <mat-tab label="List View">
+      <!-- <mat-tab label="List View">
         <ng-template matTabContent >
           @if (isLoading) {
             <div class="p-2">
@@ -41,7 +41,7 @@
         }
 
         </ng-template>
-      </mat-tab>
+      </mat-tab> -->
 
        <mat-tab label="Product Stock">
         <ng-template matTabContent >
@@ -75,7 +75,6 @@
                     <tbody>
                       @for (row of getPackData(pack.ProductID);track $index) {
                       <tr class="border-b text-center">
-                        <!-- Flavour Name -->
                         <td class="py-3 px-4 border-l border-r w-2/5 text-left">
                           {{ row.FlavorName || row.FlavourName || row.name }}
                         </td>

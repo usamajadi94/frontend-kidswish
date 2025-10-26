@@ -14,10 +14,14 @@ import { ExpenseDrListComponent } from './components/expense-dr/expense-dr-list/
 import { FlavorStockListComponent } from './components/flavor-stock/flavor-stock-list/flavor-stock-list.component';
 import { PayrollListComponent } from './components/payroll-management/payroll-list/payroll-list.component';
 import { EmployeeAttendanceListComponent } from './components/employee-attendance/employee-attendance-list/employee-attendance-list.component';
+import { SupplierItemsListComponent } from './components/supplier-items/supplier-items-list/supplier-items-list.component';
+import { SupplierOrderListComponent } from './components/supplier-order/supplier-order-list/supplier-order-list.component';
 
 export default [
     {
-        path: 'item-type-list', component: ItemTypeListComponent, data: { SCode: componentRegister.itemType.SCode },
+        path: 'item-type-list', 
+        component: ItemTypeListComponent, 
+        data: { SCode: componentRegister.itemType.SCode },
         canActivate: [permissionGuard]
     },
     // {
@@ -25,13 +29,15 @@ export default [
     //     canActivate: [permissionGuard]
     // },
     {
-        path: 'vehicle-list', component: VehicleInformationListComponent, data: { SCode: componentRegister.vehicle.SCode },
+        path: 'vehicle-list', 
+        component: VehicleInformationListComponent, 
+        data: { SCode: componentRegister.vehicle.SCode },
         canActivate: [permissionGuard],
     },
     {
         path: 'employee-management-list',
         component: EmployeeManagementListComponent,
-        data: { SCode: 'set_13' },
+        data: { SCode: componentRegister.employee.SCode },
         canActivate: [permissionGuard],
     },
     {
@@ -55,31 +61,57 @@ export default [
     },
         
     {
-        path:'packaging-stock-list', component: PackagingStockListComponent, data: { SCode: "set_17" },
-      
+        path:'packaging-stock-list', 
+        component: PackagingStockListComponent, 
+        data: { SCode: componentRegister.packagingStock.SCode },
+        canActivate: [permissionGuard],
     },
     {
-          path:'product-list', component: ProductsListComponent, data: { SCode: "set_16" },
+        path:'product-list', 
+        component: ProductsListComponent, 
+        data: { SCode: componentRegister.product.SCode },
         canActivate: [permissionGuard]
     },
     {
-          path:'expense-category-list', component:ExpenseCategoryListComponent, data: { SCode: componentRegister.expenseCategory.SCode },
+        path:'expense-category-list', 
+        component:ExpenseCategoryListComponent, 
+        data: { SCode: componentRegister.expenseCategory.SCode },
         canActivate: [permissionGuard]
     },
     {
-        path:'expense-dr-list', component:ExpenseDrListComponent, data: { SCode: componentRegister.expenseDr.SCode },
+        path:'expense-dr-list', 
+        component:ExpenseDrListComponent, 
+        data: { SCode: componentRegister.expenseDr.SCode },
         canActivate: [permissionGuard]
     },
     {
-        path:'flavor-stock-list', component:FlavorStockListComponent, data: { SCode: componentRegister.flavorStock.SCode },
+        path:'flavor-stock-list', 
+        component:FlavorStockListComponent, 
+        data: { SCode: componentRegister.flavorStock.SCode },
         canActivate: [permissionGuard]
     },
     {
-        path:'emp-payroll-list', component:PayrollListComponent, data: { SCode: componentRegister.payroll.SCode },
+        path:'emp-payroll-list', 
+        component:PayrollListComponent, 
+        data: { SCode: componentRegister.payroll.SCode },
         canActivate: [permissionGuard]
     },
     {
-        path:'emp-attendance', component:EmployeeAttendanceListComponent, data: { SCode: componentRegister.employeeAttendance.SCode },
+        path:'emp-attendance', 
+        component:EmployeeAttendanceListComponent, 
+        data: { SCode: componentRegister.employeeAttendance.SCode },
         canActivate: [permissionGuard]
-    }
+    },
+    {
+        path: 'supplier-items-list',
+        component: SupplierItemsListComponent,
+        data: { SCode: componentRegister.supplierItems.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'supplier-order-list',
+        component: SupplierOrderListComponent,
+        data: { SCode: componentRegister.supplierOrder.SCode },
+        canActivate: [permissionGuard],
+    },
 ] as Routes;

@@ -151,13 +151,13 @@
                                                     </span>
                                                 </td>
                                                 <td class="py-2 px-2 border-r w-1/5 text-center">
-                                                    {{flavor.targetQuantity}}
+                                                    {{flavor.targetQuantity}} / {{ getCaseQty(flavor,'Box','targetQuantity') }}
                                                 </td>
                                                 <td class="py-2 px-2 border-r w-1/5 text-center">
-                                                    {{flavor.produced}}
+                                                    {{flavor.produced}} / {{ getCaseQty(flavor,'Box','produced') }}
                                                 </td>
                                                 <td class="py-2 px-2 border-r w-1/5 text-center">
-                                                    {{flavor.remaining}}
+                                                    {{flavor.remaining}} / {{ getCaseQty(flavor,'Box','remaining') }}
                                                 </td>
                                                 }
                                         </tbody>
@@ -297,7 +297,7 @@
                                                                     {{flavor.FlavorName}}
                                                                 </td>
                                                                 <td class="py-2 px-2 border-r w-1/5 text-center">
-                                                                    {{flavor.Qty}}
+                                                                    {{flavor.Qty}} / {{getCaseQty(flavor,'Box','Qty')}}
                                                                 </td>
 
                                                                 }
@@ -380,9 +380,13 @@
                                             <div>
                                                 <bft-input-number name="quantity" label="Quantity Produced"
                                                     [(ngModel)]="productionForm.Qty" placeholder="Enter quantity"
-                                                    required />
+                                                    required (keyup)="updateCaseQty()" />
                                             </div>
-
+                                            <div>
+                                                <bft-input-number name="QtyCase" label="Qty Case"
+                                                [(ngModel)]="productionForm.QtyCase" 
+                                                [disabled]="true" />
+                                            </div>
 
 
 
@@ -492,7 +496,7 @@
                                                 {{record.FlavorName}}
                                             </td>
                                             <td class="py-2 px-2 border-r w-5 text-center">
-                                                {{record.Qty}}
+                                                {{record.Qty}} / {{record.QtyCase}}
                                             </td>
                                             <td class="py-2 px-2 border-r w-20 text-center">
                                                 {{record.ModifiedBy}}
@@ -584,23 +588,23 @@
                                                 </ng-template>
 
                                                 <div class="overflow-x-auto overflow-y-auto max-h-[270px] mt-3">
-                                                    <table class="w-full form-table min-w-[1100px] border-collapse">
+                                                    <table class="w-full form-table min-w-[720px] border-collapse">
                                                         <thead class="sticky top-0 bg-white z-10 p-2">
                                                             <tr>
-                                                                <th class="table-header border border-t-0 w-4/5 text-left ps-5">Flavour</th>
-                                                                <th class="table-header border border-t-0 w-1/5 text-center">Quantity</th>
+                                                                <th class="table-header border border-t-0 w-3/5 text-left ps-5">Flavour</th>
+                                                                <th class="table-header border border-t-0 w-2/5 text-center">Quantity</th>
                                                             </tr>
                                                         </thead>
 
                                                         <tbody>
                                                             @for (flavor of product.flavours; track flavor.id) {
                                                             <tr class="border-b">
-                                                                <td class="py-2 px-2 border-r border-l w-2/5">
+                                                                <td class="py-2 px-2 border-r border-l w-3/5">
                                                                     <span class="flex items-center">
                                                                         <span class="ml-2">{{ flavor.name }}</span>
                                                                     </span>
                                                                 </td>
-                                                                <td class="py-2 px-2 border-r w-1/5 text-center">
+                                                                <td class="py-2 px-2 border-r w-2/5 text-center">
                                                                     <bft-input-number 
                                                                         name="quantity_{{product.productID}}_{{flavor.id}}"
                                                                         [(ngModel)]="shipmentQuantities[product.productID + '_' + flavor.id]"

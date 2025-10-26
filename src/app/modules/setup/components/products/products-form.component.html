@@ -11,6 +11,25 @@
   </div>
 </div>
 
+<div class="grid grid-cols-2 gap-2 mt-2">
+  <div class="w-full">
+    <bft-input-number
+    name="LeafQty"
+    label="Leaf"
+    [(ngModel)]="formData.LeafQty"
+    [skeleton]="isDataLoading"
+  />
+  </div>
+  <div class="w-full">
+    <bft-input-number
+    name="NetWeight"
+    label="Gross Weight"
+    [(ngModel)]="formData.NetWeight"
+    [skeleton]="isDataLoading"
+  />
+  </div>
+</div>
+
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-2">
   <!-- By Pcs -->
   <div>

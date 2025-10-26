@@ -12,5 +12,6 @@ export class InvoiceMaster {
     Others:number = null;
     Total:number = null;
     Notes:string = null;
+    InvoiceRegards:string = "";
     Invoice_Detail:InvoiceDetail[] = [];
 }

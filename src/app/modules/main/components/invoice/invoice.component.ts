@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,6 +26,9 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { InvoiceDetail } from '../../models/invoice-detail';
 import { InvoiceMaster } from '../../models/invoice-master';
+import { Company } from 'app/modules/admin/pages/models/company';
+import { ApiResponse } from 'app/core/Base/interface/IResponses';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
     selector: 'app-invoice',
@@ -56,12 +59,15 @@ export class InvoiceComponent extends BaseComponent<
 > {
     private _DrpService = inject(DrpService);
     private listService = inject(ListService);
+    private _http = inject(HttpClient);
+    private _changeDetectorRef = inject(ChangeDetectorRef);
     private _router = inject(Router);
     componentRegister = componentRegister;
     items: any[] = [];
     customers: any[] = [];
     subTotal: number = null;
-
+    companyInfo: Company = new Company();
+    
     constructor(
         private genSer: GenericService,
         private msgSer: MessageModalService,
@@ -84,6 +90,7 @@ export class InvoiceComponent extends BaseComponent<
 
     public override async AfterInit(): Promise<void> {
         this.addRow();
+        await this.getCompanyInfo();
     }
     public override InitializeObject(): void {
         this.formData = new InvoiceMaster();
@@ -174,6 +181,7 @@ export class InvoiceComponent extends BaseComponent<
                 grouped[item.ProductID] = {
                     ProductID: item.ProductID,
                     name: item.ProductName,
+                    NetWeight: item.NetWeight,
                     flavours: [],
                 };
             }
@@ -214,16 +222,38 @@ export class InvoiceComponent extends BaseComponent<
     getQty(element: InvoiceDetail) {
         if (element.Cases && element.CaseQty) {
             element.Qty = element.Cases * element.CaseQty;
+            this.onItemSelect(element);
             this.getTAmt(element);
         }
     }
 
-   onPrint() {
-  if (this.formData?.InvoiceNo) {
-    const url = `${window.location.origin}/#/report/sale-invoice?invoiceNo=${this.formData.InvoiceNo}`;
-    window.open(url, '_blank');
-    // this.modalRef.close();
-  }
-}
+    onPrint() {
+        if (this.formData?.InvoiceNo) {
+            const url = `${window.location.origin}/#/report/sale-invoice?invoiceNo=${this.formData.InvoiceNo}`;
+            window.open(url, '_blank');
+            // this.modalRef.close();
+        }
+    }
 
+    onItemSelect(element:InvoiceDetail){
+        const product = this.items.find(p => 
+            p.flavours.some(f => f.FlavorID === element.FlavorID)
+        );
+        if(product != null){
+            element.NetWeight = product.NetWeight * element.Cases;     
+        }
+    }
+
+    async getCompanyInfo() {
+        this.companyInfo = new Company();
+        await this._http.get<ApiResponse<Company>>(apiUrls.companyFetch).subscribe({
+            next: (res) => {
+                this.companyInfo = res.Data;
+                if(this.primaryKey == 0){
+                    this.formData.InvoiceRegards = this.companyInfo.Notes;
+                }
+                this._changeDetectorRef.markForCheck();
+            },
+        });
+    }
 }

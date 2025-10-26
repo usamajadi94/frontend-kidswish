@@ -9,6 +9,7 @@ export class CustomerInformation{
     Email: string = '';
     PhoneNo: string = '';
     PhoneNo2: string = '';
+    TL: string = '';
     OpeningBalance: number = 0;
     TotalPurchase: number = 0;
     Payment: number = 0;

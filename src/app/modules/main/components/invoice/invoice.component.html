@@ -43,12 +43,13 @@
         <table class="w-full form-table mt-1 min-w-[780px]">
             <colgroup>
                 <col style="width:10%"> <!-- Item -->
-                <col style="width:25%"> <!-- Item -->
+                <col style="width:20%"> <!-- Item -->
                 <col style="width:10%"> <!-- Case Qty -->
+                <col style="width:10%"> <!-- Netweight -->
                 <col style="width:15%"> <!-- Qty -->
                 <col style="width:15%"> <!-- Sale Price -->
                 <col style="width:15%"> <!-- Total Amount -->
-                <col style="width:10%"> <!-- Action -->
+                <col style="width:5%"> <!-- Action -->
             </colgroup>
 
             <thead class="sticky top-0 bg-white z-10">
@@ -56,6 +57,7 @@
                     <th class="table-header border-r border-l">Case</th>
                     <th class="table-header border-r border-l">Flavor*</th>
                     <th class="table-header border-r ">Case Qty</th>
+                    <th class="table-header border-r ">Gross Weight</th>
                     <th class="table-header border-r ">Total Qty*</th>
                     <th class="table-header border-r ">Sale Pr*</th>
                     <th class="table-header border-r ">Total Amount</th>
@@ -81,7 +83,7 @@
                             <nz-form-control>
                                 <nz-input-group class="non-prefix-select">
                                     <nz-select nzAllowClear nzShowSearch nzPlaceHolder="Select Flavor" class="w-full"
-                                        [(ngModel)]="element.FlavorID">
+                                        [(ngModel)]="element.FlavorID" (ngModelChange)="onItemSelect(element)" >
                                         @for (product of items; track product.ProductID) {
                                         <nz-option-group [nzLabel]="product.name">
                                             @for (flavour of product.flavours; track flavour.FlavorID) {
@@ -101,11 +103,15 @@
                         <bft-input-number name="CaseQty" [(ngModel)]="element.CaseQty" [skeleton]="isDataLoading"
                             (change)="getQty(element)" />
                     </td>
-
+                    <td class="py-0 px-2 border-r border-l">
+                        <bft-input-number name="NetWeight" [required]="true" [(ngModel)]="element.NetWeight"
+                            [skeleton]="isDataLoading" />
+                    </td>
                     <td class="py-0 px-2 border-r border-l">
                         <bft-input-number name="Qty" [required]="true" [(ngModel)]="element.Qty"
                             [skeleton]="isDataLoading" (change)="getTAmt(element)" />
                     </td>
+                    
                     <td class="py-0 px-2 border-r border-l">
                         <bft-input-currency name="Price" [required]="true" [(ngModel)]="element.Price"
                             [skeleton]="isDataLoading" symbol="$" (change)="getTAmt(element)" />
@@ -211,5 +217,11 @@
                 </tr>
             </thead>
         </table>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 gap-2 mt-2">
+    <div class="w-full">
+        <bft-textarea name="InvoiceRegards" label="Invoice Regards" [(ngModel)]="formData.InvoiceRegards" [skeleton]="isDataLoading" />
     </div>
 </div>

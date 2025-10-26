@@ -20,7 +20,10 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 mt-2">
+<div class="grid grid-cols-2 gap-2 mt-2">
+    <div class="w-full">
+        <bft-input-text name="TL" label="TL" [(ngModel)]="formData.TL" [skeleton]="isDataLoading" />
+    </div>
     <div class="w-full">
         <bft-textarea name="Address" label="Address" [(ngModel)]="formData.Address" [skeleton]="isDataLoading" />
     </div>

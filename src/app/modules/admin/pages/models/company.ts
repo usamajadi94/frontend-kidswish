@@ -7,4 +7,5 @@ export class Company {
     Phone: string = null;
     Email: string = null;
     TL: string = null;
+    Notes: string = null;
 }

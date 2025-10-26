@@ -19,6 +19,8 @@ export class apiUrls {
 
     // Setup Module Controllers
     static readonly supplierInformationController = `api/supplierinformation`;
+    static readonly supplierItemsController = `api/supplieritems`;
+    static readonly supplierOrderLedgerController = `api/supplierorderledger`;
     static readonly itemTypeController = `api/itemtype`;
     static readonly customerInformatonController = `api/customerniformation`;
     static readonly vehicleInformationController = `api/vehicleinformation`;
@@ -43,9 +45,10 @@ export class apiUrls {
     
     // Main
     static readonly customerOrderController = `api/customerorder`;
-
+    
     // Factory
-        static readonly productionOrder = `${apiUrls.server}api/factoryproduction`;
-        static readonly shipmentController = `${apiUrls.server}api/shipment`;
-
+    static readonly productionOrder = `${apiUrls.server}api/factoryproduction`;
+    static readonly shipmentController = `${apiUrls.server}api/shipment`;
+    
+    static readonly supplierOrderController = `api/supplierorder`;
 }

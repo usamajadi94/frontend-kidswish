@@ -10,6 +10,9 @@ export class Product {
     BoxPcs: number | null = 1;
     PouchPcs: number | null = null;
     StickerPcs: number | null = null;
+    LeafQty: number | null = null;
+    NetWeight: number | null = null;
+
 }
 
 export class Flavour {

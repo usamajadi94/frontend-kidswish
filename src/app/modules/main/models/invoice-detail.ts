@@ -7,4 +7,5 @@ export class InvoiceDetail {
     NetAmt: number = null;
     Cases: number = null;
     CaseQty: number = 24;
+    NetWeight: number = null;
 }

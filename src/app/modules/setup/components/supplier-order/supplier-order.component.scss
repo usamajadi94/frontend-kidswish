@@ -1,0 +1,168 @@
+/* Master-Detail Form Component Styles */
+
+/* Main container */
+.supplier-order-container {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+}
+
+/* Section headers */
+.section-header {
+  color: #1f2937;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+
+/* Detail table styling */
+.detail-table-container {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.detail-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+}
+
+.detail-table thead {
+  background-color: #f9fafb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.detail-table th {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.detail-table td {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.detail-table tbody tr {
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.detail-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.detail-table tbody tr.selected {
+  background-color: #eff6ff;
+}
+
+/* Detail form panel */
+.detail-form-panel {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.detail-form-field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.detail-form-label {
+  width: 33.333%;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.detail-form-input {
+  width: 66.667%;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  color: #6b7280;
+  padding: 32px 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .detail-form-field {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .detail-form-label {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+  
+  .detail-form-input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .action-buttons bft-button {
+    width: 100%;
+  }
+}
+
+/* Loading states */
+.loading-overlay {
+  position: relative;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Animation for row selection */
+.detail-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.detail-table tbody tr.selected {
+  transform: scale(1.01);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Currency formatting */
+.currency-display {
+  font-weight: 500;
+  color: #059669;
+}
+
+/* Delete button hover effect */
+.delete-button {
+  transition: color 0.2s ease;
+}
+
+.delete-button:hover {
+  color: #dc2626 !important;
+}

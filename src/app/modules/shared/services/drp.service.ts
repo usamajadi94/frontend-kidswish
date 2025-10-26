@@ -60,4 +60,18 @@ export class DrpService {
         console.error('API Error:', error);
         return throwError(() => error);
     }
+
+    getSupplierItemsDrp() {
+        return this._QueryService.getQuery('getSupplierItemsDrp');
+    }
+
+    getProductsDrp() {
+        return this._QueryService.getQuery('getProductsDrp');
+    }
+    
+    getSupplierOrderLedger(supplierordermasterid:string) {
+        return this._QueryService.getQuery('getSupplierOrderLedger',{
+            supplierordermasterid:supplierordermasterid
+        });
+    }
 }

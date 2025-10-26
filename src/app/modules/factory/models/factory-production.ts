@@ -8,6 +8,7 @@ export class FactoryProduction {
     FlavorName: string = '';
     ModifiedBy: string = '';
     ModifiedDate: Date = new Date();
+    QtyCase: number | null = null;
 }
 export class FactorProductionForm {
     ID: number = 0;
@@ -15,4 +16,5 @@ export class FactorProductionForm {
     FlavourID: number | null = null;
     Qty: number | null = null;
     Date: Date = new Date();
+    QtyCase: number | null = null;
 }

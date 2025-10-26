@@ -94,9 +94,9 @@ export class SaleInvoiceComponent {
             });
     }
 
-    getCompanyInfo() {
+    async getCompanyInfo() {
         this.companyInfo = new Company();
-        this._http.get<ApiResponse<Company>>(apiUrls.companyFetch).subscribe({
+        await this._http.get<ApiResponse<Company>>(apiUrls.companyFetch).subscribe({
             next: (res) => {
                 this.companyInfo = res.Data;
                 this.companyInfo.Phone = this.formatPhoneNumber(
@@ -152,6 +152,8 @@ export class SaleInvoiceComponent {
                                 Others: curr.Others,
                                 Total: curr.Total,
                                 Cases: curr.Cases,
+                                TL: curr.TL,
+                                InvoiceRegards: curr.InvoiceRegards,
                                 items: [curr],
                             });
                         }
@@ -241,7 +243,7 @@ export class SaleInvoiceComponent {
                     alignment: 'left',
                 },
                 invoiceTitle: {
-                    fontSize: 15,
+                    fontSize: 18,
                     bold: true,
                     alignment: 'right',
                 },
@@ -293,7 +295,7 @@ export class SaleInvoiceComponent {
                     alignment: 'left',
                 },
                 invoiceTitle: {
-                    fontSize: 15,
+                    fontSize: 18,
                     bold: true,
                     alignment: 'right',
                 },
@@ -382,14 +384,14 @@ export class SaleInvoiceComponent {
                         {
                             width: '35%',
                             stack: [
-                                { text: 'SALE INVOICE', style: 'invoiceTitle' },
+                                { text: 'INVOICE', style: 'invoiceTitle' },
                                 {
                                     text: 'Invoice # : ' + element.InvoiceNo,
                                     style: 'FontStyle',
                                     bold: true,
                                 },
                                 {
-                                    text: `Invoice Date: ${formatDate(
+                                    text: `Date: ${formatDate(
                                         element?.InvoiceDate,
                                         'MM/dd/yyyy',
                                         'en-US'
@@ -434,6 +436,10 @@ export class SaleInvoiceComponent {
                             text: `Email: ${element?.CustomerEmail || '-'}`,
                             style: 'FontStyle',
                         },
+                        {
+                            text: `TL: ${element?.TL || '-'}`,
+                            style: 'FontStyle',
+                        },
                     ],
                     margin: [0, 0, 0, 20],
                 },
@@ -441,7 +447,7 @@ export class SaleInvoiceComponent {
                 // Table Header
                 {
                     table: {
-                        widths: ['8%', '36%', '15%', '15%', '10%', '16%'],
+                        widths: ['8%', '25%','14%', '12%', '15%', '10%', '16%'],
                         body: [
                             [
                                 {
@@ -451,6 +457,11 @@ export class SaleInvoiceComponent {
                                 },
                                 {
                                     text: 'Item',
+                                    style: 'TableHeaderFontSize',
+                                    bold: true,
+                                },
+                                {
+                                    text: 'Gross Weight',
                                     style: 'TableHeaderFontSize',
                                     bold: true,
                                 },
@@ -487,13 +498,12 @@ export class SaleInvoiceComponent {
                                         '',
                                     style: 'TableFontSize',
                                 },
+                                { text: item?.NetWeight, style: 'TableFontSize' },
                                 { text: item?.CaseQty, style: 'TableFontSize' },
                                 { text: item?.Qty, style: 'TableFontSize' },
                                 {
                                     text: this.currencyPipe.transform(
                                         item?.Price,
-                                        '',
-                                        ''
                                     ),
                                     style: 'TableFontSize',
                                 },
@@ -622,7 +632,7 @@ export class SaleInvoiceComponent {
                     alignment: 'center',
                     stack: [
                         {
-                            text: 'Purchaser is responsible for ALL State and Local Taxes.',
+                            text: element?.InvoiceRegards,
                             style: 'FontStyle',
                         },
                         { text: 'Thank You For Your Business!', bold: true },

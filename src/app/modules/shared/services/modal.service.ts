@@ -22,25 +22,26 @@ export class ModalService {
   constructor(
   ) { }
 
-  openModal(config: FormConfig,width:number = 1450): NzModalRef {
-  const modalRef = this.modal.create({
-    nzContent: BftFormComponent,
-    nzData: this.dataInfo(config.ID, config.component, config?.Data),
-    nzFooter: null,
-    nzClassName: 'bft-form',
-    nzWidth: width,
-    nzMaskClosable: false,
-  });
-  return modalRef;
-}
-
-closeModal(result?: any, modalRef?: NzModalRef) {
-  if (modalRef) {
-    modalRef.destroy(result);
-  } else if (this.formModalRef) {
-    this.formModalRef.destroy(true);
+  openModal(config: FormConfig, width: number = 1450): NzModalRef {
+    const modalRef = this.modal.create({
+      nzContent: BftFormComponent,
+      nzData: this.dataInfo(config.ID, config.component, config?.Data),
+      nzFooter: null,
+      nzClassName: 'bft-form',
+      nzWidth: width,
+      nzMaskClosable: false,
+      nzOnCancel: () => this.confirmBeforeClose(modalRef)  // 👈 handle cancel here
+    });
+    return modalRef;
   }
-}
+
+  closeModal(result?: any, modalRef?: NzModalRef) {
+    if (modalRef) {
+      modalRef.destroy(result);
+    } else if (this.formModalRef) {
+      this.formModalRef.destroy(true);
+    }
+  }
 
 
   // openModal(config: FormConfig):NzModalRef {
@@ -58,7 +59,7 @@ closeModal(result?: any, modalRef?: NzModalRef) {
   //     nzMaskClosable: false,
   //     // nzCentered:true
   //   });
-    
+
   //   return this.formModalRef;
 
   // }
@@ -91,10 +92,10 @@ closeModal(result?: any, modalRef?: NzModalRef) {
   }
 
 
-  public confirmModal(config:ConfirmModalConfig = {
-    title:'Confirmation',
-    message:"Are you sure you want to delete this?",
-    icon:"heroicons_outline:question-mark-circle"
+  public confirmModal(config: ConfirmModalConfig = {
+    title: 'Confirmation',
+    message: "Are you sure you want to delete this?",
+    icon: "heroicons_outline:question-mark-circle"
   }): MatDialogRef<FuseConfirmationDialogComponent> {
     return this._fuseConfirmationService
       .open({
@@ -105,9 +106,9 @@ closeModal(result?: any, modalRef?: NzModalRef) {
           name: 'heroicons_outline:exclamation-triangle',
           color: 'warn',
         } : {
-          show:false,
-          name:"",
-          color:"error"
+          show: false,
+          name: "",
+          color: "error"
         },
         actions: {
           confirm: {
@@ -136,7 +137,7 @@ closeModal(result?: any, modalRef?: NzModalRef) {
   public validationModal(validationInfo: Array<any>): NzModalRef {
     const modalRef = this.modal.create({
       nzTitle: "Validation Required",
-      nzContent:ValidationModalComponent,
+      nzContent: ValidationModalComponent,
       nzData: {
         validationInfo: validationInfo
       },
@@ -148,10 +149,10 @@ closeModal(result?: any, modalRef?: NzModalRef) {
     return modalRef;
   }
 
-  public apiValidationModal(Title : string = "Error Occured",validationInfo: Array<any>): NzModalRef {
+  public apiValidationModal(Title: string = "Error Occured", validationInfo: Array<any>): NzModalRef {
     const modalRef = this.modal.create({
       nzTitle: Title,
-      nzContent:ValidationModalComponent,
+      nzContent: ValidationModalComponent,
       nzData: {
         validationInfo: validationInfo
       },
@@ -163,13 +164,29 @@ closeModal(result?: any, modalRef?: NzModalRef) {
     return modalRef;
   }
 
-  private dataInfo(ID: number, component: NzSafeAny,Data: NzSafeAny = {}): NzSafeAny {
+  private dataInfo(ID: number, component: NzSafeAny, Data: NzSafeAny = {}): NzSafeAny {
     const editInfo = {
       ID: ID ? ID : 0,
       component: component,
-      Data:Data
+      Data: Data
     }
     return editInfo;
+  }
+
+  private confirmBeforeClose(modalRef: NzModalRef): boolean {
+
+    this.confirmModal({
+      title:"Confirmation",
+      message:"Are you sure you want to close?",
+      icon:"heroicons_outline:question-mark-circle"
+    }).afterClosed().subscribe(async (res)=>{
+      if(res){
+        modalRef.destroy(undefined);
+      }
+    })
+    
+    // returning false prevents auto close
+    return false;
   }
 }
 export interface ModalConfig {
@@ -185,7 +202,7 @@ export interface FormConfig {
   title: string;
   component: any;
   ID?: number;
-  Data?:any
+  Data?: any
 }
 
 export interface ConfirmModalConfig {

@@ -50,6 +50,13 @@ export class CustomerManagementListComponent extends BaseRoutedComponent {
       type: 'pNumber',
     },
     {
+      header: 'TL',
+      name: 'TL',
+      isSort: true,
+      isFilterList: true,
+      type: 'text',
+    },
+    {
       header: 'Address',
       name: 'Address',
       isSort: true,
