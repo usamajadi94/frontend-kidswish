@@ -591,25 +591,41 @@
                                                     <table class="w-full form-table min-w-[720px] border-collapse">
                                                         <thead class="sticky top-0 bg-white z-10 p-2">
                                                             <tr>
-                                                                <th class="table-header border border-t-0 w-3/5 text-left ps-5">Flavour</th>
-                                                                <th class="table-header border border-t-0 w-2/5 text-center">Quantity</th>
+                                                                <th class="table-header border border-t-0 w-4/10 text-left ps-5">Flavour</th>
+                                                                <th class="table-header border border-t-0 w-2/10 text-center">Price</th>
+                                                                <th class="table-header border border-t-0 w-2/10 text-center">Quantity</th>
+                                                                <th class="table-header border border-t-0 w-2/10 text-center">Total Price</th>
                                                             </tr>
                                                         </thead>
 
                                                         <tbody>
                                                             @for (flavor of product.flavours; track flavor.id) {
                                                             <tr class="border-b">
-                                                                <td class="py-2 px-2 border-r border-l w-3/5">
+                                                                <td class="py-2 px-2 border-r border-l w-4/10">
                                                                     <span class="flex items-center">
                                                                         <span class="ml-2">{{ flavor.name }}</span>
                                                                     </span>
                                                                 </td>
-                                                                <td class="py-2 px-2 border-r w-2/5 text-center">
+                                                                <td class="py-2 px-2 border-r w-2/10 text-center">
+                                                                    <bft-input-currency 
+                                                                        name="price_{{product.productID}}_{{flavor.id}}"
+                                                                        [(ngModel)]="shipmentPrices[product.productID + '_' + flavor.id]"
+                                                                        (keyup)="updateTotal(product.productID,flavor.id)"
+                                                                        symbol="$" />
+                                                                </td>
+                                                                <td class="py-2 px-2 border-r w-2/10 text-center">
                                                                     <bft-input-number 
                                                                         name="quantity_{{product.productID}}_{{flavor.id}}"
                                                                         [(ngModel)]="shipmentQuantities[product.productID + '_' + flavor.id]"
                                                                         placeholder="0"
-                                                                        [min]="0" />
+                                                                        [min]="0" (keyup)="updateTotal(product.productID,flavor.id)"/>
+                                                                </td>
+                                                                <td class="py-2 px-2 border-r w-2/10 text-center">
+                                                                    <bft-input-currency 
+                                                                        name="total_{{product.productID}}_{{flavor.id}}"
+                                                                        [(ngModel)]="shipmentTotals[product.productID + '_' + flavor.id]"
+                                                                        [disabled]="true"
+                                                                        symbol="$" />
                                                                 </td>
                                                             </tr>
                                                             }

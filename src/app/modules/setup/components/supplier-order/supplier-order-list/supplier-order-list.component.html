@@ -8,7 +8,7 @@
         </div>
       </div>
       
-      <bft-table [dataSource]="data" [(isVisible)]="isVisible" [columns]="columns" (view)="onView($event)">
+      <bft-table [dataSource]="data" [(isVisible)]="isVisible" [columns]="columns" (view)="onView($event)" currency="USD" >
       
         <wrapper-add [SCode]="SCode">
           <bft-button name="New" accessKey="n" svgIcon="mat_solid:add" (onClick)="addSupplierInformation()" />

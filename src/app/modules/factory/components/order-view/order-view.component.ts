@@ -31,28 +31,30 @@ import {
     FactorProductionForm,
     FactoryProduction,
 } from '../../models/factory-production';
+import { BftInputCurrencyComponent } from "app/modules/shared/components/fields/bft-input-currency/bft-input-currency.component";
 
 @Component({
     selector: 'app-order-view',
     standalone: true,
     imports: [
-        MatIconModule,
-        MatTabsModule,
-        MatTableModule,
-        MatButtonModule,
-        MatTooltipModule,
-        NzCollapseModule,
-        CommonModule,
-        FormsModule,
-        NzGridModule,
-        NzCardModule,
-        NzTagModule,
-        BftInputDateComponent,
-        BftSelectComponent,
-        BftInputNumberComponent,
-        BftInputTextComponent,
-        BftButtonComponent,
-    ],
+    MatIconModule,
+    MatTabsModule,
+    MatTableModule,
+    MatButtonModule,
+    MatTooltipModule,
+    NzCollapseModule,
+    CommonModule,
+    FormsModule,
+    NzGridModule,
+    NzCardModule,
+    NzTagModule,
+    BftInputDateComponent,
+    BftSelectComponent,
+    BftInputNumberComponent,
+    BftInputTextComponent,
+    BftButtonComponent,
+    BftInputCurrencyComponent
+],
     templateUrl: './order-view.component.html',
     styleUrl: './order-view.component.scss',
     animations: [
@@ -112,7 +114,8 @@ export class OrderViewComponent {
         Date: new Date()
     };
     shipmentQuantities: { [key: string]: number } = {};
-
+    shipmentPrices: { [key: string]: number } = {};
+    shipmentTotals: { [key: string]: number } = {};
     // Mat-table columns
     displayedColumns: string[] = [
         'expand',
@@ -503,12 +506,17 @@ export class OrderViewComponent {
         
         Object.keys(this.shipmentQuantities).forEach(key => {
             const quantity = this.shipmentQuantities[key];
+            const price = this.shipmentPrices[key] || 0;
+            const totalPrice = this.shipmentTotals[key] || (quantity * price);
+
             if (quantity && quantity > 0) {
                 const [productID, flavourID] = key.split('_');
                 shipmentRecords.push({
                     ProductID: parseInt(productID),
                     FlavourID: parseInt(flavourID),
                     Qty: quantity,
+                    Price: price,
+                    TotalPrice: totalPrice,
                     Date: this.shipmentFormData.Date
                 });
             }
@@ -589,4 +597,12 @@ export class OrderViewComponent {
         }
         else { return 0;}
     }
+
+    updateTotal(productID: number, flavourID: number): void {
+        const key = `${productID}_${flavourID}`;
+        const qty = this.shipmentQuantities[key] || 0;
+        const price = this.shipmentPrices[key] || 0;
+        this.shipmentTotals[key] = qty * price;
+    }
+      
 }

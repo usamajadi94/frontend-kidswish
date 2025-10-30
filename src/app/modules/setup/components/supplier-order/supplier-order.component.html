@@ -71,11 +71,11 @@
                     </td>
                     <td class="py-0 px-2 border-r border-l w-20">
                         <bft-input-currency name="Price" [required]="true" [(ngModel)]="element.Price"
-                            [skeleton]="isDataLoading" (change)="getTAmt(element)" />
+                            [skeleton]="isDataLoading" (change)="getTAmt(element)" symbol="$" />
                     </td>
                     <td class="py-0 px-2 border-r border-l w-20">
                         <bft-input-currency name="TotalPrice" [(ngModel)]="element.TotalPrice" [skeleton]="isDataLoading"
-                            [disabled]="true" />
+                            [disabled]="true" symbol="$" />
                     </td>
                     <td class="py-0 px-2 border-r border-l w-10">
                         <bft-input-number name="Badleafs" [required]="true" [(ngModel)]="element.Badleafs"
@@ -83,11 +83,11 @@
                     </td>
                     <td class="py-0 px-2 border-r border-l w-20">
                         <bft-input-currency name="DeductionAmt" [(ngModel)]="element.DeductionAmt"
-                            [skeleton]="isDataLoading" [disabled]="true" />
+                            [skeleton]="isDataLoading" [disabled]="true" symbol="$" />
                     </td>
                     <td class="py-0 px-2 border-r border-l w-20">
                         <bft-input-currency name="NetAmt" [(ngModel)]="element.NetAmt" [skeleton]="isDataLoading"
-                            [disabled]="true" />
+                            [disabled]="true" symbol="$" />
                     </td>
     
                     @if (formData.Supplier_Order_Detail.length > 1) {
@@ -173,28 +173,33 @@
                         <table class="w-full form-table min-w-[1100px] border-collapse">
                           <thead class="sticky top-0 bg-white z-10 p-2">
                           <tr>
-                              <th class="px-2 table-header border border-t-0 w-4/10 text-center">Supplier Item</th>
-                            <th class="px-2 table-header border border-t-0 w-4/10 text-left">Product</th>
+                            <th class="px-2 table-header border border-t-0 w-3/10 text-center">Supplier Item</th>
+                            <th class="px-2 table-header border border-t-0 w-3/10 text-left">Product</th>
                             <th class="px-2 table-header border border-t-0 w-2/10 text-center">Qty</th>
+                            <th class="px-2 table-header border border-t-0 w-2/10 text-center">Case</th>
                             
                           </tr>
                         </thead>
                         <tbody>
                             @for (product of formData.Supplier_Order_Products; track product.ID) {
                                 <tr>
-                                    <td class="py-1 px-2 border-b border-r border-l w-4/10 text-left">
+                                    <td class="py-1 px-2 border-b border-r border-l w-3/10 text-left">
                                         <bft-select name="SupplierItemID" [required]="true" [(ngModel)]="product.SupplierItemID"
                                             [displayList]="supplierProductItems" displayField="Description" valueField="ID"
                                             [skeleton]="isDataLoading"  />
                                     </td>
-                                    <td class="py-1 px-2 border-b border-r border-l w-4/10 text-left">
+                                    <td class="py-1 px-2 border-b border-r border-l w-3/10 text-left">
                                         <bft-select name="ProductID" [required]="true" [(ngModel)]="product.ProductID"
                                             [displayList]="products" displayField="Description" valueField="ID"
                                             [skeleton]="isDataLoading"  />
                                     </td>
                                     <td class="py-1 px-2 border-b border-r w-2/10 text-center">
                                         <bft-input-number name="Qty" [required]="true" [(ngModel)]="product.Qty"
-                                        [skeleton]="isDataLoading" />
+                                        [skeleton]="isDataLoading" (keyup)="updateQtyCase(product)" />
+                                    </td>
+                                    <td class="py-1 px-2 border-b border-r w-2/10 text-center">
+                                        <bft-input-number name="QtyCase" [required]="true" [(ngModel)]="product.QtyCase"
+                                        [skeleton]="isDataLoading" [disabled]="true" />
                                     </td>
                                 </tr>
                             }

@@ -8,4 +8,5 @@ export class Company {
     Email: string = null;
     TL: string = null;
     Notes: string = null;
+    InvoiceNotes: string = null;
 }

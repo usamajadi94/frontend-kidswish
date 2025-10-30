@@ -251,6 +251,7 @@ export class InvoiceComponent extends BaseComponent<
                 this.companyInfo = res.Data;
                 if(this.primaryKey == 0){
                     this.formData.InvoiceRegards = this.companyInfo.Notes;
+                    this.formData.Notes = this.companyInfo.InvoiceNotes;
                 }
                 this._changeDetectorRef.markForCheck();
             },

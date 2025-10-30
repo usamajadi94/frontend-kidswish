@@ -37,15 +37,15 @@
             </td>
             <td class="py-0 px-2 border-r border-l w-30">
                 <bft-input-currency name="Credit{{$index}}" [(ngModel)]="item.Credit" [skeleton]="isDataLoading"
-                    [disabled]="item.ID > 0" />
+                    [disabled]="item.ID > 0" symbol="$" />
             </td>
             <td class="py-0 px-2 border-r border-l w-30">
                 <bft-input-currency name="Debit{{$index}}" [(ngModel)]="item.Debit" [skeleton]="isDataLoading"
-                    [disabled]="item.ID > 0" />
+                    [disabled]="item.ID > 0" symbol="$" />
             </td>
             <td class="py-0 px-2 border-r border-l w-30">
                 <bft-input-currency name="Balance{{$index}}" [(ngModel)]="item.Balance" [skeleton]="isDataLoading"
-                    [disabled]="item.ID > 0" />
+                    [disabled]="item.ID > 0" symbol="$" />
             </td>
             <td class="py-0 px-2 border-r border-l w-30">
                 <bft-input-text name="Remarks{{$index}}" [(ngModel)]="item.Remarks" [skeleton]="isDataLoading"

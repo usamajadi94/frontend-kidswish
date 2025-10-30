@@ -25,6 +25,7 @@ export class componentRegister {
 
     // Main
     static readonly customerOrder:IComponentRegister = {Title:'Customer Order',SCode:"ord_01"};
+    static readonly shipmentView:IComponentRegister = {Title:'Shipment View',SCode:"ord_02"};
     static readonly invoice:IComponentRegister = {Title:'Invoice',SCode:"inv_01"};
 
     // Factory

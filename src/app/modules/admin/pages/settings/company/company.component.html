@@ -45,9 +45,13 @@
             <div class="sm:col-span-2">
                 <bft-input-text name="TL" label="TL" [(ngModel)]="formData.TL" required="true"></bft-input-text>
             </div>
+            
+            <div class="sm:col-span-2">
+                <bft-textarea name="InvoiceNotes" label="Invoice Notes" [(ngModel)]="formData.InvoiceNotes"  />
+            </div>
 
             <div class="sm:col-span-2">
-                <bft-textarea name="Notes" label="Invoice Notes" [(ngModel)]="formData.Notes"  />
+                <bft-textarea name="Notes" label="Invoice Regards" [(ngModel)]="formData.Notes"  />
             </div>
         </div>
 

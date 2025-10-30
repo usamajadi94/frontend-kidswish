@@ -13,7 +13,7 @@
             @for (element of records; track $index) {
 
             <!-- Company Info + Invoice Info -->
-            <div #pageContent class="flex items-start justify-between my-6 invoice-block page-break-avoid">
+            <div #pageContent class="flex items-start justify-between my-5 invoice-block page-break-avoid">
                 <div class="flex items-start gap-4 w-2/3">
 
                      <div>
@@ -40,7 +40,7 @@
             </div>
 
             <!-- Ship To -->
-            <div #pageContent class="grid grid-cols-2 gap-8 text-sm mb-6 page-break-avoid">
+            <div #pageContent class="grid grid-cols-2 gap-8 text-sm mb-5 page-break-avoid">
                
                         <div>
                     <div class="text-lg text-[#105ec6] mb-2 font-semibold">Ship To</div>
@@ -66,24 +66,24 @@
             <div #pageContent class="text-sm mt-4 page-break-avoid">
                 <div class="grid grid-cols-12 font-semibold px-2 text-gray-600 border-b border-gray-300 pb-2">
                     <div class="col-span-1">Cases</div>
-                    <div class="col-span-2">Item</div>
-                    <div class="col-span-1">Gross Weight</div>
-                    <div class="col-span-2">Case Qty</div>
-                    <div class="col-span-2">Total Qty</div>
-                    <div class="col-span-2">Price</div>
+                    <div class="col-span-3">Item</div>
+                    <div class="col-span-1 text-center">Gross Weight</div>
+                    <div class="col-span-2 text-center">Case Qty</div>
+                    <div class="col-span-2 text-center">Total Qty</div>
+                    <div class="col-span-1 text-center">Price</div>
                     <div class="col-span-2 text-right">Total</div>
                 </div>
             </div>
 
             <!-- Table Body -->
             @for (item of element.items; track $index) {
-            <div #pageContent class="grid grid-cols-12 text-sm py-1 px-2 border-b border-gray-100 page-break-avoid">
+            <div #pageContent class="grid grid-cols-12 text-sm  px-2 border-b border-gray-100 page-break-avoid">
                 <div class="col-span-1">{{item.Cases}}</div>
-                <div class="col-span-2">{{item.Item | uppercase}}</div>
-                <div class="col-span-1">{{item.NetWeight}}</div>
-                <div class="col-span-2">{{item.CaseQty}}</div>
-                <div class="col-span-2">{{item.Qty}}</div>
-                <div class="col-span-2">{{item.Price | currency}}</div>
+                <div class="col-span-3">{{item.Item | uppercase}}</div>
+                <div class="col-span-1 text-center">{{item.NetWeight}}</div>
+                <div class="col-span-2 text-center">{{item.CaseQty}}</div>
+                <div class="col-span-2 text-center">{{item.Qty}}</div>
+                <div class="col-span-1 text-center">{{item.Price | currency}}</div>
                 <div class="col-span-2 text-right">{{item.NetAmt | currency}}</div>
             </div>
             }

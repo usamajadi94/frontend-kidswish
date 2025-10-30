@@ -114,8 +114,8 @@ export class UserComponent implements OnInit, OnDestroy {
     }
 
    settings(): void {
-    // this._router.navigate(['/pages/settings']);
-    this._router.navigate(['/factory/dashboard']);
+    this._router.navigate(['/pages/settings']);
+    // this._router.navigate(['/factory/dashboard']);
 }
 
 }

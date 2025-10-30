@@ -93,7 +93,6 @@ export class SupplierOrderComponent extends BaseComponent<
     this.addProductRow()
     this.setProductItems();
   }
-  
 
   addRow() {
     this.formData.Supplier_Order_Detail.push(
@@ -156,10 +155,10 @@ export class SupplierOrderComponent extends BaseComponent<
     return this.validation.length > 0;
   }
 
-  onItemSelect(element:Supplier_Order_Detail){
-    if(element.SupplierItemID){
-      const supplierItems = this.supplierItems.filter(a=> a.ID === element.SupplierItemID);
-      if(supplierItems.length > 0){
+  onItemSelect(element: Supplier_Order_Detail) {
+    if (element.SupplierItemID) {
+      const supplierItems = this.supplierItems.filter(a => a.ID === element.SupplierItemID);
+      if (supplierItems.length > 0) {
         element.Price = supplierItems[0]?.Price;
         this.getTAmt(element);
       }
@@ -168,27 +167,27 @@ export class SupplierOrderComponent extends BaseComponent<
   }
 
   openLedger() {
-    if(this.formData.SupplierID){
-      const supplier = this.suppliers.filter(a=> a.ID === this.formData.SupplierID);
-      if(supplier.length > 0){
+    if (this.formData.SupplierID) {
+      const supplier = this.suppliers.filter(a => a.ID === this.formData.SupplierID);
+      if (supplier.length > 0) {
 
         this.modalSer
-        .openModal({
+          .openModal({
             component: SupplierOrderLedgerComponent,
             title: componentRegister.supplierLedger.Title,
             ID: 0,
-            Data:{
-              SupplierName:supplier[0]?.Description,
-              SupplierOrderMasterID:this.primaryKey,
-              OrderDate:this.formData.Date
+            Data: {
+              SupplierName: supplier[0]?.Description,
+              SupplierOrderMasterID: this.primaryKey,
+              OrderDate: this.formData.Date
             }
-        })
+          })
       }
     }
-    
+
   }
 
-  getTAmt(element:Supplier_Order_Detail){
+  getTAmt(element: Supplier_Order_Detail) {
     element.TotalPrice = (element.Qty ?? 0) * (element.Price ?? 0);
     let badleafsAmount = ((element.Badleafs ?? 0) / (element.Qty ?? 1)) * (element.TotalPrice ?? 0);
     element.DeductionAmt = badleafsAmount;
@@ -197,13 +196,37 @@ export class SupplierOrderComponent extends BaseComponent<
   }
 
 
-  setProductItems(){
-    const supplierItemIDs = this.formData.Supplier_Order_Detail.map(a=> a.SupplierItemID);
+  setProductItems() {
+    const supplierItemIDs = this.formData.Supplier_Order_Detail.map(a => a.SupplierItemID);
     const filteredSupplierItems = this.supplierItems.filter(item =>
       supplierItemIDs.includes(item.ID)
     );
     this.supplierProductItems = filteredSupplierItems;
   }
 
+  updateQtyCase(product: Supplier_Order_Products) {
+    if (product.ProductID && product.Qty) {
+      const productFind = this.products.find(a => a.ID == product.ProductID);
+      if (productFind['BoxCase'] > 0) {
+        product.QtyCase =  Math.floor(product.Qty / productFind['BoxCase']);
+      }
+      else {
+        product.QtyCase = 0;
+      }
+    }
+  }
+
+  public BeforeUpSert(formData: SupplierOrderMaster): void {
+    this.formData.Supplier_Order_Products = this.formData.Supplier_Order_Products.filter(item => {
+      // Return true only if at least one of these fields has a meaningful value
+      return (
+        item.ProductID != null ||
+        item.SupplierItemID != null ||
+        item.Qty != null && item.Qty > 0 ||
+        item.LeafUsed != null && item.LeafUsed > 0 ||
+        item.QtyCase != null && item.QtyCase > 0
+      );
+    });
+  }
 
 }

@@ -12,6 +12,7 @@ export class Product {
     StickerPcs: number | null = null;
     LeafQty: number | null = null;
     NetWeight: number | null = null;
+    ActualNetWeight: number | null = null;
 
 }
 

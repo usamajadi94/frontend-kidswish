@@ -14,7 +14,7 @@ import { ReportPdfService } from 'app/modules/shared/services/report-pdf.service
 import { ReportService } from 'app/modules/shared/services/report.service';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzModalModule } from 'ng-zorro-antd/modal';
-import { Subject, takeUntil } from 'rxjs';
+import { lastValueFrom, Subject, takeUntil } from 'rxjs';
 import { BftButtonComponent } from '../../shared/components/buttons/bft-button/bft-button.component';
 import { BftInputDateComponent } from '../../shared/components/fields/bft-input-date/bft-input-date.component';
 import { BftInputTextComponent } from '../../shared/components/fields/bft-input-text/bft-input-text.component';
@@ -96,15 +96,19 @@ export class SaleInvoiceComponent {
 
     async getCompanyInfo() {
         this.companyInfo = new Company();
-        await this._http.get<ApiResponse<Company>>(apiUrls.companyFetch).subscribe({
-            next: (res) => {
-                this.companyInfo = res.Data;
-                this.companyInfo.Phone = this.formatPhoneNumber(
-                    this.companyInfo.Phone
-                );
-                this._changeDetectorRef.markForCheck();
-            },
-        });
+        this.companyInfo = (await lastValueFrom(this._http.get<ApiResponse<Company>>(apiUrls.companyFetch)))?.Data;
+        this.companyInfo.Phone = this.formatPhoneNumber(
+            this.companyInfo.Phone
+        );
+        // await this._http.get<ApiResponse<Company>>(apiUrls.companyFetch).subscribe({
+        //     next: (res) => {
+        //         this.companyInfo = res.Data;
+        //         this.companyInfo.Phone = this.formatPhoneNumber(
+        //             this.companyInfo.Phone
+        //         );
+        //         this._changeDetectorRef.markForCheck();
+        //     },
+        // });
     }
 
     getCustomers() {

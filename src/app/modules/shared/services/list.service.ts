@@ -124,4 +124,10 @@ export class ListService {
     getSupplierOrders() {
         return this._QueryService.getQuery('getSupplierOrders');
     }
+
+    getShipments(month: Date | null) {
+        return this._QueryService.getQuery('getShipments', {
+            month: month || '',
+        });
+    }
 }

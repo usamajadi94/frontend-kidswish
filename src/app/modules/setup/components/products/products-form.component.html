@@ -15,18 +15,30 @@
   <div class="w-full">
     <bft-input-number
     name="LeafQty"
-    label="Leaf"
+    label="Leaf (Single Pouch)"
     [(ngModel)]="formData.LeafQty"
     [skeleton]="isDataLoading"
   />
   </div>
   <div class="w-full">
-    <bft-input-number
-    name="NetWeight"
-    label="Gross Weight"
-    [(ngModel)]="formData.NetWeight"
-    [skeleton]="isDataLoading"
-  />
+    <div class="grid grid-cols-2 gap-2">
+      <div class="w-full">
+        <bft-input-number
+          name="ActualNetWeight"
+          label="Net Weight"
+          [(ngModel)]="formData.ActualNetWeight"
+          [skeleton]="isDataLoading"
+        />
+      </div>
+      <div class="w-full">
+        <bft-input-number
+          name="NetWeight"
+          label="Gross Weight"
+          [(ngModel)]="formData.NetWeight"
+          [skeleton]="isDataLoading"
+        />
+      </div>
+    </div>
   </div>
 </div>
 
