@@ -222,12 +222,21 @@ export class SaleInvoiceComponent {
         );
     }
 
+    // getTotal(element: any, columnName: string): number {
+    //     return element.items?.reduce(
+    //         (sum, item) => sum + (item[columnName] || 0),
+    //         0
+    //     );
+    // }
+
     getTotal(element: any, columnName: string): number {
-        return element.items?.reduce(
-            (sum, item) => sum + (item[columnName] || 0),
-            0
-        );
-    }
+    const total = element.items?.reduce(
+        (sum, item) => sum + (item[columnName] || 0),
+        0
+    ) || 0;
+
+    return Math.round(total * 100) / 100; // 2 decimal places
+}
 
     onPageIndexChanged(pageIndex: number) {
         this.currentPageIndex = pageIndex;
@@ -528,15 +537,21 @@ export class SaleInvoiceComponent {
                 // Totals Row
                 {
                     table: {
-                        widths: ['8%', '36%', '15%','15%', '10%', '16%'],
+                         widths: ['8%', '25%','14%', '12%', '15%', '10%', '16%'],
+                        // widths: ['8%', '36%', '15%','15%', '10%', '16%'],
                         body: [
                             [
                                 {
                                     text: this.getTotal(element, 'Cases'),
                                     style: 'TotalStyle',
                                 },
+                               
                                 {
                                     text: '',
+                                },
+                                 {
+                                    text: this.getTotal(element, 'NetWeight'),
+                                    style: 'TotalStyle',
                                 },
                                 {
                                     text: '',

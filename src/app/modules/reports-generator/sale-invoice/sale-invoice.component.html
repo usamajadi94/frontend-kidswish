@@ -92,10 +92,12 @@
             <div #pageContent class="mt-4 text-sm page-break-avoid">
                 <div class="grid grid-cols-12 bg-gray-100 py-2 px-2 font-bold text-gray-700 border-t border-b">
                     <div class="col-span-1">{{getTotal(element,'Cases') }}</div>
-                    <div class="col-span-5"></div>
-                    <div class="col-span-2">{{ getTotal(element,'Qty') }}</div>
-                    <!-- <div class="col-span-2">{{ getTotal(element,'Price') | currency : ' ' }}</div> -->
+                    <div class="col-span-3"></div>
+                    <div class="col-span-1 text-center">{{ getTotal(element,'NetWeight') }}</div>
                     <div class="col-span-2"></div>
+                    <div class="col-span-2 text-center">{{ getTotal(element,'Qty') }}</div>
+                    <!-- <div class="col-span-2">{{ getTotal(element,'Price') | currency : ' ' }}</div> -->
+                    <div class="col-span-1"></div>
                     <div class="col-span-2 text-right">{{ getTotal(element,'NetAmt') | currency  }}</div>
                 </div>
             </div>
