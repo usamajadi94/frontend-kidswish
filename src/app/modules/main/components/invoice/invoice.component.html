@@ -1,4 +1,4 @@
-<div class="flex  justify-end  gap-4 items-center w-full">
+<!-- <div class="flex  justify-end  gap-4 items-center w-full">
     @if (formData.InvoiceNo && primaryKey > 0) {
 
      <div>
@@ -15,8 +15,22 @@
    
     }
 
-</div>
+</div> -->
 
+@if (primaryKey > 0) {
+
+    <div class="grid grid-cols-3 gap-2 mt-2 items-end">
+        <div class="w-full">
+            <bft-input-number name="InvoiceNo" [required]="true" label="Invoice #" [(ngModel)]="formData.InvoiceNo"
+                [skeleton]="isDataLoading" />
+        </div>
+        <div class="col-span-2 w-full flex justify-end">
+            <div class="pb-2">
+                <bft-button name="Print" icon="print"  class="py-1" (onClick)="onPrint()"/>
+            </div>
+        </div>
+    </div>
+}
 
 <div class="grid grid-cols-3 gap-2 mt-2">
     <div class="w-full">
