@@ -138,10 +138,147 @@ const theming = plugin.withOptions(
                 console.error(err);
             }
 
+            /* Check if file has manually added content (like neutral palette for medcloud) */
+            let manualNeutralContent = '';
+            let hasMedcloudTheme = false;
+            let existingMedcloudContent = '';
+            
+            if (data) {
+                // Check if medcloud theme exists in current file
+                hasMedcloudTheme = data.includes('medcloud:');
+                
+                if (hasMedcloudTheme) {
+                    // Extract the entire medcloud theme section from current file
+                    const medcloudStart = data.indexOf('medcloud:');
+                    if (medcloudStart !== -1) {
+                        // Find the end of medcloud theme (look for closing ))) or ),)
+                        let depth = 0;
+                        let startFound = false;
+                        let medcloudEnd = medcloudStart;
+                        
+                        for (let i = medcloudStart; i < data.length; i++) {
+                            if (data[i] === '(') {
+                                depth++;
+                                startFound = true;
+                            } else if (data[i] === ')') {
+                                depth--;
+                                if (startFound && depth === 0) {
+                                    // Check if this is the end of medcloud theme (followed by , or ))
+                                    const nextChars = data.substring(i + 1, i + 3);
+                                    if (nextChars.startsWith(')') || nextChars.startsWith(',')) {
+                                        medcloudEnd = i + (nextChars.startsWith('))') ? 3 : 2);
+                                        break;
+                                    } else if (data[i + 1] === ',' || (i + 1 < data.length && data[i + 1] === ' ')) {
+                                        medcloudEnd = i + 2;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (medcloudEnd > medcloudStart) {
+                            existingMedcloudContent = data.substring(medcloudStart, medcloudEnd).trim();
+                            // Extract neutral palette if exists
+                            if (existingMedcloudContent.includes('neutral:')) {
+                                const neutralMatch = existingMedcloudContent.match(/neutral:\s*\([\s\S]*?\)\)/);
+                                if (neutralMatch) {
+                                    manualNeutralContent = neutralMatch[0].trim();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* Check if generated sassMap has medcloud theme */
+            const generatedHasMedcloud = sassMap.includes('medcloud:');
+            
+            /* If current file has medcloud but generated map doesn't, merge it into generated map */
+            if (hasMedcloudTheme && !generatedHasMedcloud && existingMedcloudContent) {
+                // Insert medcloud theme before the closing )); of the sassMap
+                // Find the last occurrence of )) before the closing ;
+                const lastBraceIndex = sassMap.lastIndexOf('))');
+                if (lastBraceIndex !== -1) {
+                    // Insert medcloud theme before the last ))
+                    sassMap = sassMap.substring(0, lastBraceIndex) + 
+                              ',\n    ' + existingMedcloudContent + 
+                              sassMap.substring(lastBraceIndex);
+                }
+            }
+            
             /* Write the file if the map has been changed */
             if (data !== sassMap) {
                 try {
-                    fs.writeFileSync(filename, sassMap, { encoding: 'utf8' });
+                    let finalSassMap = sassMap;
+                    
+                    // If manually added neutral content exists for medcloud, preserve it
+                    if (manualNeutralContent) {
+                        // Check if medcloud exists in final sassMap (either from generation or merge)
+                        const finalHasMedcloud = finalSassMap.includes('medcloud:');
+                        
+                        if (finalHasMedcloud) {
+                            // Find medcloud theme end - look for warn))) pattern
+                            // Multiple patterns to match different formatting
+                            const patterns = [
+                                /(medcloud:\s*\([\s\S]*?warn:[\s\S]*?DEFAULT:\s*#FFFFFF\)\)\))/,
+                                /(medcloud:[\s\S]*?warn:[\s\S]*?DEFAULT:\s*#FFFFFF\)\)\))/,
+                                /(medcloud:\s*\([\s\S]*?warn:[\s\S]*?DEFAULT:\s*#FFFFFF\)\s*\)\s*\))/,
+                            ];
+                            
+                            let replaced = false;
+                            for (const pattern of patterns) {
+                                if (pattern.test(finalSassMap)) {
+                                    finalSassMap = finalSassMap.replace(
+                                        pattern,
+                                        (match) => {
+                                            // Only add neutral if it's not already there
+                                            if (!match.includes('neutral:')) {
+                                                return match.replace(/\)\)\)$/, `,\n        ${manualNeutralContent}\n    )))`);
+                                            }
+                                            return match;
+                                        }
+                                    );
+                                    replaced = true;
+                                    break;
+                                }
+                            }
+                            
+                            // If no pattern matched, try to find medcloud and add neutral before last ))
+                            if (!replaced) {
+                                const medcloudIndex = finalSassMap.indexOf('medcloud:');
+                                if (medcloudIndex !== -1) {
+                                    // Find the end of medcloud theme
+                                    let depth = 0;
+                                    let foundStart = false;
+                                    let endIndex = medcloudIndex;
+                                    
+                                    for (let i = medcloudIndex; i < finalSassMap.length; i++) {
+                                        if (finalSassMap[i] === '(') {
+                                            depth++;
+                                            foundStart = true;
+                                        } else if (finalSassMap[i] === ')') {
+                                            depth--;
+                                            if (foundStart && depth === 0) {
+                                                const next = finalSassMap.substring(i + 1, i + 3);
+                                                if (next === '))' || next.startsWith(')')) {
+                                                    endIndex = i + (next === '))' ? 3 : 2);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    if (endIndex > medcloudIndex && !finalSassMap.substring(medcloudIndex, endIndex).includes('neutral:')) {
+                                        finalSassMap = finalSassMap.substring(0, endIndex - 2) + 
+                                                      ',\n        ' + manualNeutralContent + '\n    ' + 
+                                                      finalSassMap.substring(endIndex - 2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    fs.writeFileSync(filename, finalSassMap, { encoding: 'utf8' });
                 } catch (err) {
                     console.error(err);
                 }

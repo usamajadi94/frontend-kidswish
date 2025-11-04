@@ -24,16 +24,35 @@
                         "tsConfig": "tsconfig.app.json",
                         "inlineStyleLanguage": "scss",
                         "allowedCommonJsDependencies": [
-                            "apexcharts",
                             "crypto-js/enc-utf8",
                             "crypto-js/hmac-sha256",
                             "crypto-js/enc-base64",
-                            "quill-delta"
+                            "html2pdf.js",
+                            "pdfmake/build/pdfmake"
                         ],
                         "assets": [
                             {
                                 "glob": "**/*",
-                                "input": "public"
+                                "input": "public",
+                                "ignore": [
+                                    "**/*.md",
+                                    "**/*.txt",
+                                    "**/images/apps/ecommerce/**",
+                                    "**/images/apps/contacts/**",
+                                    "**/images/apps/mailbox/**",
+                                    "**/images/cards/**",
+                                    "**/images/pages/**",
+                                    "**/images/ui/**",
+                                    "**/images/avatars/**",
+                                    "**/images/flags/TR.svg",
+                                    "**/fonts/pdfMake/Poppins-Thin*.ttf",
+                                    "**/fonts/pdfMake/Poppins-ExtraLight*.ttf",
+                                    "**/fonts/pdfMake/Poppins-Light*.ttf",
+                                    "**/fonts/pdfMake/Poppins-Medium*.ttf",
+                                    "**/fonts/pdfMake/Poppins-SemiBold*.ttf",
+                                    "**/fonts/pdfMake/Poppins-ExtraBold*.ttf",
+                                    "**/fonts/pdfMake/Poppins-Black*.ttf"
+                                ]
                             },
                             {
                                 "glob": "_redirects",
@@ -63,19 +82,38 @@
                                     "with": "src/environments/environment.prd.ts"
                                 }
                             ],
+                            "optimization": {
+                                "scripts": true,
+                                "styles": {
+                                    "minify": true,
+                                    "inlineCritical": true
+                                },
+                                "fonts": false
+                            },
+                            "deleteOutputPath": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "namedChunks": false,
+                            "extractLicenses": true,
+                            "progress": false,
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "3mb",
-                                    "maximumError": "5mb"
+                                    "maximumWarning": "3.2mb",
+                                    "maximumError": "3.5mb"
                                 },
                                 {
                                     "type": "anyComponentStyle",
-                                    "maximumWarning": "75kb",
-                                    "maximumError": "90kb"
+                                    "maximumWarning": "50kb",
+                                    "maximumError": "70kb"
+                                },
+                                {
+                                    "type": "bundle",
+                                    "name": "polyfills",
+                                    "maximumWarning": "80kb",
+                                    "maximumError": "120kb"
                                 }
-                            ],
-                            "outputHashing": "all"
+                            ]
                         },
                         "development": {
                             "optimization": false,

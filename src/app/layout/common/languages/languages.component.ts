@@ -63,7 +63,6 @@ export class LanguagesComponent implements OnInit, OnDestroy {
         // Set the country iso codes for languages for flags
         this.flagCodes = {
             en: 'us',
-            es: 'es',
         };
     }
 
@@ -90,8 +89,7 @@ export class LanguagesComponent implements OnInit, OnDestroy {
             const win: any = window as any;
             const gt = win.google && win.google.translate;
             const targetMap: Record<string, string> = {
-                en: 'en',
-                es: 'es'
+                en: 'en'
             };
             const target = targetMap[lang] || 'en';
 
