@@ -13,9 +13,6 @@ import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { FusePlatformService } from '@fuse/services/platform';
 import { FUSE_VERSION } from '@fuse/version';
 import { Subject, combineLatest, filter, map, takeUntil } from 'rxjs';
-import { SettingsComponent } from './common/settings/settings.component';
-import { ClassicLayoutComponent } from './layouts/vertical/classic/classic.component';
-import { ClassyLayoutComponent } from './layouts/vertical/classy/classy.component';
 import { CompactLayoutComponent } from './layouts/vertical/compact/compact.component';
 import { EmptyLayoutComponent } from './layouts/empty/empty.component';
 import { ModernLayoutComponent } from './layouts/horizontal/modern/modern.component';
@@ -28,10 +25,7 @@ import { ModernLayoutComponent } from './layouts/horizontal/modern/modern.compon
     standalone: true,
     imports: [
         EmptyLayoutComponent,
-        ClassicLayoutComponent,
-        ClassyLayoutComponent,
         CompactLayoutComponent,
-        SettingsComponent,
         ModernLayoutComponent
     ],
 })

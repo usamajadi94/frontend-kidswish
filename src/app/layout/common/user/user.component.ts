@@ -15,9 +15,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { Router } from '@angular/router';
 import { UserService } from 'app/core/user/user.service';
-import { CurrentUser, User } from 'app/core/user/user.types';
+import { CurrentUser } from 'app/core/user/user.types';
 import { Subject, takeUntil } from 'rxjs';
-import { SettingsComponent } from '../settings/settings.component';
 
 @Component({
     selector: 'user',
@@ -32,7 +31,6 @@ import { SettingsComponent } from '../settings/settings.component';
         MatIconModule,
         NgClass,
         MatDividerModule,
-        SettingsComponent
     ],
 })
 export class UserComponent implements OnInit, OnDestroy {

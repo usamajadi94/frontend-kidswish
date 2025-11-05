@@ -1,11 +1,3 @@
-export interface User {
-    id: string;
-    name: string;
-    email: string;
-    avatar?: string;
-    status?: string;
-}
-
 export class CurrentUser {
     UserID: string | null = null;
     FirstName: string | null = null;

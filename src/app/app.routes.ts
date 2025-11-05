@@ -81,7 +81,6 @@ export const appRoutes: Route[] = [
             initialData: initialDataResolver
         },
         children: [
-            {path: 'example', loadChildren: () => import('app/modules/admin/example/example.routes')},
             {path: 'home', loadChildren: () => import('app/modules/landing/home/home.routes')},
             {path: 'setup', loadChildren: () => import('app/modules/setup/setup.routes')},
             {path: 'report', loadChildren: () => import('app/modules/reports-generator/report.routes')},
@@ -90,36 +89,11 @@ export const appRoutes: Route[] = [
             {path: 'factory', loadChildren: () => import('app/modules/factory/factory.routes')},
             // Pages
             {path: 'pages', children: [
-
-               
-
                 // Authentication
                 {path: 'authentication', loadChildren: () => import('app/modules/admin/pages/authentication/authentication.routes')},
-
-                // Coming Soon
-                {path: 'coming-soon', loadChildren: () => import('app/modules/admin/pages/coming-soon/coming-soon.routes')},
-
-                // Error
-                {path: 'error', children: [
-                    {path: '404', loadChildren: () => import('app/modules/admin/pages/error/error-404/error-404.routes')},
-                    {path: '500', loadChildren: () => import('app/modules/admin/pages/error/error-500/error-500.routes')}
-                ]},
-
-               
-
-                // Maintenance
-                {path: 'maintenance', loadChildren: () => import('app/modules/admin/pages/maintenance/maintenance.routes')},
-
-               
-
-                // Profile
-                {path: 'profile', loadChildren: () => import('app/modules/admin/pages/profile/profile.routes')},
-
                 // Settings
                 {path: 'settings', loadChildren: () => import('app/modules/admin/pages/settings/settings.routes')},
             ]},
-
-          
 
             // 404 & Catch all
             {path: '404-not-found', pathMatch: 'full', loadChildren: () => import('app/modules/admin/pages/error/error-404/error-404.routes')},

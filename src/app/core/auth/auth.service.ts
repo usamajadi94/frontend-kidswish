@@ -3,7 +3,6 @@ import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { UserService } from 'app/core/user/user.service';
-import { user as userData } from 'app/mock-api/common/user/data';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { BehaviorSubject, catchError, filter, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
 import { ApiResponse } from '../Base/interface/IResponses';
@@ -11,7 +10,7 @@ import { LocalStorageService } from './localStorage.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-    private _user: any = userData;
+
     private _authenticated: boolean = false;
     private _httpClient = inject(HttpClient);
     private _userService = inject(UserService);

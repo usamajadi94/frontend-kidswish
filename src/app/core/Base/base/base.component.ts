@@ -12,7 +12,7 @@ import { GenericService } from '../services/generic.service';
     selector: 'app-base',
     standalone: true,
     imports: [],
-    templateUrl: './base.component.html',
+    template: ``,
 })
 export class BaseComponent<T, Component> {
     readonly nzModalData: any = inject(NZ_MODAL_DATA);
