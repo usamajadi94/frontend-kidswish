@@ -49,13 +49,13 @@ export class InvoiceListComponent  extends BaseRoutedComponent {
       isFilterList: true,
       type: 'currency',
     },
-    {
-      header: 'Notes',
-      name: 'Notes',
-      isSort: true,
-      isFilterList: true,
-      type: 'text',
-    },
+    // {
+    //   header: 'Notes',
+    //   name: 'Notes',
+    //   isSort: true,
+    //   isFilterList: true,
+    //   type: 'text',
+    // },
     {
       header: 'Modified By',
       name: 'ModifiedBy',

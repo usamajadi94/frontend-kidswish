@@ -5,6 +5,7 @@ import {
     HttpRequest,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from 'app/core/auth/auth.service';
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { apiUrls } from 'app/modules/shared/services/api-url';
@@ -23,6 +24,7 @@ export const authInterceptor = (
 ): Observable<HttpEvent<unknown>> => {
     const authService = inject(AuthService);
     const _localStorage = inject(LocalStorageService);
+    const _router = inject(Router);
 
     const excludedUrls: string[] = [
         `${apiUrls.login}`,
@@ -60,7 +62,8 @@ export const authInterceptor = (
                     return authService.refreshAccessToken().pipe(
                         switchMap((newToken) => next(attachAuth(req, newToken))),
                         catchError((refreshErr) => {
-                            authService.signOut();
+                            // authService.signOut();
+                            _router.navigate(['/sign-out']);
                             return throwError(refreshErr);
                         })
                     );
@@ -75,7 +78,8 @@ export const authInterceptor = (
         return authService.refreshAccessToken().pipe(
             switchMap((newToken) => next(attachAuth(req, newToken))),
             catchError((refreshErr) => {
-                authService.signOut();
+                // authService.signOut();
+                _router.navigate(['/sign-out']);
                 return throwError(refreshErr);
             })
         );
@@ -85,7 +89,8 @@ export const authInterceptor = (
     return next(req).pipe(
         catchError((error) => {
             if (error instanceof HttpErrorResponse && error.status === 401) {
-                authService.signOut();
+                // authService.signOut();
+                _router.navigate(['/sign-out']);
             }
             return throwError(error);
         })

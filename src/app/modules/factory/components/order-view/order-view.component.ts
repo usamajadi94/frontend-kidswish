@@ -604,5 +604,14 @@ export class OrderViewComponent {
         const price = this.shipmentPrices[key] || 0;
         this.shipmentTotals[key] = qty * price;
     }
+
+    getShipmentCases(productID: number, flavourID: number, flavor: any): number {
+        const key = `${productID}_${flavourID}`;
+        const qty = this.shipmentQuantities[key] || 0;
+        if (qty && flavor.BoxCase > 0) {
+            return Math.floor(qty / flavor.BoxCase);
+        }
+        return 0;
+    }
       
 }
