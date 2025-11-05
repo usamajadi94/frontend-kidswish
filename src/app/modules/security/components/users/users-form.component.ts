@@ -103,6 +103,11 @@ export class UsersFormComponent extends BaseComponent<
         if (formData.Email == null || formData.Email.trim() == '') {
             this.validation.push('Email is required.');
         }
+        // Check if at least one permission group is selected
+        const hasSelectedGroup = this.permissionGroups.some(group => group.selected);
+        if (!hasSelectedGroup) {
+            this.validation.push('At least one permission must be selected.');
+        }
         return this.validation.length > 0;
     }
 

@@ -12,6 +12,7 @@ export class Rbac_User {
     RBAC_User_Entity_Groups: RBAC_User_Entity_Groups[] = [];
     SCode: string = componentRegister.user.SCode;
     IsCustomer:boolean = false;
+    IsActive:boolean = true;
 }
 
 export class RBAC_User_Entity_Groups {
