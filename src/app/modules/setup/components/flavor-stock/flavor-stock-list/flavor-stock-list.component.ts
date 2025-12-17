@@ -150,6 +150,7 @@ export class FlavorStockListComponent
         this._listService.getProductWithFlavor().subscribe({
             next: (res) => {
                 this.groupedPacks = this.groupByProduct(res);
+                debugger
                 this.combineProductAndStock();
             },
             error: (err) => {
@@ -175,6 +176,7 @@ export class FlavorStockListComponent
                 FlavorID: item.FlavorID,
                 name: item.FlavorName,
                 Stock: item.Stock || 0,
+                BoxCase: item.BoxCase || 0,
             });
         });
 

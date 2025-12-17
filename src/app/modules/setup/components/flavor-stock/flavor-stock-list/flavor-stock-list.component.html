@@ -79,7 +79,7 @@
                           {{ row.FlavorName || row.FlavourName || row.name }}
                         </td>
                         <td class="py-3 px-4 border-l border-r w-2/5 text-left">
-                          {{ row.UpdatedStock ?? row.Stock ?? 0 }}
+                          {{ row.UpdatedStock ?? row.Stock  ?? 0 }} / {{ row.Stock / row.BoxCase}}
                         </td>
 
                         

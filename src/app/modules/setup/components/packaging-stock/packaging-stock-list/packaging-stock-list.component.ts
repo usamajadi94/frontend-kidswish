@@ -26,6 +26,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { ProductOrderFormComponent } from '../product-order-form/product-order-form.component';
+import * as XLSX from 'xlsx';
 
 @Component({
     selector: 'app-packaging-stock-list',
@@ -141,7 +142,6 @@ export class PackagingStockListComponent implements OnInit {
     }
 
     groupByProduct(data: any[]) {
-        debugger;
         const grouped: { [key: number]: any } = {};
 
         data.forEach((item) => {
@@ -263,5 +263,179 @@ export class PackagingStockListComponent implements OnInit {
             return Math.floor(detail[type] / detail[type + 'Case']);
         }
         else { return 0;}
+    }
+
+    exportToExcel() {
+        // Prepare data for Excel export
+        const excelData: any[] = [];
+        
+        // Add header row
+        excelData.push(['Product', 'Flavour', 'Box (Qty/Cases)', 'Pouch (Qty/Cases)', 'Sticker (Qty/Cases)']);
+        
+        // Add data rows
+        this.groupedPacks.forEach(pack => {
+            pack.flavours.forEach((flavour: any) => {
+                const boxQty = `${flavour.Box} / ${this.getCaseQty(flavour, 'Box')}`;
+                const pouchQty = `${flavour.Pouch} / ${this.getCaseQty(flavour, 'Pouch')}`;
+                const stickerQty = `${flavour.Sticker} / ${this.getCaseQty(flavour, 'Sticker')}`;
+                
+                excelData.push([
+                    pack.name,
+                    flavour.name,
+                    boxQty,
+                    pouchQty,
+                    stickerQty
+                ]);
+            });
+        });
+        
+        // Create worksheet
+        const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+        
+        // Set column widths
+        worksheet['!cols'] = [
+            { wch: 25 }, // Product
+            { wch: 25 }, // Flavour
+            { wch: 20 }, // Box
+            { wch: 20 }, // Pouch
+            { wch: 20 }  // Sticker
+        ];
+        
+        // Create workbook
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Packaging Stock');
+        
+        // Generate filename with current date
+        const fileName = `Packaging_Stock_Management_${new Date().toISOString().split('T')[0]}.xlsx`;
+        
+        // Save file
+        XLSX.writeFile(workbook, fileName);
+    }
+
+    printTable() {
+        // Create a print-friendly HTML table
+        let printContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Packaging Stock Management</title>
+                <style>
+                    @media print {
+                        @page {
+                            margin: 1cm;
+                        }
+                        body {
+                            margin: 0;
+                            padding: 0;
+                        }
+                    }
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                    }
+                    h1 {
+                        text-align: center;
+                        margin-bottom: 20px;
+                        color: #333;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 20px;
+                        page-break-inside: auto;
+                    }
+                    th {
+                        background-color: #f2f2f2;
+                        border: 1px solid #ddd;
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: bold;
+                    }
+                    td {
+                        border: 1px solid #ddd;
+                        padding: 10px;
+                    }
+                    tr {
+                        page-break-inside: avoid;
+                        page-break-after: auto;
+                    }
+                    .product-group {
+                        margin-top: 30px;
+                        page-break-before: auto;
+                    }
+                    .product-header {
+                        background-color: #e0e0e0;
+                        font-weight: bold;
+                        padding: 10px;
+                        margin-bottom: 10px;
+                    }
+                    .no-break {
+                        page-break-inside: avoid;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>Packaging Stock Management - Products</h1>
+        `;
+        
+        // Add data to print content
+        this.groupedPacks.forEach(pack => {
+            printContent += `
+                <div class="product-group no-break">
+                    <div class="product-header">
+                        ${pack.name} (${pack.flavours.length} Flavours)
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Flavour</th>
+                                <th style="text-align: center;">Box (Qty / Cases)</th>
+                                <th style="text-align: center;">Pouch (Qty / Cases)</th>
+                                <th style="text-align: center;">Sticker (Qty / Cases)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            pack.flavours.forEach((flavour: any) => {
+                const boxQty = `${flavour.Box} / ${this.getCaseQty(flavour, 'Box')}`;
+                const pouchQty = `${flavour.Pouch} / ${this.getCaseQty(flavour, 'Pouch')}`;
+                const stickerQty = `${flavour.Sticker} / ${this.getCaseQty(flavour, 'Sticker')}`;
+                
+                printContent += `
+                    <tr>
+                        <td>${flavour.name}</td>
+                        <td style="text-align: center;">${boxQty}</td>
+                        <td style="text-align: center;">${pouchQty}</td>
+                        <td style="text-align: center;">${stickerQty}</td>
+                    </tr>
+                `;
+            });
+            
+            printContent += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        });
+        
+        printContent += `
+            </body>
+            </html>
+        `;
+        
+        // Open print window
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            // Wait for content to load, then print
+            printWindow.onload = () => {
+                setTimeout(() => {
+                    printWindow.print();
+                }, 250);
+            };
+        }
     }
 }

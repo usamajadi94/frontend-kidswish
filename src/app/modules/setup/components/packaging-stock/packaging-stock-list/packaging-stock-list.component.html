@@ -136,6 +136,13 @@
 
       <mat-tab label="Products">
         <ng-template matTabContent>
+          <div class="list-header-row grid grid-cols-3 mt-4 items-center mb-4">
+            <div class="col-span-2 flex gap-3">
+              <bft-button name="Print" icon="print" (onClick)="printTable()" />
+              <bft-button name="Export Excel" icon="grid_on" (onClick)="exportToExcel()" />
+            </div>
+          </div>
+          
           <nz-collapse nzBordered="false" class="main-collapse mt-4">
             @for (pack of groupedPacks; track trackByFn($index, pack)) {
             <nz-collapse-panel [nzHeader]="packHeader" [nzActive]="false"
@@ -157,7 +164,7 @@
                         <th class="table-header border border-t-0 w-2/5 text-left ps-5">Flavour</th>
                         <th class="table-header border border-t-0 w-1/5 text-center">Box</th>
                         <th class="table-header border border-t-0 w-1/5 text-center">Pouch</th>
-                        <th class="table-header border border-t-0 w-1/5 text-center">Sticker</th>
+                        <!-- <th class="table-header border border-t-0 w-1/5 text-center">Sticker</th> -->
                       </tr>
                     </thead>
 
@@ -182,9 +189,9 @@
                        
 
                         <!-- Sticker -->
-                        <td class="py-3 px-4 border-r w-1/5">
+                        <!-- <td class="py-3 px-4 border-r w-1/5">
                           {{ flavour.Sticker }} / {{ getCaseQty(flavour,'Sticker') }}
-                        </td>
+                        </td> -->
                       </tr>
 
                       }

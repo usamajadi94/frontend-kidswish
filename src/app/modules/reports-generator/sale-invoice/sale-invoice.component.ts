@@ -244,7 +244,7 @@ export class SaleInvoiceComponent {
 
     async onPrintReport() {
         const base64Logo = await this._pdfService.convertImageUrlToBase64(
-            'images/logo/trackcloud/icon.png'
+            'images/logo/trackcloud/dabossicon.png'
         );
 
         const docDefinition: any = {
@@ -296,7 +296,7 @@ export class SaleInvoiceComponent {
 
     async onPdfGenerate() {
         const base64Logo = await this._pdfService.convertImageUrlToBase64(
-            'images/logo/trackcloud/icon.png'
+            'images/logo/trackcloud/dabossicon.png'
         );
 
         const docDefinition: any = {
@@ -397,6 +397,13 @@ export class SaleInvoiceComponent {
                         {
                             width: '35%',
                             stack: [
+                                {
+                                        image: logo, // logo/image placeholder
+                                        rowSpan: 3,
+                                        width: 48,
+                                        height: 48,
+                                        border: [false, false, false, false],
+                                    },
                                 { text: 'INVOICE', style: 'invoiceTitle' },
                                 {
                                     text: 'Invoice # : ' + element.InvoiceNo,

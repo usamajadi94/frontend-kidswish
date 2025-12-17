@@ -2,6 +2,7 @@ export class Company {
     Description: string = null;
     Address: string = null;
     City: string = null;
+    Dba: string = null;
     State: string = null;
     Zip: string = null;
     Phone: string = null;

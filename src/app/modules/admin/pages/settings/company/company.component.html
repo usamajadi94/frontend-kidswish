@@ -18,9 +18,12 @@
                     [(ngModel)]="formData.Phone" required="true"></bft-input-phone>
             </div>
 
-            <div class="sm:col-span-4">
-                <bft-textarea name="Address" label="Address" [(ngModel)]="formData.Address" required="true"></bft-textarea>
+          
+            <div class="sm:col-span-2">
+                <bft-input-text name="DBA" label="DBA"  
+                    [(ngModel)]="formData.Dba" required="true"></bft-input-text>
             </div>
+            
 
             <div class="sm:col-span-2">
                 <bft-input-text name="City" label="City"  
@@ -52,6 +55,9 @@
 
             <div class="sm:col-span-2">
                 <bft-textarea name="Notes" label="Invoice Regards" [(ngModel)]="formData.Notes"  />
+            </div>
+              <div class="sm:col-span-2">
+                <bft-textarea name="Address" label="Address" [(ngModel)]="formData.Address" required="true"></bft-textarea>
             </div>
         </div>
 

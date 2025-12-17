@@ -63,8 +63,11 @@ export class ListService {
         return this._QueryService.getQuery('getExpenseCategory');
     }
     
-    getInvoices() {
-        return this._QueryService.getQuery('getInvoices');
+    getInvoices(fromdate: any, todate: any) {
+        return this._QueryService.getQuery('getInvoices',{
+            fromdate: fromdate || '',
+            todate: todate || '', 
+        });
     }
 
     getExpenseDR(fromdate: any, todate: any) {
