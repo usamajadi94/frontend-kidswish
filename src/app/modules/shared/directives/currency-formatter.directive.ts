@@ -18,10 +18,26 @@ export class CurrencyFormatterDirective {
 
   @HostListener('input', ['$event'])
   onInput(event: KeyboardEvent) {
-    this.el.value = this.el.value.replace(/[^0-9.]/g, '');
-    if (this.el.value.split('.').length > 2) {
-      this.el.value = this.el.value.slice(0, -1);
+    let value = this.el.value;
+    
+    // Check if value starts with minus
+    const isNegative = value.startsWith('-');
+    
+    // Remove all non-numeric characters except decimal point
+    value = value.replace(/[^0-9.]/g, '');
+    
+    // Add minus sign back if it was at the beginning
+    if (isNegative) {
+      value = '-' + value;
     }
+    
+    // Prevent multiple decimal points
+    if (value.split('.').length > 2) {
+      const parts = value.split('.');
+      value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    
+    this.el.value = value;
   }
 
   @HostListener('blur', ['$event.target.value'])
@@ -36,8 +52,11 @@ export class CurrencyFormatterDirective {
 
   private formatCurrency(value: string) {
     if (value) {
-      const numericValue = parseFloat(value.replace(/,/g, '')).toFixed(2);
-      this.el.value = this.formatToCurrency(numericValue);
+      const cleanedValue = value.replace(/,/g, '');
+      const numericValue = parseFloat(cleanedValue);
+      if (!isNaN(numericValue)) {
+        this.el.value = this.formatToCurrency(numericValue.toFixed(2));
+      }
     }
   }
   // private formatCurrency(value: string) {
@@ -48,12 +67,20 @@ export class CurrencyFormatterDirective {
   
 
   private parseCurrency(value: string): string {
-    return value.replace(/[^0-9.]/g, '');
+    // Preserve minus sign at the beginning and digits/periods
+    const isNegative = value.startsWith('-');
+    let cleaned = value.replace(/[^0-9.]/g, '');
+    return isNegative ? '-' + cleaned : cleaned;
   }
 
   private formatToCurrency(value: string): string {
-    const [integerPart, decimalPart] = value.split('.');
+    // Handle negative values
+    const isNegative = value.startsWith('-');
+    const numericValue = isNegative ? value.substring(1) : value;
+    
+    const [integerPart, decimalPart] = numericValue.split('.');
     const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return `${formattedInteger}.${decimalPart}`;
+    
+    return isNegative ? `-${formattedInteger}.${decimalPart}` : `${formattedInteger}.${decimalPart}`;
   }
 }

@@ -7,15 +7,18 @@ import { componentRegister } from 'app/modules/shared/services/component-registe
 import { ListService } from 'app/modules/shared/services/list.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { InvoiceComponent } from '../invoice.component';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-invoice-list',
   standalone: true,
-  imports: [BftButtonComponent, BftTableComponent, WrapperAddComponent],
+  imports: [BftButtonComponent, BftTableComponent, WrapperAddComponent, NzDatePickerModule, FormsModule],
   templateUrl: './invoice-list.component.html',
   styleUrl: './invoice-list.component.scss'
 })
 export class InvoiceListComponent  extends BaseRoutedComponent {
+  date = null;
   private modalService = inject(ModalService);
   private _listService = inject(ListService);
   title: string = componentRegister.invoice.Title;
@@ -47,6 +50,7 @@ export class InvoiceListComponent  extends BaseRoutedComponent {
       name: 'Total',
       isSort: true,
       isFilterList: true,
+      total: true,
       type: 'currency',
     },
     // {
@@ -72,13 +76,35 @@ export class InvoiceListComponent  extends BaseRoutedComponent {
     },
   ];
   data = [];
-
   ngOnInit() {
+     const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);          // 1st day of month
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);      // last day of month
+    this.date = [firstDay, lastDay];
     this.getData();
   }
 
+  
+  
+
+  onChange(result: Date[]): void {
+    this.date = result;
+    this.getData();
+  }
+
+
   getData() {
-    this._listService.getInvoices().subscribe({
+    if (!this.date) return;
+
+    let fromDate = '';
+    let toDate = '';
+    if(this.date != null && this.date.length ==2){
+      
+      fromDate = this.formatDate(this.date[0]);
+      toDate = this.formatDate(this.date[1]);
+    };
+
+    this._listService.getInvoices(fromDate, toDate).subscribe({
       next: (res: any) => {
         this.data = res;
       },
@@ -115,7 +141,12 @@ export class InvoiceListComponent  extends BaseRoutedComponent {
       });
   }
 
- 
+   private formatDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = ('0' + (date.getMonth() + 1)).slice(-2);
+  const day = ('0' + date.getDate()).slice(-2);
+  return `${year}-${month}-${day}`;
+}
 }
 
 

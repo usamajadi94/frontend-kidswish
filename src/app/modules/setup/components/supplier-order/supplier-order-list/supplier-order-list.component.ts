@@ -38,6 +38,23 @@ export class SupplierOrderListComponent extends BaseRoutedComponent implements O
         type: 'text',
       },
       {
+        header: 'Credit',
+        name: 'TotalCredit',
+        isSort: true,
+        isFilterList: true,
+        type: 'currency',
+        total: true,
+      },
+      
+      {
+        header: 'Remaining',
+        name: 'Remaining',
+        isSort: true,
+        isFilterList: true,
+        type: 'currency',
+        total: true,
+      },
+      {
           header: 'Modified By',
           name: 'ModifiedBy',
           isSort: true,

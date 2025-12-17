@@ -4,7 +4,7 @@ export const environment: IEnvironmentalVariables = {
     // apiRoot: 'http://cloudfusion-001-site10.qtempurl.com/',
     apiRoot: 'https://localhost:44327/',
     // apiRoot: 'http://cloudfusion-001-site10.qtempurl.com/',
-    // apiRoot: 'https://dmsapi.browsefytech.com/',
+    // apiRoot: 'http://cloudfusion-001-site10.qtempurl.com/',
     env: 'local',
     site: {
         baseUrl: '',
