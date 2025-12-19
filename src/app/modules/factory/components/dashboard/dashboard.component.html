@@ -1,9 +1,181 @@
 <div class="absolute inset-0 flex min-w-0 flex-col overflow-y-auto p-6 md:p-8" cdkScrollable>
-    <div class="flex-0">
-        <div class="mb-7">
+    <div class="flex justify-between items-center">
+        <div>
             <div class="text-3xl font-semibold leading-8 tracking-tight">
                 Dashboard
             </div>
         </div>
+        <div>
+            <div class="w-48">
+                <bft-input-date name="CurrentMonth" label="Select Month" [(ngModel)]="currentMonth" format="MM/yyyy"
+                    nzMode="month" (ngModelChange)="onMonthChange()" />
+            </div>
+
+        </div>
     </div>
+
+    <div class="grid w-full min-w-0 grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4 mt-4">
+        <!-- Total Invoice -->
+        <div class="bg-card rounded-2xl p-6 shadow">
+            <div class="flex items-center gap-3">
+                <div
+                    class="flex h-10 w-10 items-center justify-center rounded bg-green-100 text-green-800 dark:bg-green-600 dark:text-green-50">
+                    <mat-icon class="text-current" [svgIcon]="'heroicons_outline:banknotes'"></mat-icon>
+                </div>
+
+                <div class="truncate text-lg font-medium leading-6 tracking-tight">
+                    Total Invoice
+                    <div class="mt-2 flex flex-col ">
+                        <div class="text-1xl font-bold leading-none tracking-tight text-green-500 sm:text-1xl">
+                            $ {{ totalInvoice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Order -->
+        <div class="bg-card rounded-2xl p-6 shadow">
+            <div class="flex items-center gap-3">
+                <div
+                    class="flex h-10 w-10 items-center justify-center rounded bg-blue-100 text-blue-800 dark:bg-blue-600 dark:text-blue-50">
+                    <mat-icon class="text-current" svgIcon="mat_solid:production_quantity_limits"></mat-icon>
+                </div>
+
+                <div class="truncate text-lg font-medium leading-6 tracking-tight">
+                    Customer Order
+                    <div class="mt-2 flex flex-col ">
+                        <div class="text-1xl font-bold leading-none tracking-tight text-blue-500 sm:text-1xl">
+                            {{ totalCustomerOrders }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+
+        <!-- Expense US -->
+        <div class="bg-card rounded-2xl p-6 shadow">
+            <div class="flex items-center gap-3">
+                <div
+                    class="flex h-10 w-10 items-center justify-center rounded bg-red-100 text-red-800 dark:bg-red-600 dark:text-red-50">
+                    <mat-icon class="text-current" [svgIcon]="'heroicons_outline:credit-card'"></mat-icon>
+                </div>
+
+                <div class="truncate text-lg font-medium leading-6 tracking-tight">
+                    Expense US
+                    <div class="mt-2 flex flex-col ">
+                        <div class="text-1xl font-bold leading-none tracking-tight text-red-500 sm:text-1xl">
+                            $ {{ expenseUS.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense DR -->
+        <div class="bg-card rounded-2xl p-6 shadow">
+            <div class="flex items-center gap-3">
+                <div
+                    class="flex h-10 w-10 items-center justify-center rounded bg-red-100 text-red-800 dark:bg-red-600 dark:text-red-50">
+                    <mat-icon class="text-current" [svgIcon]="'heroicons_outline:credit-card'"></mat-icon>
+                </div>
+                <div class="truncate text-lg font-medium leading-6 tracking-tight">
+                    Expense DR
+                    <div class="mt-2 flex flex-col ">
+                        <div class="text-1xl font-bold leading-none tracking-tight text-red-500 sm:text-1xl">
+                            $ {{ expenseDR.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid w-full min-w-0 grid-cols-1 gap-6 lg:grid-cols-2 mt-6">
+        <!-- Expense by Category US Chart -->
+        <div class="bg-card flex flex-auto flex-col rounded-2xl p-6 shadow">
+            <div class="flex items-center mb-4">
+                <div class="flex flex-col">
+                    <div class="mr-4 truncate text-lg font-medium leading-6 tracking-tight">
+                        Expense by Category (US)
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1">
+                <apx-chart
+                    [series]="expenseUSSeries"
+                    [chart]="expenseUSChartOptions.chart"
+                    [dataLabels]="expenseUSChartOptions.dataLabels"
+                    [plotOptions]="expenseUSChartOptions.plotOptions"
+                    [yaxis]="expenseUSChartOptions.yaxis"
+                    [xaxis]="expenseUSChartOptions.xaxis"
+                    [fill]="expenseUSChartOptions.fill"
+                    [stroke]="expenseUSChartOptions.stroke"
+                    [tooltip]="expenseUSChartOptions.tooltip"
+                    [colors]="expenseUSChartOptions.colors"
+                    class="w-full">
+                </apx-chart>
+            </div>
+        </div>
+
+        <!-- Expense by Category DR Chart -->
+        <div class="bg-card flex flex-auto flex-col rounded-2xl p-6 shadow">
+            <div class="flex items-center mb-4">
+                <div class="flex flex-col">
+                    <div class="mr-4 truncate text-lg font-medium leading-6 tracking-tight">
+                        Expense by Category (DR)
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1">
+                <apx-chart
+                    [series]="expenseDRSeries"
+                    [chart]="expenseDRChartOptions.chart"
+                    [dataLabels]="expenseDRChartOptions.dataLabels"
+                    [plotOptions]="expenseDRChartOptions.plotOptions"
+                    [yaxis]="expenseDRChartOptions.yaxis"
+                    [xaxis]="expenseDRChartOptions.xaxis"
+                    [fill]="expenseDRChartOptions.fill"
+                    [stroke]="expenseDRChartOptions.stroke"
+                    [tooltip]="expenseDRChartOptions.tooltip"
+                    [colors]="expenseDRChartOptions.colors"
+                    class="w-full">
+                </apx-chart>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top 3 Products Chart -->
+    <div class="grid w-full min-w-0 grid-cols-1 gap-6 mt-6">
+        <div class="bg-card flex flex-auto flex-col rounded-2xl p-6 shadow">
+            <div class="flex items-center mb-4">
+                <div class="flex flex-col">
+                    <div class="mr-4 truncate text-lg font-medium leading-6 tracking-tight">
+                        Top 3 Products
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1">
+                <apx-chart
+                    [series]="top3ProductsSeries"
+                    [chart]="top3ProductsChartOptions.chart"
+                    [dataLabels]="top3ProductsChartOptions.dataLabels"
+                    [plotOptions]="top3ProductsChartOptions.plotOptions"
+                    [yaxis]="top3ProductsChartOptions.yaxis"
+                    [xaxis]="top3ProductsChartOptions.xaxis"
+                    [fill]="top3ProductsChartOptions.fill"
+                    [stroke]="top3ProductsChartOptions.stroke"
+                    [tooltip]="top3ProductsChartOptions.tooltip"
+                    [colors]="top3ProductsChartOptions.colors"
+                    class="w-full">
+                </apx-chart>
+            </div>
+        </div>
+    </div>
+
 </div>

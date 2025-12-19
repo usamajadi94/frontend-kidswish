@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { QueryService } from 'app/core/Base/services/query.service';
+import { DateTime } from 'luxon';
 
 @Injectable({
     providedIn: 'root',
@@ -131,6 +132,13 @@ export class ListService {
     getShipments(month: Date | null) {
         return this._QueryService.getQuery('getShipments', {
             month: month || '',
+        });
+    }
+
+    getDashboardData(selectedMonth: Date | null) {
+        // const monthStr = selectedMonth ? DateTime.fromJSDate(selectedMonth).toFormat('yyyy-MM') : DateTime.now().toFormat('yyyy-MM');
+        return this._QueryService.getMultipleQuery('getDashboardData', {
+            date: selectedMonth
         });
     }
 }

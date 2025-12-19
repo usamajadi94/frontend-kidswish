@@ -1,0 +1,43 @@
+<div class="w-full max-w-3xl">
+    <div>
+        <div class="text-xl">Shipment</div>
+        <div class="text-secondary">
+            Following information is publicly displayed, be careful!
+        </div>
+    </div>
+    <form #accountNgForm="ngForm">
+        <div class="mt-8 grid gap-2 sm:grid-cols-4">
+            <div class="sm:col-span-2">
+                <bft-input-text name="Description" label="Name" required="true"
+                    [(ngModel)]="formData.Description"></bft-input-text>
+            </div>
+
+            <div class="sm:col-span-2">
+                <bft-input-phone name="Telephone" label="Telephone" mask="(000)000-0000"
+                    prefixSvgIcon="heroicons_solid:phone" [(ngModel)]="formData.Tel" required="true"></bft-input-phone>
+            </div>
+
+            <div class="sm:col-span-2">
+                <bft-input-text name="Email" label="Email" prefixSvgIcon="heroicons_solid:envelope"
+                    [(ngModel)]="formData.Email" required="true"></bft-input-text>
+            </div>
+            <div class="sm:col-span-2">
+                <bft-input-text name="Fax" label="Fax" prefixSvgIcon="heroicons_solid:envelope"
+                    [(ngModel)]="formData.Fax" required="true"></bft-input-text>
+            </div>
+
+            <div class="sm:col-span-4">
+                <bft-textarea name="Address" label="Address" [(ngModel)]="formData.Address"
+                    required="true"></bft-textarea>
+            </div>
+        </div>
+
+    </form>
+
+    <div class="flex items-center justify-end">
+        <button class="ml-4" mat-flat-button type="button" [color]="'primary'" [disabled]="accountNgForm.invalid"
+            (click)="updateShipmentInfo()">
+            Save
+        </button>
+    </div>
+</div>

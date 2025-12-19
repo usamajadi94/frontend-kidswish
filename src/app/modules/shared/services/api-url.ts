@@ -15,6 +15,9 @@ export class apiUrls {
     static readonly entity = `${apiUrls.server}api/GetUserEntities`;
     static readonly settings = `${apiUrls.server}api/me/settings`;
     static readonly companyFetch = `${apiUrls.server}api/GetCompanyByClient`;
+    
+    static readonly shipmentFetch = `${apiUrls.server}api/GetShipmentByClient`;
+    static readonly shipmentUpdate = `${apiUrls.server}api/ShipmentByClient`;
 
     static readonly navigation = `${apiUrls.server}api/GetNavigation`;
     // Query service
