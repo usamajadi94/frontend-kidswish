@@ -33,7 +33,7 @@
                         <div class="flex items-center">
                             <p class="text-1xl font-medium text-gray-600">Monthly Target</p>
                         </div>
-                        <p class="text-3xl font-bold text-teal-600">{{ monthlyTarget }}</p>
+                        <p class="text-3xl font-bold text-teal-600">{{ monthlyTarget }} / {{getCaseByQty(monthlyTarget)}}</p>
                         <p class="text-md text-gray-500 mt-1">Total units ordered</p>
                     </div>
                     <div
@@ -52,7 +52,7 @@
                             <p class="text-1xl font-medium text-gray-600">Produced This Month
                             </p>
                         </div>
-                        <p class="text-3xl font-bold text-orange-600">{{ producedThisMonth }}</p>
+                        <p class="text-3xl font-bold text-orange-600">{{ producedThisMonth }} / {{getCaseByQty(producedThisMonth)}}</p>
                         <p class="text-md text-gray-500 mt-1">Units produced</p>
                     </div>
                     <div
@@ -73,7 +73,7 @@
 
                             </p>
                         </div>
-                        <p class="text-3xl font-bold text-red-600">{{ pendingOrders }}</p>
+                        <p class="text-3xl font-bold text-red-600">{{ pendingOrders }} / {{getCaseByQty(pendingOrders)}}</p>
                         <p class="text-md text-gray-500 mt-1">Units pending</p>
                     </div>
                     <div
@@ -92,7 +92,7 @@
                             <p class="text-1xl font-medium text-gray-600">Shipment
                             </p>
                         </div>
-                        <p class="text-3xl font-bold text-purple-600">{{ totalShipment }}</p>
+                        <p class="text-3xl font-bold text-purple-600">{{ totalShipment }} / {{getCaseByQty(totalShipment)}}</p>
                         <p class="text-md text-gray-500 mt-1">Units shipped</p>
                     </div>
                     <div

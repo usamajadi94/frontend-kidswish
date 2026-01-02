@@ -34,26 +34,32 @@
         <table class="w-full form-table min-w-[1100px] border-collapse">
           <thead class="sticky top-0 bg-white z-10 p-2">
             <tr>
-              <th class="table-header border border-t-0 w-4/5 text-left ps-5">Flavour</th>
-              <th class="table-header border border-t-0 w-1/5 text-center">Quantity</th>
+              <th class="table-header border border-t-0 w-6/10 text-left ps-5">Flavour</th>
+              <th class="table-header border border-t-0 w-2/10 text-center">Quantity</th>
+              <th class="table-header border border-t-0 w-2/10 text-center">Case</th>
             </tr>
           </thead>
 
           <tbody>
             @for (flavour of pack.flavours; track flavour.name) {
             <tr class="border-b">
-              <td class="py-2 px-2 border-r border-l w-2/5">
+              <td class="py-2 px-2 border-r border-l w-6/10">
                 <span class="flex items-center">
                   <span class="ml-2">{{ flavour.name }}</span>
                 </span>
               </td>
 
 
-              <td class="py-2 px-2 border-r w-1/5 text-right">
+              <td class="py-2 px-2 border-r w-2/10 text-right">
                 <div class="flex justify-end items-center gap-2">
                   <bft-button name="-" (onClick)="decrementQty(flavour)" ></bft-button>
                   <bft-input-number [(ngModel)]="flavour.qty" />
                   <bft-button name="+" (onClick)="incrementQty(flavour)" ></bft-button>
+                </div>
+              </td>
+              <td class="py-2 px-2 border-r w-2/10 text-right">
+                <div class="flex justify-end items-center gap-2">
+                   {{ getCaseQty(flavour,'Box','qty') }}
                 </div>
               </td>
             </tr>

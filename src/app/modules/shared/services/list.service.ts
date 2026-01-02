@@ -129,9 +129,16 @@ export class ListService {
         return this._QueryService.getQuery('getSupplierOrders');
     }
 
-    getShipments(month: Date | null) {
+    /*getShipments(month: Date | null) {
         return this._QueryService.getQuery('getShipments', {
             month: month || '',
+        });
+    }*/
+
+    getShipments(fromdate: any, todate: any) {
+        return this._QueryService.getQuery('getShipments',{
+            fromdate: fromdate || '',
+            todate: todate || '', 
         });
     }
 

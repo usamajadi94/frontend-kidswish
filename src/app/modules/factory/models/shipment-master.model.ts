@@ -1,10 +1,9 @@
-export class Shipment_Informaton {
-    ID: number = 0 ;
-    Description: string = null;
-    Address: string = null;
-    Tel: string = null;
-    Fax: string = null;
-    Email: string = null;
+import { componentRegister } from "app/modules/shared/services/component-register";
+import { Shipment } from "./shipment.model";
+
+export class ShipmentMaster {
+    ID: number = 0;
+    ShipmentDate: Date = new Date();
     CompanyName: string = null;
     CompanyRnc: string = null;
     CompanyContactPerson: string = null;
@@ -21,4 +20,7 @@ export class Shipment_Informaton {
     ClientTel: string = null;
     ClientFax: string = null;
     ClientEmail: string = null;
+    SCode: string = componentRegister.shipmentView.SCode;
+    InvoiceNo: string = null;
+    Shipment: Shipment[] = [];
 }

@@ -63,6 +63,7 @@ export class SupplierOrderLedgerComponent extends BaseComponent<
 
     override InitializeObject(): void {
         this.formData = new Array<Supplier_Order_Ledger>();
+        this.formData.push(new Supplier_Order_Ledger());
     }
     public async BeforeInit(): Promise<void> {
       this.onLoad();

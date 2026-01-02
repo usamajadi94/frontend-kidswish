@@ -32,6 +32,8 @@ import {
     FactoryProduction,
 } from '../../models/factory-production';
 import { BftInputCurrencyComponent } from "app/modules/shared/components/fields/bft-input-currency/bft-input-currency.component";
+import { ShipmentMaster } from '../../models/shipment-master.model';
+import { Shipment } from '../../models/shipment.model';
 
 @Component({
     selector: 'app-order-view',
@@ -269,6 +271,7 @@ export class OrderViewComponent {
                     name: item.ProductName,
                     category: item.ProductCategory,
                     BoxCase:item.BoxCase,
+                    NetWeight: item.NetWeight,
                     flavours: [],
                 };
             }
@@ -502,22 +505,32 @@ export class OrderViewComponent {
 
     saveShipment() {
         // Create shipment records only for flavors with quantities > 0
-        const shipmentRecords: any[] = [];
+        let shipment:ShipmentMaster = new ShipmentMaster();
+        shipment.ShipmentDate = this.shipmentFormData.Date;
+        const shipmentRecords: Shipment[] = [];
         
         Object.keys(this.shipmentQuantities).forEach(key => {
             const quantity = this.shipmentQuantities[key];
             const price = this.shipmentPrices[key] || 0;
             const totalPrice = this.shipmentTotals[key] || (quantity * price);
-
+            
             if (quantity && quantity > 0) {
                 const [productID, flavourID] = key.split('_');
+                const product = this.groupedProducts.find(p => p.productID == parseInt(productID))
                 shipmentRecords.push({
                     ProductID: parseInt(productID),
                     FlavourID: parseInt(flavourID),
                     Qty: quantity,
                     Price: price,
                     TotalPrice: totalPrice,
-                    Date: this.shipmentFormData.Date
+                    Date: this.shipmentFormData.Date,
+                    ShipmentMasterID: shipment.ID,
+                    Case: this.getShipmentCases(parseInt(productID), parseInt(flavourID), product.flavours.find((f: any) => f.id == parseInt(flavourID))),
+                    ID: 0,
+                    ItemID: null,
+                    NetWeight: null,
+                    GrossWeight: product.NetWeight * this.getShipmentCases(parseInt(productID), parseInt(flavourID), product.flavours.find((f: any) => f.id == parseInt(flavourID))),
+                    Description: null
                 });
             }
         });
@@ -527,11 +540,13 @@ export class OrderViewComponent {
             return;
         }
 
+        shipment.Shipment = shipmentRecords;
+
         // Save each record individually (same as production)
-        let completedRequests = 0;
-        const totalRequests = shipmentRecords.length;
+        // let completedRequests = 0;
+        // const totalRequests = shipmentRecords.length;
         
-        shipmentRecords.forEach(record => {
+        /*shipmentRecords.forEach(record => {
             this._http.post(apiUrls.shipmentController, record)
                 .subscribe({
                     next: (res: any) => {
@@ -547,6 +562,21 @@ export class OrderViewComponent {
                         console.error('Shipment save error:', err);
                     }
                 });
+        });*/
+         this._http.post(apiUrls.server + apiUrls.shipmentController, shipment)
+        .subscribe({
+            next: (res: any) => {
+                // completedRequests++;
+                // if (completedRequests === totalRequests) {
+                    this._MessageModalService.success('Shipment saved successfully!');
+                    this.fetchShipmentData();
+                    this.clearShipmentForm();
+                // }
+            },
+            error: (err) => {
+                this._MessageModalService.error('Error saving shipment');
+                console.error('Shipment save error:', err);
+            }
         });
     }
 
@@ -613,5 +643,11 @@ export class OrderViewComponent {
         }
         return 0;
     }
-      
+    
+    getCaseByQty(Qty: number): number {
+        if (Qty) {
+            return Math.floor(Qty / 24);
+        }
+        else { return 0;}
+    }
 }

@@ -12,7 +12,7 @@ export class componentRegister {
     static readonly packagingStock:IComponentRegister = {Title:'Packaging Stock Management',SCode:"prod_02"};
     static readonly expenseCategory:IComponentRegister = {Title:'Expense Category',SCode:"exp_03"};
     static readonly expenseDr:IComponentRegister = {Title:'Expense DR',SCode:"exp_01"};
-    static readonly flavorOrder:IComponentRegister = {Title:'Flavor Order',SCode:""};
+    static readonly flavorOrder:IComponentRegister = {Title:'Flavor Order',SCode:"prod_02"};
     static readonly flavorStock:IComponentRegister = {Title:'Product Flavor Stock',SCode:"prod_03"};
     static readonly employeeAttendance:IComponentRegister = {Title:'Employee Attendance',SCode:"emp_03"};
 
@@ -25,7 +25,7 @@ export class componentRegister {
 
     // Main
     static readonly customerOrder:IComponentRegister = {Title:'Customer Order',SCode:"ord_01"};
-    static readonly shipmentView:IComponentRegister = {Title:'Shipment View',SCode:"ord_02"};
+    static readonly shipmentView:IComponentRegister = {Title:'Shipment',SCode:"ord_02"};
     static readonly invoice:IComponentRegister = {Title:'Invoice',SCode:"inv_01"};
 
     // Factory

@@ -1,9 +1,12 @@
+import { componentRegister } from "app/modules/shared/services/component-register";
+
 export class FlavorOrderMaster {
     ID: number = 0;
     OrderDate: Date = new Date();
     SupplierID: number | null = null;
     StatusID: number | null = null;
     Description: string = null;
+    SCode:string = componentRegister.flavorOrder.SCode;
     Flavor_Order_Detail: FlavorOrderDetail[] = [];
 }
 

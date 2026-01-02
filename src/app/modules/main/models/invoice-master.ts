@@ -1,3 +1,4 @@
+import { componentRegister } from "app/modules/shared/services/component-register";
 import { InvoiceDetail } from "./invoice-detail";
 
 export class InvoiceMaster {
@@ -13,5 +14,6 @@ export class InvoiceMaster {
     Total:number = null;
     Notes:string = null;
     InvoiceRegards:string = "";
+    SCode:string = componentRegister.invoice.SCode;
     Invoice_Detail:InvoiceDetail[] = [];
 }

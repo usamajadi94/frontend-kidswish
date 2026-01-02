@@ -1,37 +1,100 @@
-<div class="w-full max-w-3xl">
+<div class="w-full ">
     <div>
         <div class="text-xl">Shipment</div>
         <div class="text-secondary">
             Following information is publicly displayed, be careful!
         </div>
     </div>
-    <form #accountNgForm="ngForm">
-        <div class="mt-8 grid gap-2 sm:grid-cols-4">
-            <div class="sm:col-span-2">
-                <bft-input-text name="Description" label="Name" required="true"
-                    [(ngModel)]="formData.Description"></bft-input-text>
+    <form #accountNgForm="ngForm" class="mt-4">
+        <div class="text-xl font-semibold">Country</div>
+        <hr class="my-1" />
+        <div class="mt-4 grid gap-2 grid-cols-2 sm:grid-cols-4">
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="CompanyName" label="Name" required="true"
+                    [(ngModel)]="formData.CompanyName"></bft-input-text>
             </div>
 
-            <div class="sm:col-span-2">
-                <bft-input-phone name="Telephone" label="Telephone" mask="(000)000-0000"
-                    prefixSvgIcon="heroicons_solid:phone" [(ngModel)]="formData.Tel" required="true"></bft-input-phone>
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="CompanyEmail" label="Email" 
+                [(ngModel)]="formData.CompanyEmail" required="true"></bft-input-text>
+            </div>
+            
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="CompanyCity" label="City" 
+                [(ngModel)]="formData.CompanyCity" required="true"></bft-input-text>
             </div>
 
-            <div class="sm:col-span-2">
-                <bft-input-text name="Email" label="Email" prefixSvgIcon="heroicons_solid:envelope"
-                    [(ngModel)]="formData.Email" required="true"></bft-input-text>
-            </div>
-            <div class="sm:col-span-2">
-                <bft-input-text name="Fax" label="Fax" prefixSvgIcon="heroicons_solid:envelope"
-                    [(ngModel)]="formData.Fax" required="true"></bft-input-text>
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="CompanyCountry" label="Country" 
+                [(ngModel)]="formData.CompanyCountry" required="true"></bft-input-text>
             </div>
 
-            <div class="sm:col-span-4">
-                <bft-textarea name="Address" label="Address" [(ngModel)]="formData.Address"
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="CompanyContactPerson" label="Contact Person" required="true"
+                    [(ngModel)]="formData.CompanyContactPerson"></bft-input-text>
+            </div>
+            
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="CompanyTel" label="Tel" 
+                [(ngModel)]="formData.CompanyTel" required="true"></bft-input-text>
+            </div>
+
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="CompanyRnc" label="RNC" required="true"
+                    [(ngModel)]="formData.CompanyRnc"></bft-input-text>
+            </div>
+
+            <div class="w-full sm:col-span-2">
+                <bft-textarea name="CompanyAddress" label="Address" [(ngModel)]="formData.CompanyAddress"
                     required="true"></bft-textarea>
             </div>
         </div>
 
+        <div class="text-xl font-semibold mt-4">Client</div>
+        <hr class="my-1" />
+        
+       <div class="mt-4 grid gap-2 grid-cols-2 sm:grid-cols-4">
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="ClientName" label="Name" 
+                [(ngModel)]="formData.ClientName" required="true"></bft-input-text>
+            </div>
+            
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="ClientEmail" label="Email" 
+                    [(ngModel)]="formData.ClientEmail" required="true"></bft-input-text>
+            </div>
+
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="ClientTel" label="Tel" 
+                    [(ngModel)]="formData.ClientTel" required="true"></bft-input-text>
+            </div>
+            
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="ClientFax" label="Fax" 
+                    [(ngModel)]="formData.ClientFax" required="true"></bft-input-text>
+            </div>
+            
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="ClientCity" label="City" 
+                    [(ngModel)]="formData.ClientCity" required="true"></bft-input-text>
+            </div>
+
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="ClientState" label="State" 
+                    [(ngModel)]="formData.ClientState" required="true"></bft-input-text>
+            </div>
+
+            <div class="w-full sm:col-span-2">
+                <bft-input-text name="ClientZipcode" label="Zipcode" 
+                    [(ngModel)]="formData.ClientZipcode" required="true"></bft-input-text>
+            </div>
+
+            <div class="w-full sm:col-span-2">
+                <bft-textarea name="ClientAddress" label="Address" [(ngModel)]="formData.ClientAddress"
+                    required="true"></bft-textarea>
+            </div>
+
+        </div>
     </form>
 
     <div class="flex items-center justify-end">

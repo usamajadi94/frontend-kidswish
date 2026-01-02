@@ -17,6 +17,14 @@ export class ReportService {
       enddate: endDate || '',
     });
   }
+  
+  getShipmentInvoiceReport(invoiceNo?: string, fromDate?: Date, endDate?: Date) {
+    return this._QueryService.getQuery('getShipmentInvoice', {
+      invoiceno:invoiceNo || '' ,
+      fromdate: fromDate || '',
+      enddate: endDate || '',
+    });
+  }
 
 
 }

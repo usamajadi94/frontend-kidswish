@@ -4,7 +4,8 @@ import { componentRegister } from '../shared/services/component-register';
 
 import { CustomerOrderListComponent } from './components/customer-order/customer-order-list/customer-order-list.component';
 import { InvoiceListComponent } from './components/invoice/invoice-list/invoice-list.component';
-import { ShipmentListComponent } from './components/shipment-list/shipment-list.component';
+import { ShipmentListComponent } from './components/shipment-form/shipment-list/shipment-list.component';
+
 
 export default [
     {

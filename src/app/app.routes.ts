@@ -10,7 +10,8 @@ import { LayoutComponent } from 'app/layout/layout.component';
 export const appRoutes: Route[] = [
 
     // Redirect empty path to '/dashboards/project'
-    {path: '', pathMatch : 'full', redirectTo: 'factory/dashboard'},
+    // {path: '', pathMatch : 'full', redirectTo: 'factory/dashboard'},
+    {path: '', pathMatch : 'full', redirectTo: 'pages/settings'},
 
     // Redirect signed-in user to the '/dashboards/project'
     //

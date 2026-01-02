@@ -189,7 +189,7 @@ export class SupplierOrderComponent extends BaseComponent<
 
   getTAmt(element: Supplier_Order_Detail) {
     element.TotalPrice = (element.Qty ?? 0) * (element.Price ?? 0);
-    let badleafsAmount = ((element.Badleafs ?? 0) / (element.Qty ?? 1)) * (element.TotalPrice ?? 0);
+    let badleafsAmount = (element.Badleafs ?? 0) * (element.Price ?? 0);
     element.DeductionAmt = badleafsAmount;
     element.NetAmt = (element.TotalPrice ?? 0) - (element.DeductionAmt ?? 0);
 

@@ -13,7 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
-  selector: 'app-shipment-list',
+  selector: 'app-shipment-list-by-date',
   standalone: true,
   imports: [
     MatTableModule,
@@ -24,8 +24,8 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
     CommonModule,
     ScrollingModule
   ],
-  templateUrl: './shipment-list.component.html',
-  styleUrl: './shipment-list.component.scss',
+  templateUrl: './shipment-list-by-date.component.html',
+  styleUrl: './shipment-list-by-date.component.scss',
   animations: [
     trigger('detailExpand', [
         state('collapsed', style({ height: '0px', minHeight: '0' })),
@@ -37,7 +37,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
     ]),
 ],
 })
-export class ShipmentListComponent extends BaseRoutedComponent {
+export class ShipmentListByDateComponent extends BaseRoutedComponent {
   private modalService = inject(ModalService);
   private _listService = inject(ListService);
   title: string = componentRegister.shipmentView.Title;
@@ -65,16 +65,16 @@ export class ShipmentListComponent extends BaseRoutedComponent {
       this.selectedMonth = new Date();
     }
 
-    this._listService.getShipments(this.selectedMonth).subscribe({
-      next: (res: any) => {
+    // this._listService.getShipments(this.selectedMonth).subscribe({
+    //   next: (res: any) => {
 
-        this.dataSource = new MatTableDataSource(this.groupByDates(res) || []);
-      },
-      error: (error) => {
-        console.error('Error fetching payroll data:', error);
-        this.dataSource = new MatTableDataSource([]);
-      }
-    });
+    //     this.dataSource = new MatTableDataSource(this.groupByDates(res) || []);
+    //   },
+    //   error: (error) => {
+    //     console.error('Error fetching payroll data:', error);
+    //     this.dataSource = new MatTableDataSource([]);
+    //   }
+    // });
   }
 
   onMonthChange() {

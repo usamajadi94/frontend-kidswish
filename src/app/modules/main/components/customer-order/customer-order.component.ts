@@ -119,6 +119,7 @@ export class CustomerOrderComponent
                     productID: item.ProductID,
                     name: item.ProductName,
                     category: item.ProductCategory,
+                    BoxCase:item.BoxCase,
                     flavours: [],
                 };
             }
@@ -127,6 +128,7 @@ export class CustomerOrderComponent
                 name: item.FlavorName,
                 id: item.FlavorID,
                 qty: 0,
+                BoxCase:item.BoxCase
             });
         });
 
@@ -206,5 +208,12 @@ export class CustomerOrderComponent
         }
 
         return this.validation.length > 0;
+    }
+    
+    getCaseQty(detail: any, type: 'Box' | 'Pouch' | 'Sticker',Qty:any) {
+        if (detail[Qty] && detail[type + 'Case'] > 0) {
+            return Math.floor(detail[Qty] / detail[type + 'Case']);
+        }
+        else { return 0;}
     }
 }

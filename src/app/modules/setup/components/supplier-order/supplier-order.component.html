@@ -28,18 +28,19 @@
             <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes" [skeleton]="isDataLoading" />
         </div> -->
     </div>
-    
-    <div class="flex justify-end mt-5">
-      
-        <div>
-            <bft-button name="Add Row" icon="add" class="py-1" (click)="addRow()" />
-    
+    @if(formData.ID == 0){
+        <div class="flex justify-end mt-5">
+          
+            <div>
+                <bft-button name="Add Row" icon="add" class="py-1" (click)="addRow()" />
+        
+            </div>
         </div>
-    </div>
+    }
     
     
     <div class="overflow-x-auto overflow-y-auto max-h-[378px]">
-        <table class="w-full form-table mt-2 min-w-[1100px]">
+        <table class="w-full form-table mt-3 min-w-[1100px]">
             <thead class="sticky top-0 bg-white z-10">
                 <tr>
                     <th class="table-header border-r border-l w-15">Supplier Item</th>
@@ -78,8 +79,8 @@
                             [disabled]="true" symbol="$" />
                     </td>
                     <td class="py-0 px-2 border-r border-l w-10">
-                        <bft-input-number name="Badleafs" [required]="true" [(ngModel)]="element.Badleafs"
-                            [skeleton]="isDataLoading" [disabled]="true" />
+                        <bft-input-number name="Badleafs"  [(ngModel)]="element.Badleafs"
+                            [skeleton]="isDataLoading" (change)="getTAmt(element)" />
                     </td>
                     <td class="py-0 px-2 border-r border-l w-20">
                         <bft-input-currency name="DeductionAmt" [(ngModel)]="element.DeductionAmt"

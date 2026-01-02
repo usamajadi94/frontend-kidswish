@@ -1,3 +1,5 @@
+import { componentRegister } from "app/modules/shared/services/component-register";
+
 export class Product {
     ID: number = 0;
     ProductName: string | null = null;
@@ -13,7 +15,7 @@ export class Product {
     LeafQty: number | null = null;
     NetWeight: number | null = null;
     ActualNetWeight: number | null = null;
-
+    SCode:string = componentRegister.product.SCode;
 }
 
 export class Flavour {
