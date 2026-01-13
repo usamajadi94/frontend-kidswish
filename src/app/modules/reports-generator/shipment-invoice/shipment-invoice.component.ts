@@ -212,6 +212,29 @@ export class ShipmentInvoiceComponent {
     );
 
     const docDefinition: any = {
+      header: (currentPage: number, pageCount: number) => {
+        return {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
+            {
+              width: 'auto',
+              stack: [
+                { text: '', height: 60 }, // Space to align with content position (after company name + FECHA/DATE)
+                {
+                  text: `PAGINA/PAGE: ${currentPage}/${pageCount}`,
+                  style: 'FontStyle',
+                  alignment: 'right',
+                  fontSize: 9,
+                }
+              ]
+            }
+          ],
+          margin: [40, 20, 40, 20] // Match content margins (default pdfMake margins)
+        };
+      },
       content: this.getPdfcontent(base64Logo, true),
       styles: {
         companyTitle: {
@@ -264,6 +287,29 @@ export class ShipmentInvoiceComponent {
     );
 
     const docDefinition: any = {
+      header: (currentPage: number, pageCount: number) => {
+        return {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
+            {
+              width: 'auto',
+              stack: [
+                { text: '', height: 60 }, // Space to align with content position (after company name + FECHA/DATE)
+                {
+                  text: `PAGINA/PAGE: ${currentPage}/${pageCount}`,
+                  style: 'FontStyle',
+                  alignment: 'right',
+                  fontSize: 9,
+                }
+              ]
+            }
+          ],
+          margin: [40, 0, 40, 0] // Match content margins (default pdfMake margins)
+        };
+      },
       content: this.getPdfcontent(base64Logo),
       styles: {
         companyTitle: {
@@ -346,11 +392,6 @@ export class ShipmentInvoiceComponent {
                 },
                 {
                   text: `FECHA/DATE: ${this.formatDate(element.ShipmentDate)}`,
-                  style: 'FontStyle',
-                  alignment: 'right',
-                },
-                {
-                  text: `PAGINA/PAGE: ${index + 1}/${record.length}`,
                   style: 'FontStyle',
                   alignment: 'right',
                 },
