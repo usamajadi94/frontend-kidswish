@@ -24,6 +24,7 @@ import { BftInputCurrencyComponent } from 'app/modules/shared/components/fields/
 import { Supplier_Order_Products } from '../../models/supplier-order-products';
 import { MatTabsModule } from '@angular/material/tabs';
 import { SupplierOrderLedgerComponent } from './supplier-order-ledger/supplier-order-ledger.component';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 
 @Component({
@@ -39,7 +40,8 @@ import { SupplierOrderLedgerComponent } from './supplier-order-ledger/supplier-o
     BftInputNumberComponent,
     BftButtonComponent,
     BftInputCurrencyComponent,
-    MatTabsModule
+    MatTabsModule,
+    NzSelectModule
   ],
   templateUrl: './supplier-order.component.html',
   styleUrl: './supplier-order.component.scss'
@@ -129,9 +131,9 @@ export class SupplierOrderComponent extends BaseComponent<
   }
 
   async getProducts() {
-    await this._DrpService.getProductsDrp().subscribe({
+    await this.listService.getProductWithFlavor().subscribe({
       next: (res: any) => {
-        this.products = res;
+        this.products = this.groupByProduct(res);
       },
       error: (err) => {
         console.error('Error fetching items:', err);
@@ -150,7 +152,15 @@ export class SupplierOrderComponent extends BaseComponent<
   // -- Validation
   override ValidateBeforeSave(formData: SupplierOrderMaster): boolean {
     this.validation = []; // Clear previous validations
-
+    if(this.formData.Date == null) {
+      this.validation.push('Order Date is required.');
+    }
+    if(this.formData.SupplierID == null) {
+      this.validation.push('Supplier is required.');
+    }
+    if(this.formData.Supplier_Order_Detail.length == 0) {
+      this.validation.push('Order Details are required.');
+    }
 
     return this.validation.length > 0;
   }
@@ -206,7 +216,7 @@ export class SupplierOrderComponent extends BaseComponent<
 
   updateQtyCase(product: Supplier_Order_Products) {
     if (product.ProductID && product.Qty) {
-      const productFind = this.products.find(a => a.ID == product.ProductID);
+      const productFind = this.products.find(a => a.productID == product.ProductID);
       if (productFind['BoxCase'] > 0) {
         product.QtyCase =  Math.floor(product.Qty / productFind['BoxCase']);
       }
@@ -229,4 +239,37 @@ export class SupplierOrderComponent extends BaseComponent<
     });
   }
 
+  groupByProduct(data: any[]): any[] {
+    const grouped: { [key: number]: any } = {};
+
+    data.forEach((item) => {
+        if (!grouped[item.ProductID]) {
+            grouped[item.ProductID] = {
+                productID: item.ProductID,
+                name: item.ProductName,
+                category: item.ProductCategory,
+                BoxCase:item.BoxCase,
+                flavours: [],
+            };
+        }
+
+        grouped[item.ProductID].flavours.push({
+            name: item.FlavorName,
+            id: item.FlavorID,
+            qty: 0,
+            BoxCase:item.BoxCase
+        });
+    });
+
+    return Object.values(grouped);
+}
+
+  onProductItemSelect(element:Supplier_Order_Products) {
+    const product = this.products.find(a => {
+      return a.flavours.find(b => b.id === element.FlavorID);
+    });
+    if (product) {
+      element.ProductID = product.productID;
+    }
+  }
 }

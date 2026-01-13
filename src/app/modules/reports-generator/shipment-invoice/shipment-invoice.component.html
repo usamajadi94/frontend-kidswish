@@ -13,7 +13,27 @@
             @if(records && records.length > 0) {
             @for (element of records; track $index) {
 
-            <div #pageContent class="flex items-start justify-between my-5 invoice-block page-break-avoid">
+            <!-- Company Name Heading -->
+            <div #pageContent class="text-center my-5 invoice-block page-break-avoid">
+                <div class="text-2xl font-bold text-gray-900 uppercase">
+                    {{element.CompanyName}}
+                </div>
+            </div>
+
+            <!-- Top Header Section -->
+            <div #pageContent class="flex justify-end mb-5 text-sm page-break-avoid">
+                <div class="text-right space-y-1">
+                    <div class="font-semibold">FACTURA: {{element.InvoiceNo || '-'}}</div>
+                    <div>FECHA/DATE: {{formatDate(element.ShipmentDate)}}</div>
+                    <div>PAGINA/PAGE: {{$index + 1}}/{{records.length}}</div>
+                    <div>GROSS WEIGHT KGS: {{getTotal(element, 'GrossWeight')}}</div>
+                    <div>TOTAL PCS: {{getTotal(element, 'Case')}}</div>
+                    <div>DABOSSLEAF CUTS DIMENSIONS: {{element.FirstDimension}}</div>
+                    <div>DABOSSLEAF CUTS DIMENSIONS: {{element.SecondDimension}}</div>
+                </div>
+            </div>
+
+            <div #pageContent class="flex items-start justify-between mb-5 page-break-avoid">
                 <div class="flex items-start gap-4 w-3/3">
                     <div>
                         <div class="space-y-1">
@@ -117,6 +137,23 @@
                 </div>
             </div>
 
+            <!-- Summary Section -->
+            <div #pageContent class="mt-6 text-sm page-break-avoid">
+                <div class="space-y-2">
+                    <div>CANT. BULTOS: {{getTotal(element,'Case')}}</div>
+                    <div>NOTE:</div>
+                    <div>TOTAL NET WEIGHT: {{getTotal(element,'NetWeight')}}</div>
+                    <div>TOTAL GROSS WEIGHT: {{getTotal(element,'GrossWeight')}}</div>
+                </div>
+            </div>
+
+            <!-- Signature Section -->
+            <div #pageContent class="mt-8 text-sm page-break-avoid">
+                <div class="flex flex-col items-center">
+                    <div class="w-64 border-t border-gray-400 mb-2"></div>
+                    <div class="text-center font-semibold">FIRMA</div>
+                </div>
+            </div>
 
             }
             }

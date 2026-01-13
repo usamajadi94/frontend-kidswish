@@ -6,4 +6,5 @@ export class Supplier_Order_Products {
   Qty: number | null = null;
   LeafUsed: number | null = null;
   QtyCase: number | null = null;
+  FlavorID: number | null = null;
 }

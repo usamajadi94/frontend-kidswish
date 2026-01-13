@@ -151,6 +151,7 @@ export class ShipmentFormComponent  extends BaseComponent<
                     ProductID: item.ProductID,
                     name: item.ProductName,
                     NetWeight: item.NetWeight,
+                    ActualNetWeight: item.ActualNetWeight,
                     flavours: [],
                 };
             }
@@ -179,7 +180,7 @@ export class ShipmentFormComponent  extends BaseComponent<
             p.flavours.some(f => f.FlavorID === element.FlavourID)
         );
         if(product != null){
-            element.NetWeight = product.NetWeight * element.Case;     
+            element.NetWeight = product.ActualNetWeight * element.Case;     
             element.GrossWeight = product.NetWeight * element.Case;     
         }
     }

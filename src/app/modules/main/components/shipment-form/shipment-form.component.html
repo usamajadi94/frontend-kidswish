@@ -73,6 +73,16 @@
                         <bft-textarea name="CompanyAddress" label="Address" [(ngModel)]="formData.CompanyAddress"
                             required="true"></bft-textarea>
                     </div>
+                    
+                    <div class="w-full sm:col-span-4">
+                        <bft-textarea name="FirstDimension" label="First Dimension" required="true" rows="3"
+                            [(ngModel)]="formData.FirstDimension"></bft-textarea>
+                    </div>
+        
+                    <!-- <div class="w-full sm:col-span-2">
+                        <bft-input-text name="SecondDimension" label="Second Dimension" required="true"
+                            [(ngModel)]="formData.SecondDimension"></bft-input-text>
+                    </div> -->
                 </div>
             </div>
         </nz-collapse>

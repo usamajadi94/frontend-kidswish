@@ -272,6 +272,7 @@ export class OrderViewComponent {
                     category: item.ProductCategory,
                     BoxCase:item.BoxCase,
                     NetWeight: item.NetWeight,
+                    ActualNetWeight: item.ActualNetWeight,
                     flavours: [],
                 };
             }
@@ -528,8 +529,8 @@ export class OrderViewComponent {
                     Case: this.getShipmentCases(parseInt(productID), parseInt(flavourID), product.flavours.find((f: any) => f.id == parseInt(flavourID))),
                     ID: 0,
                     ItemID: null,
-                    NetWeight: null,
-                    GrossWeight: product.NetWeight * this.getShipmentCases(parseInt(productID), parseInt(flavourID), product.flavours.find((f: any) => f.id == parseInt(flavourID))),
+                    NetWeight: (product.ActualNetWeight ?? 0) * this.getShipmentCases(parseInt(productID), parseInt(flavourID), product.flavours.find((f: any) => f.id == parseInt(flavourID))),
+                    GrossWeight: (product.NetWeight ?? 0) * this.getShipmentCases(parseInt(productID), parseInt(flavourID), product.flavours.find((f: any) => f.id == parseInt(flavourID))),
                     Description: null
                 });
             }

@@ -22,5 +22,7 @@ export class ShipmentMaster {
     ClientEmail: string = null;
     SCode: string = componentRegister.shipmentView.SCode;
     InvoiceNo: string = null;
+    FirstDimension: string = null;
+    SecondDimension: string = null;
     Shipment: Shipment[] = [];
 }

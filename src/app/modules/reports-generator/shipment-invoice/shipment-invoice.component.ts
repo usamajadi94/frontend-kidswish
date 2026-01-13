@@ -35,7 +35,7 @@ import { ReportViewerToolComponent } from '../report-viewer-tool/report-viewer-t
     NzDrawerModule,
     ReportViewerToolComponent,
     MatIconModule,
-    
+
   ],
   providers: [CurrencyPipe],
   templateUrl: './shipment-invoice.component.html',
@@ -111,22 +111,24 @@ export class ShipmentInvoiceComponent {
               acc.push({
                 InvoiceNo: curr.InvoiceNo,
                 ShipmentDate: curr.ShipmentDate,
-                CompanyName:curr.CompanyName,
-                CompanyRnc:curr.CompanyRnc,
-                CompanyContactPerson:curr.CompanyContactPerson,
-                CompanyAddress:curr.CompanyAddress,
-                CompanyCity:curr.CompanyCity,
-                CompanyCountry:curr.CompanyCountry,
-                CompanyTel:curr.CompanyTel,
-                CompanyEmail:curr.CompanyEmail,
-                ClientName:curr.ClientName,
-                ClientAddress:curr.ClientAddress,
-                ClientCity:curr.ClientCity,
-                ClientState:curr.ClientState,
-                ClientZipcode:curr.ClientZipcode,
-                ClientTel:curr.ClientTel,
-                ClientFax:curr.ClientFax,
-                ClientEmail:curr.ClientEmail,
+                CompanyName: curr.CompanyName,
+                CompanyRnc: curr.CompanyRnc,
+                CompanyContactPerson: curr.CompanyContactPerson,
+                CompanyAddress: curr.CompanyAddress,
+                CompanyCity: curr.CompanyCity,
+                CompanyCountry: curr.CompanyCountry,
+                CompanyTel: curr.CompanyTel,
+                CompanyEmail: curr.CompanyEmail,
+                ClientName: curr.ClientName,
+                ClientAddress: curr.ClientAddress,
+                ClientCity: curr.ClientCity,
+                ClientState: curr.ClientState,
+                ClientZipcode: curr.ClientZipcode,
+                ClientTel: curr.ClientTel,
+                ClientFax: curr.ClientFax,
+                ClientEmail: curr.ClientEmail,
+                FirstDimension: curr.FirstDimension,
+                SecondDimension: curr.SecondDimension,
                 items: [curr],
               });
             }
@@ -316,6 +318,77 @@ export class ShipmentInvoiceComponent {
       }
 
       content.push(
+        // Company Name Heading
+        {
+          text: element.CompanyName || '',
+          style: 'companyTitle',
+          alignment: 'center',
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 10],
+        },
+
+        // Top Header Section
+        {
+          columns: [
+            {
+              width: '*',
+              text: '',
+            },
+            {
+              width: 'auto',
+              stack: [
+                {
+                  text: `FACTURA: ${element.InvoiceNo || '-'}`,
+                  style: 'FontStyle',
+                  bold: true,
+                  alignment: 'right',
+                },
+                {
+                  text: `FECHA/DATE: ${this.formatDate(element.ShipmentDate)}`,
+                  style: 'FontStyle',
+                  alignment: 'right',
+                },
+                {
+                  text: `PAGINA/PAGE: ${index + 1}/${record.length}`,
+                  style: 'FontStyle',
+                  alignment: 'right',
+                },
+                {
+                  text: `GROSS WEIGHT KGS: ${this.getTotal(element, 'GrossWeight')}`,
+                  style: 'FontStyle',
+                  alignment: 'right',
+                },
+                {
+                  text: `TOTAL PCS: ${this.getTotal(element, 'Case')}`,
+                  style: 'FontStyle',
+                  alignment: 'right',
+                },
+                // {
+                //   text: `DABOSSLEAF CUTS DIMENSIONS: ${element.FirstDimension}`,
+                //   style: 'FontStyle',
+                //   alignment: 'right',
+                // },
+                
+                element.FirstDimension ?
+                {
+                  text: `${element.FirstDimension?.toString().replace('\\n', '\n')}`,
+                  style: 'FontStyle',
+                  alignment: 'right',
+                }
+                : null,
+                element.SecondDimension ? {
+                  text: `DABOSSLEAF CUTS DIMENSIONS: ${element.SecondDimension}`,
+                  style: 'FontStyle',
+                  alignment: 'right',
+                }
+                : null,
+              ],
+            },
+          ],
+          margin: [0, 0, 0, 10],
+        },
+
         // Company Info + Invoice Info
         {
           columns: [
@@ -354,7 +427,7 @@ export class ShipmentInvoiceComponent {
                     },
                   ],
                 }
-                
+
               ],
             },
           ],
@@ -364,16 +437,16 @@ export class ShipmentInvoiceComponent {
         // Ship To
         {
           stack: [
-           {
+            {
               text: `CLIENTE: ${element.ClientName}`,
               style: 'companyTitle',
             },
             {
-              text:`DIRECCION: ${element?.ClientAddress}, ${element?.ClientCity}, ${element?.ClientState} ${element?.ClientZipcode}` ,
+              text: `DIRECCION: ${element?.ClientAddress}, ${element?.ClientCity}, ${element?.ClientState} ${element?.ClientZipcode}`,
               style: 'FontStyle',
             },
             {
-              text:`Tel: ${element?.ClientTel || '-'} | Fax: ${element?.ClientFax || '-'}` ,
+              text: `Tel: ${element?.ClientTel || '-'} | Fax: ${element?.ClientFax || '-'}`,
               style: 'FontStyle',
             },
             {
@@ -384,10 +457,51 @@ export class ShipmentInvoiceComponent {
           margin: [0, 0, 0, 20],
         },
 
+        {
+          table: {
+            widths: ['20%', '60%', '20%'],
+            body: [
+              [
+                { text: '' },
+                {
+                  text: 'ORIGIN OF ALL TOBACCO COMPONENTS, REPUBLICA DOMINICANA',
+                  style: 'FontStyle',
+                  alignment: 'center',
+                },
+                { text: '' },
+              ],
+            ]
+          },
+          layout: {
+            defaultBorder: false,
+          }
+        },
+        {
+          table: {
+            widths: ['20%', '60%', '20%'],
+            body: [
+              [
+                { text: '' },
+                {
+                  text: 'DOES NOT INCLUDE ANY CUBAN TOBACCOS',
+                  style: 'FontStyle',
+                  bold: true,
+                  alignment: 'center',
+                  border: [true, true, true, true],
+                },
+                { text: '' },
+              ]
+            ]
+          },
+          layout: {
+            defaultBorder: false,
+          },
+          margin: [0, 10, 0, 20],
+        },
         // Table Header
         {
           table: {
-            widths: ['8%', '10%', '12%', '9%', '9%', '22%', '15%', '15%'],
+            widths: ['5%', '7%', '8%', '9%', '9%', '22%', '16%', '12%', '12%'],
             body: [
               [
                 {
@@ -427,6 +541,12 @@ export class ShipmentInvoiceComponent {
                   alignment: 'center',
                 },
                 {
+                  text: 'Flavor',
+                  style: 'TableHeaderFontSize',
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
                   text: 'PRICE',
                   style: 'TableHeaderFontSize',
                   bold: true,
@@ -451,14 +571,26 @@ export class ShipmentInvoiceComponent {
                   style: 'TableFontSize',
                   alignment: 'center',
                 },
-                { text: item?.Qty, style: 'TableFontSize',
-                  alignment: 'center', },
-                { text: item?.NetWeight, style: 'TableFontSize',
-                  alignment: 'center' },
-                { text: item?.GrossWeight, style: 'TableFontSize',
-                  alignment: 'center' },
-                { text: item?.Description, style: 'TableFontSize',
-                  alignment: 'center' },
+                {
+                  text: item?.Qty, style: 'TableFontSize',
+                  alignment: 'center',
+                },
+                {
+                  text: item?.NetWeight, style: 'TableFontSize',
+                  alignment: 'center'
+                },
+                {
+                  text: item?.GrossWeight, style: 'TableFontSize',
+                  alignment: 'center'
+                },
+                {
+                  text: item?.Description, style: 'TableFontSize',
+                  alignment: 'center'
+                },
+                {
+                  text: item?.Item, style: 'TableFontSize',
+                  alignment: 'center'
+                },
                 {
                   text: this.currencyPipe.transform(
                     item?.Price,
@@ -483,7 +615,7 @@ export class ShipmentInvoiceComponent {
         // Totals Row
         {
           table: {
-            widths: ['8%', '10%', '12%', '9%', '9%', '22%', '15%', '15%'],
+            widths: ['5%', '7%', '8%', '9%', '9%', '22%', '16%', '12%', '12%'],
             body: [
               [
                 {
@@ -513,7 +645,11 @@ export class ShipmentInvoiceComponent {
                   style: 'TotalStyle',
                   alignment: 'center'
                 },
-             
+
+                {
+                  text: '',
+
+                },
                 {
                   text: '',
 
@@ -529,6 +665,61 @@ export class ShipmentInvoiceComponent {
             ],
           },
           fillColor: '#F1F5F9',
+          margin: [0, 0, 0, 10],
+        },
+
+        // Summary Section
+        {
+          stack: [
+            {
+              text: `CANT. BULTOS: ${this.getTotal(element, 'Case')}`,
+              style: 'FontStyle',
+              margin: [0, 0, 0, 5],
+            },
+            {
+              text: 'NOTE:',
+              style: 'FontStyle',
+              margin: [0, 0, 0, 5],
+            },
+            {
+              text: `TOTAL NET WEIGHT: ${this.getTotal(element, 'NetWeight')}`,
+              style: 'FontStyle',
+              margin: [0, 0, 0, 5],
+            },
+            {
+              text: `TOTAL GROSS WEIGHT: ${this.getTotal(element, 'GrossWeight')}`,
+              style: 'FontStyle',
+              margin: [0, 0, 0, 5],
+            },
+          ],
+          margin: [0, 20, 0, 20],
+        },
+
+        // Signature Section
+        {
+          stack: [
+            {
+              canvas: [
+                {
+                  type: 'line',
+                  x1: 0,
+                  y1: 0,
+                  x2: 200,
+                  y2: 0,
+                  lineWidth: 1,
+                  lineColor: '#666666',
+                },
+              ],
+              margin: [0, 0, 0, 5],
+              alignment: 'center',
+            },
+            {
+              text: 'FIRMA',
+              style: 'Signature',
+              bold: true,
+              alignment: 'center',
+            },
+          ],
           margin: [0, 0, 0, 10],
         },
 
@@ -564,5 +755,24 @@ export class ShipmentInvoiceComponent {
       }
     }
     // Removing all non-digit characters
+  }
+
+  formatDate(date: any): string {
+    if (!date) return '-';
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '-';
+    return formatDate(d, 'dd-MM-yyyy', 'en-US');
+  }
+
+  getDimensions(element: any): string {
+    // Extract dimensions from items if available, or return default
+    if (element.items && element.items.length > 0) {
+      const dimensions = element.items
+        .map((item: any) => item.Dimensions)
+        .filter((dim: any) => dim)
+        .join(' / ');
+      return dimensions || '-';
+    }
+    return '-';
   }
 }

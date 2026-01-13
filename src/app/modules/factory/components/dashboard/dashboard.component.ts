@@ -226,7 +226,8 @@ export class DashboardComponent implements OnInit {
             },
             yaxis: {
                 title: {
-                    text: 'Products'
+                    // text: 'Products'
+                    text: 'Flavors'
                 }
             },
             fill: {

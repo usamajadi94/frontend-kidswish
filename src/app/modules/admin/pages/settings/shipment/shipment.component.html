@@ -6,7 +6,7 @@
         </div>
     </div>
     <form #accountNgForm="ngForm" class="mt-4">
-        <div class="text-xl font-semibold">Country</div>
+        <div class="text-xl font-semibold">Company</div>
         <hr class="my-1" />
         <div class="mt-4 grid gap-2 grid-cols-2 sm:grid-cols-4">
             <div class="w-full sm:col-span-2">
@@ -44,10 +44,21 @@
                     [(ngModel)]="formData.CompanyRnc"></bft-input-text>
             </div>
 
+            
             <div class="w-full sm:col-span-2">
                 <bft-textarea name="CompanyAddress" label="Address" [(ngModel)]="formData.CompanyAddress"
-                    required="true"></bft-textarea>
+                required="true"></bft-textarea>
             </div>
+
+            <div class="w-full sm:col-span-4">
+                <bft-textarea name="FirstDimension" label="First Dimension" required="true" rows="3"
+                    [(ngModel)]="formData.FirstDimension"></bft-textarea>
+            </div>
+
+            <!-- <div class="w-full sm:col-span-2">
+                <bft-input-text name="SecondDimension" label="Second Dimension" required="true"
+                    [(ngModel)]="formData.SecondDimension"></bft-input-text>
+            </div> -->
         </div>
 
         <div class="text-xl font-semibold mt-4">Client</div>

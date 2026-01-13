@@ -270,21 +270,22 @@ export class PackagingStockListComponent implements OnInit {
         const excelData: any[] = [];
         
         // Add header row
-        excelData.push(['Product', 'Flavour', 'Box (Qty/Cases)', 'Pouch (Qty/Cases)', 'Sticker (Qty/Cases)']);
+        // excelData.push(['Product', 'Flavour', 'Box (Qty/Cases)', 'Pouch (Qty/Cases)', 'Sticker (Qty/Cases)']);
+        excelData.push(['Product', 'Flavour', 'Box (Qty/Cases)', 'Pouch (Qty/Cases)']);
         
         // Add data rows
         this.groupedPacks.forEach(pack => {
             pack.flavours.forEach((flavour: any) => {
                 const boxQty = `${flavour.Box} / ${this.getCaseQty(flavour, 'Box')}`;
                 const pouchQty = `${flavour.Pouch} / ${this.getCaseQty(flavour, 'Pouch')}`;
-                const stickerQty = `${flavour.Sticker} / ${this.getCaseQty(flavour, 'Sticker')}`;
+                // const stickerQty = `${flavour.Sticker} / ${this.getCaseQty(flavour, 'Sticker')}`;
                 
                 excelData.push([
                     pack.name,
                     flavour.name,
                     boxQty,
                     pouchQty,
-                    stickerQty
+                    // stickerQty
                 ]);
             });
         });
@@ -294,11 +295,11 @@ export class PackagingStockListComponent implements OnInit {
         
         // Set column widths
         worksheet['!cols'] = [
-            { wch: 25 }, // Product
-            { wch: 25 }, // Flavour
+            { wch: 35 }, // Product
+            { wch: 35 }, // Flavour
             { wch: 20 }, // Box
             { wch: 20 }, // Pouch
-            { wch: 20 }  // Sticker
+            // { wch: 20 }  // Sticker
         ];
         
         // Create workbook
@@ -391,7 +392,7 @@ export class PackagingStockListComponent implements OnInit {
                                 <th>Flavour</th>
                                 <th style="text-align: center;">Box (Qty / Cases)</th>
                                 <th style="text-align: center;">Pouch (Qty / Cases)</th>
-                                <th style="text-align: center;">Sticker (Qty / Cases)</th>
+                                
                             </tr>
                         </thead>
                         <tbody>
@@ -400,14 +401,14 @@ export class PackagingStockListComponent implements OnInit {
             pack.flavours.forEach((flavour: any) => {
                 const boxQty = `${flavour.Box} / ${this.getCaseQty(flavour, 'Box')}`;
                 const pouchQty = `${flavour.Pouch} / ${this.getCaseQty(flavour, 'Pouch')}`;
-                const stickerQty = `${flavour.Sticker} / ${this.getCaseQty(flavour, 'Sticker')}`;
+                // const stickerQty = `${flavour.Sticker} / ${this.getCaseQty(flavour, 'Sticker')}`;
                 
                 printContent += `
                     <tr>
                         <td>${flavour.name}</td>
                         <td style="text-align: center;">${boxQty}</td>
                         <td style="text-align: center;">${pouchQty}</td>
-                        <td style="text-align: center;">${stickerQty}</td>
+                        
                     </tr>
                 `;
             });

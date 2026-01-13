@@ -175,7 +175,7 @@
                           <thead class="sticky top-0 bg-white z-10 p-2">
                           <tr>
                             <th class="px-2 table-header border border-t-0 w-3/10 text-center">Supplier Item</th>
-                            <th class="px-2 table-header border border-t-0 w-3/10 text-left">Product</th>
+                            <th class="px-2 table-header border border-t-0 w-3/10 text-left">Flavour</th>
                             <th class="px-2 table-header border border-t-0 w-2/10 text-center">Qty</th>
                             <th class="px-2 table-header border border-t-0 w-2/10 text-center">Case</th>
                             
@@ -188,11 +188,35 @@
                                         <bft-select name="SupplierItemID" [required]="true" [(ngModel)]="product.SupplierItemID"
                                             [displayList]="supplierProductItems" displayField="Description" valueField="ID"
                                             [skeleton]="isDataLoading"  />
+                                            
                                     </td>
                                     <td class="py-1 px-2 border-b border-r border-l w-3/10 text-left">
-                                        <bft-select name="ProductID" [required]="true" [(ngModel)]="product.ProductID"
+                                        <!-- <bft-select name="ProductID" [required]="true" [(ngModel)]="product.ProductID"
                                             [displayList]="products" displayField="Description" valueField="ID"
-                                            [skeleton]="isDataLoading"  />
+                                            [skeleton]="isDataLoading"  /> -->
+
+                                        @if(isDataLoading){
+                                        <bft-skeleton />
+                                        }
+                                        @else {
+                                        <nz-form-item>
+                                            <nz-form-control>
+                                                <nz-input-group class="non-prefix-select">
+                                                    <nz-select nzAllowClear nzShowSearch nzPlaceHolder="Select Flavor" class="w-full"
+                                                        [(ngModel)]="product.FlavorID" (ngModelChange)="onProductItemSelect(product)" >
+                                                        @for (productItem of products; track productItem.productID) {
+                                                        <nz-option-group [nzLabel]="productItem.name">
+                                                            @for (flavour of productItem.flavours; track flavour.id) {
+                                                            <nz-option [nzValue]="flavour.id"
+                                                                [nzLabel]="flavour.name"></nz-option>
+                                                            }
+                                                        </nz-option-group>
+                                                        }
+                                                    </nz-select>
+                                                </nz-input-group>
+                                            </nz-form-control>
+                                        </nz-form-item>
+                                        }
                                     </td>
                                     <td class="py-1 px-2 border-b border-r w-2/10 text-center">
                                         <bft-input-number name="Qty" [required]="true" [(ngModel)]="product.Qty"

@@ -21,4 +21,6 @@ export class Shipment_Informaton {
     ClientTel: string = null;
     ClientFax: string = null;
     ClientEmail: string = null;
+    FirstDimension: string = null;
+    SecondDimension: string = null;
 }

@@ -127,9 +127,9 @@ export class ProductOrderFormComponent extends BaseComponent<
     }
 
     decrement(detail: FlavorOrderDetail, field: 'Pouch' | 'Box' | 'Sticker') {
-        if ((detail[field] as number) > 0) {
-            (detail[field] as number)--;
-        }
+        
+        (detail[field] as number)--;
+        
     }
 
     public BeforeInsert(formData: FlavorOrderMaster): void {
@@ -138,9 +138,9 @@ export class ProductOrderFormComponent extends BaseComponent<
             // Loop over flavours
             product.flavours.forEach((flavour: any) => {
                 if (
-                    flavour.Box > 0 ||
-                    flavour.Pouch > 0 ||
-                    flavour.Sticker > 0
+                    flavour.Box != 0 ||
+                    flavour.Pouch != 0 ||
+                    flavour.Sticker != 0
                 ) {
                     const detail = new FlavorOrderDetail();
                     detail.ProductID = product.ProductID; // product ka ID
@@ -200,9 +200,9 @@ export class ProductOrderFormComponent extends BaseComponent<
                         d.FlavorID === flavour.FlavorID
                 );
                   if (
-                    flavour.Box > 0 ||
-                    flavour.Pouch > 0 ||
-                    flavour.Sticker > 0
+                    flavour.Box != 0 ||
+                    flavour.Pouch != 0 ||
+                    flavour.Sticker != 0
                 ){
                     this.formData.Flavor_Order_Detail.push({
                         ID: found ? found.ID : 0, // keep old ID if exists, else insert new
