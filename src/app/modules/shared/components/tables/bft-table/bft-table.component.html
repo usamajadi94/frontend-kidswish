@@ -8,7 +8,7 @@
       <nz-form-item class="search w-full">
         <nz-form-control class="w-full">
           <nz-input-group [nzPrefix]="suffixIconSearch">
-            <input nz-input type="text" name="search" #input placeholder="Search..." [(ngModel)]="search"  (keyup)="Search()" />
+            <input nz-input type="text" name="search" #input placeholder="Search..." [(ngModel)]="search" (ngModelChange)="onSearchChange()" />
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>
@@ -217,13 +217,12 @@
               }
               @else if (col.type === 'currency' && col?.total === true) {
                 <span>
-
-                  {{ getTotal(col.name) | currency:currency }}
+                  {{ totals[col.name] | currency:currency }}
                 </span>
               }
               @else if (col.type === 'number' && col?.total === true) {
                 <span>
-                  {{ getTotal(col.name) | number }}
+                  {{ totals[col.name] | number }}
                 </span>
               }
             </td>

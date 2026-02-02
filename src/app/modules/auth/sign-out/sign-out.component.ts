@@ -2,6 +2,7 @@ import { I18nPluralPipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from 'app/core/auth/auth.service';
+import { NavigationService } from 'app/core/navigation/navigation.service';
 import { Subject, finalize, takeUntil, takeWhile, tap, timer } from 'rxjs';
 
 @Component({
@@ -24,6 +25,7 @@ export class AuthSignOutComponent implements OnInit, OnDestroy {
      */
     constructor(
         private _authService: AuthService,
+        private _navigationService: NavigationService,
         private _router: Router
     ) {}
 
@@ -37,6 +39,9 @@ export class AuthSignOutComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         // Sign out
         this._authService.signOut();
+        
+        // Clear navigation cache so next user gets fresh navigation
+        this._navigationService.clearCache();
 
         // Redirect after the countdown
         timer(1000, 1000)

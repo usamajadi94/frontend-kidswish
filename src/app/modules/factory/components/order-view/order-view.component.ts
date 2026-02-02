@@ -7,7 +7,7 @@ import {
 } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -34,6 +34,7 @@ import {
 import { BftInputCurrencyComponent } from "app/modules/shared/components/fields/bft-input-currency/bft-input-currency.component";
 import { ShipmentMaster } from '../../models/shipment-master.model';
 import { Shipment } from '../../models/shipment.model';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-order-view',
@@ -70,11 +71,12 @@ import { Shipment } from '../../models/shipment.model';
         ]),
     ],
 })
-export class OrderViewComponent {
+export class OrderViewComponent implements OnDestroy {
     Title: string = componentRegister.pipelineOrders.Title;
     private _listService = inject(ListService);
     private _http = inject(HttpClient);
     private _MessageModalService = inject(MessageModalService);
+    private _destroy$ = new Subject<void>();
 
     groupedProducts: any[] = [];
     pipelineOrders: any[] = [];
@@ -130,6 +132,11 @@ export class OrderViewComponent {
     ];
     detailColumns: string[] = ['product', 'flavor', 'quantity'];
 
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
+    }
+
     ngOnInit(): void {
         this.getProductWithFlavors();
         this.getPipelineOrders();
@@ -143,7 +150,7 @@ export class OrderViewComponent {
         this.fetchShipmentData();
     }
     getProductWithFlavors() {
-        this._listService.getProductWithFlavor().subscribe({
+        this._listService.getProductWithFlavor().pipe(takeUntil(this._destroy$)).subscribe({
             next: (res: any) => {
                 this.groupedProducts = this.groupByProduct(res);
                 this.productOptions = this.groupedProducts.map((product) => ({
@@ -159,7 +166,7 @@ export class OrderViewComponent {
     }
 
     getPipelineOrders() {
-        this._listService.getPipeLineOrder(this.currentMonth).subscribe({
+        this._listService.getPipeLineOrder(this.currentMonth).pipe(takeUntil(this._destroy$)).subscribe({
             next: (res: any) => {
                 this.pipelineOrders = res || [];
                 console.log(this.pipelineOrders);
@@ -320,6 +327,7 @@ export class OrderViewComponent {
                     `${apiUrls.productionOrder}/${this.productionForm.ID}`,
                     this.productionForm
                 )
+                .pipe(takeUntil(this._destroy$))
                 .subscribe({
                     next: (res: any) => {
                         this._MessageModalService.success(
@@ -339,6 +347,7 @@ export class OrderViewComponent {
             // Create new record
         this._http
             .post(apiUrls.productionOrder, this.productionForm)
+                .pipe(takeUntil(this._destroy$))
                 .subscribe({
                     next: (res: any) => {
                         this._MessageModalService.success(
@@ -367,6 +376,7 @@ export class OrderViewComponent {
     fetchProductionDetail() {
         this._listService
             .getProductionDetail(this.currentMonth)
+            .pipe(takeUntil(this._destroy$))
             .subscribe((res: any) => {
                 this.productionRecords = res || [];
 
@@ -455,7 +465,7 @@ export class OrderViewComponent {
     }
 
     deleteProduction(record: FactoryProduction) {
-        this._http.delete(`${apiUrls.productionOrder}/${record.ID}`).subscribe({
+        this._http.delete(`${apiUrls.productionOrder}/${record.ID}`).pipe(takeUntil(this._destroy$)).subscribe({
             next: (res: any) => {
                 this._MessageModalService.success(
                     'Production record deleted successfully!'
@@ -593,7 +603,7 @@ export class OrderViewComponent {
     // ============================================
 
     fetchShipmentData() {
-        this._listService.getShipmentDetail(this.currentMonth).subscribe({
+        this._listService.getShipmentDetail(this.currentMonth).pipe(takeUntil(this._destroy$)).subscribe({
             next: (res: any) => {
                 this.shipmentRecords = res || [];
                this.totalShipment = res && res.length > 0 ? res[0].Qty || 0 : 0;

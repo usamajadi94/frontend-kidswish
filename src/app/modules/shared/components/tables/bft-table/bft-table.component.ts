@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { NzCustomColumn, NzTableModule, NzTableSortFn, NzTableSortOrder } from 'ng-zorro-antd/table';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { NzModalModule } from 'ng-zorro-antd/modal';
@@ -17,6 +17,7 @@ import { BftCheckboxComponent } from '../../fields/bft-checkbox/bft-checkbox.com
 import { BftButtonComponent } from '../../buttons/bft-button/bft-button.component';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { NgxMaskPipe, provideNgxMask } from 'ngx-mask';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 @Component({
   selector: 'bft-table',
   standalone: true,
@@ -43,7 +44,7 @@ import { NgxMaskPipe, provideNgxMask } from 'ngx-mask';
   styleUrl: './bft-table.component.scss',
   providers: [provideNgxMask()]
 })
-export class BftTableComponent  implements OnInit, OnChanges {
+export class BftTableComponent  implements OnInit, OnChanges, OnDestroy {
   @Output() view: EventEmitter<any> = new EventEmitter();
   @Output() onNewClick: EventEmitter<any> = new EventEmitter();
   @Input() columns: any[] = [];
@@ -68,7 +69,12 @@ export class BftTableComponent  implements OnInit, OnChanges {
   inputValue: any = '';
   options: string[] = [];
   isTotalExists: boolean = false;
-  private _isVisible = true;  
+  // Precomputed totals to avoid recalculating on every change detection
+  totals: { [columnName: string]: number } = {};
+  private _isVisible = true;
+  // Debounced search subject to avoid filtering on every keystroke
+  private _searchSubject = new Subject<string>();
+  private _destroy$ = new Subject<void>();  
 
   @Input()
   get isVisible(): boolean {
@@ -89,12 +95,32 @@ export class BftTableComponent  implements OnInit, OnChanges {
     // console.log(this.displayData)
     this.setColumns();
     this.setExcelColumns();
+    // Initialize displayData and calculate totals (shallow copy - we don't mutate row objects)
+    if (this.dataSource && this.dataSource.length > 0) {
+      this.displayData = [...this.dataSource];
+      this.calculateTotals();
+    }
+    
+    // Set up debounced search subscription
+    this._searchSubject.pipe(
+      debounceTime(300), // Wait 300ms after user stops typing
+      distinctUntilChanged(), // Only trigger if search value actually changed
+      takeUntil(this._destroy$)
+    ).subscribe(searchValue => {
+      this.performSearch(searchValue);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this._destroy$.next();
+    this._destroy$.complete();
+    this._searchSubject.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.displayData = JSON.parse(JSON.stringify(this.dataSource));
-    // this.setColumns();
-
+    // Shallow copy - row objects are never mutated, only the array is replaced when filtering
+    this.displayData = this.dataSource ? [...this.dataSource] : [];
+    this.calculateTotals();
   }
 
   setColumns() {
@@ -548,6 +574,7 @@ export class BftTableComponent  implements OnInit, OnChanges {
       });
     });
 
+    this.calculateTotals();
     this.loading = false;
   }
 
@@ -619,7 +646,8 @@ export class BftTableComponent  implements OnInit, OnChanges {
   onClear() {
     this.filtersArr = [];
     this.filtersStore = [];
-    this.displayData = this.dataSource
+    this.displayData = this.dataSource;
+    this.calculateTotals();
   }
 
   combineObj(arr: any[]) {
@@ -633,12 +661,25 @@ export class BftTableComponent  implements OnInit, OnChanges {
   }
 
 
-  Search() {
+  /**
+   * Called from template when search input changes
+   * Emits to debounced subject instead of searching immediately
+   */
+  onSearchChange(): void {
+    this._searchSubject.next(this.search);
+  }
+
+  /**
+   * Performs the actual search operation
+   * This is called after debounce delay to avoid filtering on every keystroke
+   */
+  private performSearch(searchValue: string): void {
     var value: any = null
-    const filterValue = this.search.trim().toLowerCase();
+    const filterValue = searchValue.trim().toLowerCase();
 
     if (!filterValue) {
       this.displayData = this.dataSource;
+      this.calculateTotals();
       return;
     }
     var data = this.dataSource.filter(item => {
@@ -653,6 +694,14 @@ export class BftTableComponent  implements OnInit, OnChanges {
       return false;
     });
     this.displayData = data;
+    this.calculateTotals();
+  }
+
+  /**
+   * @deprecated Use onSearchChange() instead. This method is kept for backward compatibility.
+   */
+  Search() {
+    this.performSearch(this.search);
   }
 
   onViewbtn(row: any) {
@@ -668,10 +717,52 @@ export class BftTableComponent  implements OnInit, OnChanges {
     this.excelService.generateExcel();*/
   }
 
+  /**
+   * Calculate totals for all columns that have total enabled
+   * This is called whenever displayData changes to precompute totals
+   * instead of calculating them on every change detection cycle
+   */
+  calculateTotals(): void {
+    if (!this.isTotalExists) {
+      this.totals = {};
+      return;
+    }
+
+    // Reset totals
+    this.totals = {};
+
+    // Calculate totals only for columns that have total enabled
+    this.columns.forEach(col => {
+      if (col?.total === true && (col.type === 'currency' || col.type === 'number')) {
+        let total = 0;
+        this.displayData.forEach(element => {
+          const value = element[col.name];
+          if (value !== null && value !== undefined && !isNaN(value)) {
+            total += Number(value);
+          }
+        });
+        this.totals[col.name] = total;
+      }
+    });
+  }
+
+  /**
+   * @deprecated Use totals[columnName] instead. This method is kept for backward compatibility
+   * but should not be called from templates as it causes performance issues.
+   */
   getTotal(totalValue:any){
+    // Return precomputed total if available, otherwise calculate on the fly
+    if (this.totals.hasOwnProperty(totalValue)) {
+      return this.totals[totalValue];
+    }
+    
+    // Fallback calculation (should rarely be needed)
     var total:number = 0;
     this.displayData.forEach(element=>{
-      total += element[totalValue];
+      const value = element[totalValue];
+      if (value !== null && value !== undefined && !isNaN(value)) {
+        total += Number(value);
+      }
     });
     return total;
   }

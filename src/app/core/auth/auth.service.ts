@@ -106,41 +106,22 @@ export class AuthService {
 
         if (this._localStorage.isPasswordChanged == 'true') {
             this._router.navigateByUrl('/change-password');
-            // this._authenticated = true;
-            // return of(true);
-        } else if (this._localStorage.eid == '') {
-                if (this.checkMultipleEntity() == true) {
-                    this._router.navigateByUrl('/switch-entity');
-                    // this._authenticated = true;
-                    // return of(true);
-                }
-        }else{
-        //   Fetch user profile
-        // this._userService.getUser().subscribe((res) => {
-        //     this._userService.setUserProfile(res.Data);
-        // });
+            return of(true);
+        }
+        if (this._localStorage.eid == '' && this.checkMultipleEntity() === true) {
+            this._router.navigateByUrl('/switch-entity');
+            return of(true);
+        }
+
+        // Fetch user profile (cached after first call; no repeated HTTP on every guard check)
         return this._userService.getUser().pipe(
             tap((res) => {
-            this._userService.setUserProfile(res.Data);
-            this._authenticated = true;
+                this._userService.setUserProfile(res.Data);
+                this._authenticated = true;
             }),
             map(() => true),
             catchError(() => of(false))
-        );
-
-
-        }
-
-        // Check multiple entities condition
-        // if(this._localStorage.eid == ''){
-        //     if (this.checkMultipleEntity(accessToken)) {
-        //         this._router.navigateByUrl('/switch-entity');
-        //         this._authenticated = true;
-        //         return of(true);
-        //     }
-        // }
-
-      
+        );
     }
 
     /**
@@ -153,6 +134,9 @@ export class AuthService {
 
         // Set the authenticated flag to false
         this._authenticated = false;
+
+        // Clear cached user so next login fetches fresh data
+        this._userService.clearUserCache();
 
         // Return the observable
         return of(true);

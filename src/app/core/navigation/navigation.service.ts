@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { FuseNavigationItem } from '@fuse/components/navigation';
 import { Navigation } from 'app/core/navigation/navigation.types';
 import { apiUrls } from 'app/modules/shared/services/api-url';
-import { map, Observable, ReplaySubject, tap } from 'rxjs';
+import { map, Observable, ReplaySubject, shareReplay, tap } from 'rxjs';
 import { ApiResponse } from '../Base/interface/IResponses';
 
 @Injectable({ providedIn: 'root' })
@@ -11,6 +11,7 @@ export class NavigationService {
     private _httpClient = inject(HttpClient);
     private _navigation: ReplaySubject<Navigation> =
         new ReplaySubject<Navigation>(1);
+    private _navigationCache$: Observable<Navigation> | null = null;
 
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
@@ -29,19 +30,31 @@ export class NavigationService {
 
     /**
      * Get all navigation data
+     * Cached: Subsequent calls return the same cached observable instead of making new HTTP requests
      */
    get(): Observable<Navigation> {
-    /*  return this._httpClient.get<Navigation>('api/common/navigation').pipe(
-            tap((navigation) => {
-                this._navigation.next(navigation);
-            })
-        );*/
-    return this._httpClient.get<ApiResponse<any[]>>(apiUrls.navigation).pipe(
+    // If we already have a cached observable, return it
+    if (this._navigationCache$) {
+        return this._navigationCache$;
+    }
+
+    // Create and cache the observable with shareReplay(1) to cache the result
+    this._navigationCache$ = this._httpClient.get<ApiResponse<any[]>>(apiUrls.navigation).pipe(
         map((navigation: ApiResponse<any[]>) => this.buildNavigationVariants(navigation)),
         tap((navObj: Navigation) => {
             this._navigation.next(navObj);
-        })
+        }),
+        shareReplay(1) // Cache the result and share it with all subscribers
     );
+
+    return this._navigationCache$;
+}
+
+/**
+ * Clear the navigation cache (useful after logout or when navigation needs to be refreshed)
+ */
+clearCache(): void {
+    this._navigationCache$ = null;
 }
 
 /**

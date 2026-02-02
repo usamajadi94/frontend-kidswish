@@ -22,7 +22,7 @@
                 <nz-form-control class="w-full">
                   <nz-input-group [nzPrefix]="suffixIconSearch">
                     <input nz-input type="text" name="search" #input placeholder="Search..."
-                      (keyup)="Search(input.value)" />
+                      [(ngModel)]="searchValue" (ngModelChange)="onSearchChange($event)" />
                   </nz-input-group>
                 </nz-form-control>
               </nz-form-item>

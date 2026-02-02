@@ -8,14 +8,16 @@ import {
 } from 'app/core/user/user.types';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { Observable, ReplaySubject, map, of, switchMap, tap } from 'rxjs';
-import { LocalStorageService } from '../auth/localStorage.service';
 import { ApiResponse } from '../Base/interface/IResponses';
+import { LocalStorageService } from '../auth/localStorage.service';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
     private _httpClient = inject(HttpClient);
     private _localStorage = inject(LocalStorageService);
     private _user: ReplaySubject<CurrentUser> = new ReplaySubject<CurrentUser>();
+    /** Cached user API response to avoid repeated getUser() calls on every guard check */
+    private _cachedUserResponse: ApiResponse<any> | null = null;
 
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
@@ -65,15 +67,29 @@ export class UserService {
             );
     }
 
-    getUser() {
-        return this._httpClient.get(apiUrls.me).pipe(
+    /**
+     * Get current user from API. Result is cached after first successful call
+     * so the Auth Guard does not trigger a new HTTP request on every navigation.
+     * Cache is cleared on logout via clearUserCache().
+     */
+    getUser(): Observable<ApiResponse<any>> {
+        if (this._cachedUserResponse !== null) {
+            return of(this._cachedUserResponse);
+        }
+        return this._httpClient.get<ApiResponse<any>>(apiUrls.me).pipe(
             switchMap((response: ApiResponse<any>) => {
                 this._localStorage.cid = response?.Data?.value[0].CID;
                 this._localStorage.uid = response?.Data?.value[0].UID;
                 this._localStorage.eid = response?.Data?.value[0].EID;
+                this._cachedUserResponse = response;
                 return of(response);
             })
         );
+    }
+
+    /** Clear cached user (call on logout so next login fetches fresh data) */
+    clearUserCache(): void {
+        this._cachedUserResponse = null;
     }
 
     setUserProfile(response: any): void {

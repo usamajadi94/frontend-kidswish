@@ -1,10 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ToastService } from 'app/core/toaster/toast.service';
 import { MessageModalService } from 'app/modules/shared/services/message.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { NZ_MODAL_DATA, NzModalRef } from 'ng-zorro-antd/modal';
-import { Observable, firstValueFrom } from 'rxjs';
+import { Observable, Subject, firstValueFrom, takeUntil } from 'rxjs';
 import { ApiResponse, ModalResult } from '../interface/IResponses';
 import { GenericService } from '../services/generic.service';
 
@@ -14,7 +14,7 @@ import { GenericService } from '../services/generic.service';
     imports: [],
     template: ``,
 })
-export class BaseComponent<T, Component> {
+export class BaseComponent<T, Component> implements OnDestroy {
     readonly nzModalData: any = inject(NZ_MODAL_DATA);
     readonly modalRef = inject(NzModalRef);
     public formData!: T;
@@ -38,6 +38,9 @@ export class BaseComponent<T, Component> {
     isDataLoading: boolean = false;
     isSubmitLoading: boolean = false;
     isDeleteLoading: boolean = false;
+    
+    // Subject for unsubscribing from all subscriptions when component is destroyed
+    protected destroy$ = new Subject<void>();
 
     ngOnInit(): void {
         this.BaseNgOninit();
@@ -54,7 +57,7 @@ export class BaseComponent<T, Component> {
     // Init Funcs
     private async BaseNgOninit() {
         if (this.isRoute) {
-            this.route.params.subscribe((res: any) => {
+            this.route.params.pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
                 this.primaryKey = Number(res.ID) || 0;
             });
         } else {
@@ -258,13 +261,13 @@ export class BaseComponent<T, Component> {
             await this.BeforeGetData();
             this.isDataLoaded = false;
             if (this.isBaseGetData === true) {
-                await (
+                (
                     await this.service.getDataByID(
                         this.controllerName,
                         this.primaryKey
                         // this.query
                     )
-                ).subscribe(
+                ).pipe(takeUntil(this.destroy$)).subscribe(
                     async (res: ApiResponse<T>) => {
                         this.formData = res.Data as T;
                         this.heading = this.formTitle + ' / View';
@@ -292,6 +295,7 @@ export class BaseComponent<T, Component> {
         this.modalService
             .confirmModal()
             .afterClosed()
+            .pipe(takeUntil(this.destroy$))
             .subscribe(async (res) => {
                 if (res) {
                     this.isDeleteLoading = true;
@@ -301,7 +305,7 @@ export class BaseComponent<T, Component> {
                             this.controllerName,
                             this.primaryKey
                         )
-                    ).subscribe(
+                    ).pipe(takeUntil(this.destroy$)).subscribe(
                         async (res) => {
                             this.message.success('Deleted Successfully!');
                             this.isCreated = false;
@@ -363,5 +367,10 @@ export class BaseComponent<T, Component> {
         } else {
             this.primaryKey = 0;
         }
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

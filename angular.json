@@ -51,7 +51,8 @@
                                     "**/fonts/pdfMake/Poppins-Medium*.ttf",
                                     "**/fonts/pdfMake/Poppins-SemiBold*.ttf",
                                     "**/fonts/pdfMake/Poppins-ExtraBold*.ttf",
-                                    "**/fonts/pdfMake/Poppins-Black*.ttf"
+                                    "**/fonts/pdfMake/Poppins-Black*.ttf",
+                                    "**/fonts/pdfMake-optimized/**"
                                 ]
                             },
                             {

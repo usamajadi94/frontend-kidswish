@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
@@ -27,6 +27,7 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { ProductOrderFormComponent } from '../product-order-form/product-order-form.component';
 import * as XLSX from 'xlsx';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-packaging-stock-list',
@@ -58,7 +59,7 @@ import * as XLSX from 'xlsx';
     templateUrl: './packaging-stock-list.component.html',
     styleUrl: './packaging-stock-list.component.scss',
 })
-export class PackagingStockListComponent implements OnInit {
+export class PackagingStockListComponent implements OnInit, OnDestroy {
     FlavorOrderStatusEnum = FlavorOrderStatusEnum;
     title: string = componentRegister.packagingStock.Title;
 
@@ -85,9 +86,28 @@ export class PackagingStockListComponent implements OnInit {
         new Date().getMonth() + 1,
         0
     ); // last day of current month
+    searchValue: string = '';
+    // Debounced search subject to avoid filtering on every keystroke
+    private _searchSubject = new Subject<string>();
+    private _destroy$ = new Subject<void>();
 
     async ngOnInit(): Promise<void> {
         await Promise.all([this.onGenerate(), this.getData()]);
+        
+        // Set up debounced search subscription
+        this._searchSubject.pipe(
+            debounceTime(300), // Wait 300ms after user stops typing
+            distinctUntilChanged(), // Only trigger if search value actually changed
+            takeUntil(this._destroy$)
+        ).subscribe(searchValue => {
+            this.performSearch(searchValue);
+        });
+    }
+
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
+        this._searchSubject.complete();
     }
 
     addFlavorOrder() {
@@ -173,7 +193,20 @@ export class PackagingStockListComponent implements OnInit {
         return item?.id || index;
     }
 
-    Search(opt: string) {
+    /**
+     * Called from template when search input changes
+     * Emits to debounced subject instead of searching immediately
+     */
+    onSearchChange(searchValue: string): void {
+        this.searchValue = searchValue;
+        this._searchSubject.next(searchValue);
+    }
+
+    /**
+     * Performs the actual search operation
+     * This is called after debounce delay to avoid filtering on every keystroke
+     */
+    private performSearch(opt: string): void {
         var value: any = null;
         const filterValue = opt.trim().toLowerCase();
 
@@ -193,6 +226,13 @@ export class PackagingStockListComponent implements OnInit {
             return false;
         });
         this.data = data;
+    }
+
+    /**
+     * @deprecated Use onSearchChange() instead. This method is kept for backward compatibility.
+     */
+    Search(opt: string) {
+        this.performSearch(opt);
     }
 
     openFilterDrawer() {

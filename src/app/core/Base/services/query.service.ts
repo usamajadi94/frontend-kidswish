@@ -1,5 +1,6 @@
 import { HttpClient} from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from 'environments/environment';
 import { LoginUser } from 'app/core/user/user.types';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
@@ -15,7 +16,11 @@ export class QueryService {
     const body = { helpno, filters };
     return this.http.post(apiUrls.query, body ).pipe(
       map((res:ApiResponse<any>)=> res.Data['value']),
-      tap(() => console.log('Help data request sent')),
+      tap(() => {
+        if (!environment.production) {
+          console.log('Help data request sent');
+        }
+      }),
       catchError(this.handleError)
     );
   }
@@ -24,7 +29,11 @@ export class QueryService {
     const body = { helpno, filters };
     return this.http.post(apiUrls.query, body ).pipe(
       map((res:ApiResponse<any>)=> res.Data),
-      tap(() => console.log('Help data request sent')),
+      tap(() => {
+        if (!environment.production) {
+          console.log('Help data request sent');
+        }
+      }),
       catchError(this.handleError)
     );
   }
@@ -32,13 +41,20 @@ export class QueryService {
 
   get<T>(path: string): Observable<ApiResponse<T>>{
     return this.http.get<ApiResponse<T>>(apiUrls.server+path).pipe(
-      tap(() => console.log('Help data request sent')),
+      tap(() => {
+        if (!environment.production) {
+          console.log('Help data request sent');
+        }
+      }),
       catchError(this.handleError)
     );
   }
 
   private handleError(error: any) {
-    console.error('API Error:', error);
+    // Always log errors, but use console.error only in development
+    if (!environment.production) {
+      console.error('API Error:', error);
+    }
     return throwError(() => error);
   }
 }
