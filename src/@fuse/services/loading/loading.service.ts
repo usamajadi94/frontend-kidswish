@@ -4,6 +4,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 const ROUTER_LOADING_KEY = '__router_navigation__';
+/** Show loading bar only if navigation takes longer than this (ms). Quick switches stay smooth. */
+const ROUTER_LOADING_DELAY_MS = 280;
 
 @Injectable({ providedIn: 'root' })
 export class FuseLoadingService {
@@ -20,6 +22,8 @@ export class FuseLoadingService {
         false
     );
     private _urlMap: Map<string, boolean> = new Map<string, boolean>();
+    private _routerLoadingTimer: ReturnType<typeof setTimeout> | null = null;
+    private _routerLoadingShown = false;
 
     constructor() {
         if (this._router) {
@@ -35,9 +39,20 @@ export class FuseLoadingService {
                 )
                 .subscribe((e) => {
                     if (e instanceof NavigationStart) {
-                        this._setLoadingStatus(true, ROUTER_LOADING_KEY);
+                        this._routerLoadingShown = false;
+                        this._routerLoadingTimer = setTimeout(() => {
+                            this._routerLoadingTimer = null;
+                            this._routerLoadingShown = true;
+                            this._setLoadingStatus(true, ROUTER_LOADING_KEY);
+                        }, ROUTER_LOADING_DELAY_MS);
                     } else {
-                        this._setLoadingStatus(false, ROUTER_LOADING_KEY);
+                        if (this._routerLoadingTimer != null) {
+                            clearTimeout(this._routerLoadingTimer);
+                            this._routerLoadingTimer = null;
+                        }
+                        if (this._routerLoadingShown) {
+                            this._setLoadingStatus(false, ROUTER_LOADING_KEY);
+                        }
                     }
                 });
         }

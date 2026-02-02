@@ -5,9 +5,11 @@ import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
     provideRouter,
+    withPreloading,
     withHashLocation,
     withInMemoryScrolling,
 } from '@angular/router';
+import { QuickPreloadStrategy } from 'app/core/router/quick-preload.strategy';
 import { provideFuse } from '@fuse';
 import { TranslocoService, provideTransloco } from '@ngneat/transloco';
 import { appRoutes } from 'app/app.routes';
@@ -27,7 +29,7 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(),
         provideRouter(
             appRoutes,
-            // withPreloading(/* Disable preloading for smaller initial bundle */),
+            withPreloading(QuickPreloadStrategy),
             withHashLocation(),
             withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })
         ),
