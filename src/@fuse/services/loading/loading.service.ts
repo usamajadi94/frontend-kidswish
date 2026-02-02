@@ -1,8 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
+
+const ROUTER_LOADING_KEY = '__router_navigation__';
 
 @Injectable({ providedIn: 'root' })
 export class FuseLoadingService {
+    private _router = inject(Router, { optional: true });
     private _auto$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
         true
     );
@@ -15,6 +20,28 @@ export class FuseLoadingService {
         false
     );
     private _urlMap: Map<string, boolean> = new Map<string, boolean>();
+
+    constructor() {
+        if (this._router) {
+            this._router.events
+                .pipe(
+                    filter(
+                        (e) =>
+                            e instanceof NavigationStart ||
+                            e instanceof NavigationEnd ||
+                            e instanceof NavigationError ||
+                            e instanceof NavigationCancel
+                    )
+                )
+                .subscribe((e) => {
+                    if (e instanceof NavigationStart) {
+                        this._setLoadingStatus(true, ROUTER_LOADING_KEY);
+                    } else {
+                        this._setLoadingStatus(false, ROUTER_LOADING_KEY);
+                    }
+                });
+        }
+    }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
