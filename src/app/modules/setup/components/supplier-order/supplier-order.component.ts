@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { lastValueFrom } from 'rxjs';
 
 // Import BFT components
 import { BftInputDateComponent } from '../../../shared/components/fields/bft-input-date/bft-input-date.component';
@@ -109,25 +110,21 @@ export class SupplierOrderComponent extends BaseComponent<
   }
 
   async getSuppliers() {
-    await this._DrpService.getSuppliersDrp().subscribe({
-      next: (res: any) => {
-        this.suppliers = res;
-      },
-      error: (err) => {
-        console.error('Error fetching items:', err);
-      },
-    });
+    try {
+      const res = await lastValueFrom(this._DrpService.getSuppliersDrp());
+      this.suppliers = res;
+    } catch (err) {
+      console.error('Error fetching items:', err);
+    }
   }
 
   async getSupplierItems() {
-    await this._DrpService.getSupplierItemsDrp().subscribe({
-      next: (res: any) => {
-        this.supplierItems = res;
-      },
-      error: (err) => {
-        console.error('Error fetching items:', err);
-      },
-    });
+    try {
+      const res = await lastValueFrom(this._DrpService.getSupplierItemsDrp());
+      this.supplierItems = res;
+    } catch (err) {
+      console.error('Error fetching items:', err);
+    }
   }
 
   async getProducts() {
