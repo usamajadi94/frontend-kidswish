@@ -2,7 +2,7 @@ import { IEnvironmentalVariables } from '../app/EnvironmentalVariables';
 
 export const environment: IEnvironmentalVariables = {
     production: true,
-    apiRoot: 'https://RAILWAY_BACKEND_URL_HERE/',
+    apiRoot: 'https://kidswish-api-production.up.railway.app/',
     env: 'prd',
     site: {
         baseUrl: '',
