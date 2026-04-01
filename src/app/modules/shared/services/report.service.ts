@@ -17,14 +17,26 @@ export class ReportService {
       enddate: endDate || '',
     });
   }
-  
-  getShipmentInvoiceReport(invoiceNo?: string, fromDate?: Date, endDate?: Date) {
-    return this._QueryService.getQuery('getShipmentInvoice', {
-      invoiceno:invoiceNo || '' ,
+
+  getExpenseByVendorReport(fromDate?: Date, endDate?: Date, vendorId?: number) {
+    return this._QueryService.getQuery('getExpenseByVendorReport', {
       fromdate: fromDate || '',
-      enddate: endDate || '',
+      todate: endDate || '',
+      vendorid: vendorId || '',
     });
   }
 
+  getPaymentReceivedReport(fromDate?: Date, endDate?: Date) {
+    return this._QueryService.getQuery('getPaymentReceivedReport', {
+      fromdate: fromDate || '',
+      todate: endDate || '',
+    });
+  }
 
+  getPaymentMadeReport(fromDate?: Date, endDate?: Date) {
+    return this._QueryService.getQuery('getPaymentMadeReport', {
+      fromdate: fromDate || '',
+      todate: endDate || '',
+    });
+  }
 }

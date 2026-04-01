@@ -1,0 +1,29 @@
+<div class="flex flex-col gap-4">
+
+    <div class="grid grid-cols-2 gap-4">
+        <bft-input-date name="Date" label="Date" [(ngModel)]="formData.Date" [required]="true" [skeleton]="isDataLoading" />
+        <bft-input-currency name="Amount" label="Amount" symbol="PKR" [(ngModel)]="formData.Amount" [skeleton]="isDataLoading" />
+    </div>
+
+    <bft-select name="PaymentType" label="Payment Type" [displayList]="paymentTypes" valueField="ID" displayField="Name"
+        [(ngModel)]="formData.PaymentType" [skeleton]="isDataLoading" />
+
+    <div class="grid grid-cols-2 gap-4">
+        <bft-select name="FromPartyType" label="From Type" [displayList]="fromPartyTypes" valueField="ID" displayField="Name"
+            [(ngModel)]="formData.FromPartyType" [clearable]="true" [skeleton]="isDataLoading"
+            (ngModelChange)="onFromTypeChange()" />
+        <bft-select name="FromPartyID" label="From" [displayList]="fromList" valueField="ID" displayField="Name"
+            [(ngModel)]="formData.FromPartyID" [clearable]="true" [skeleton]="isDataLoading" />
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <bft-select name="ToPartyType" label="To Type" [displayList]="toPartyTypes" valueField="ID" displayField="Name"
+            [(ngModel)]="formData.ToPartyType" [clearable]="true" [skeleton]="isDataLoading"
+            (ngModelChange)="onToTypeChange()" />
+        <bft-select name="ToPartyID" label="To" [displayList]="toList" valueField="ID" displayField="Name"
+            [(ngModel)]="formData.ToPartyID" [clearable]="true" [skeleton]="isDataLoading" />
+    </div>
+
+    <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes" [skeleton]="isDataLoading" />
+
+</div>

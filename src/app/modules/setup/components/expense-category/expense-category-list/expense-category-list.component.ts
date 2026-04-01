@@ -55,7 +55,6 @@ export class ExpenseCategoryListComponent extends BaseRoutedComponent  {
         this.data = res;
       },
       error: (err) => {
-        console.error('Error fetching expense:', err);
       },
     });
   }

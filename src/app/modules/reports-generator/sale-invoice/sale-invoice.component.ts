@@ -117,7 +117,6 @@ export class SaleInvoiceComponent {
                 this.customers = res;
             },
             error: (err) => {
-                console.error('Error fetching items:', err);
             },
         });
     }
@@ -173,7 +172,6 @@ export class SaleInvoiceComponent {
                     // this.currentPage = 1;
                 },
                 error: (err) => {
-                    console.error('Error fetching salesmans:', err);
                 },
             });
     }
@@ -244,7 +242,7 @@ export class SaleInvoiceComponent {
 
     async onPrintReport() {
         const base64Logo = await this._pdfService.convertImageUrlToBase64(
-            'images/logo/trackcloud/dabossicon.png'
+            'images/logo/trackcloud/kidswishlogo.png'
         );
 
         const docDefinition: any = {
@@ -296,7 +294,7 @@ export class SaleInvoiceComponent {
 
     async onPdfGenerate() {
         const base64Logo = await this._pdfService.convertImageUrlToBase64(
-            'images/logo/trackcloud/dabossicon.png'
+            'images/logo/trackcloud/kidswishlogo.png'
         );
 
         const docDefinition: any = {

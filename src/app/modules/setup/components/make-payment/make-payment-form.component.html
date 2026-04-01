@@ -1,0 +1,19 @@
+<div class="flex flex-col gap-4">
+
+    <div class="grid grid-cols-2 gap-4">
+        <bft-input-date name="Date" label="Date" [(ngModel)]="formData.Date" [required]="true" [skeleton]="isDataLoading" />
+        <bft-input-currency name="Amount" label="Amount" symbol="PKR" [(ngModel)]="formData.Amount" [skeleton]="isDataLoading" />
+    </div>
+
+    <bft-select name="PaymentType" label="Payment Type" [displayList]="paymentTypes" valueField="ID" displayField="Name"
+        [(ngModel)]="formData.PaymentType" [skeleton]="isDataLoading" />
+
+    <bft-select name="FromPartyID" label="From (Bank Account)" [displayList]="bankAccounts" valueField="ID" displayField="Name"
+        [(ngModel)]="formData.FromPartyID" [clearable]="true" [skeleton]="isDataLoading" />
+
+    <bft-select name="ToPartyID" label="To (Vendor)" [displayList]="vendors" valueField="ID" displayField="Name"
+        [(ngModel)]="formData.ToPartyID" [clearable]="true" [skeleton]="isDataLoading" />
+
+    <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes" [skeleton]="isDataLoading" />
+
+</div>

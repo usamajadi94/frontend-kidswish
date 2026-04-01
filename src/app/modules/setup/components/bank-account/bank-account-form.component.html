@@ -1,0 +1,16 @@
+<div class="flex flex-col gap-4">
+
+    <bft-select name="Type" label="Type" [displayList]="accountTypes" valueField="ID" displayField="Name"
+        [(ngModel)]="formData.Type" [skeleton]="isDataLoading" />
+
+    <bft-input-text name="Name" label="Account Name" [(ngModel)]="formData.Name" [required]="true" [skeleton]="isDataLoading" />
+
+    <bft-textarea name="Description" label="Description" [(ngModel)]="formData.Description" [rows]="3" [skeleton]="isDataLoading" />
+
+    <bft-input-currency name="OpeningBalance" label="Opening Balance" [(ngModel)]="formData.OpeningBalance" [skeleton]="isDataLoading" />
+
+    @if (formData.Type === 'Bank') {
+        <bft-input-text name="Owner" label="Account Holder" [(ngModel)]="formData.Owner" [skeleton]="isDataLoading" />
+    }
+
+</div>

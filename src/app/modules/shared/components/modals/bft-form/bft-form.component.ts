@@ -16,26 +16,25 @@ export class BftFormComponent implements AfterViewInit {
   readonly nzModalData: IModalData = inject(NZ_MODAL_DATA);
   @ViewChild('dynamicContent', { read: ViewContainerRef }) dynamicContent!: ViewContainerRef;
   ExistingComponent: any = null;
-  primaryKey: number  = 0; 
+  primaryKey: number  = 0;
+  private _capturedSCode: string | null = null;
+
   constructor(){  }
+
   ngAfterViewInit(): void {
-    
     this.loadComponent();
-    setTimeout(() => {
-      
-      // if(this.ExistingComponent.instance.formData.ID != null ){
-      //   this.primaryKey = this.ExistingComponent.instance.formData.ID;
-      //   console.log('primary' , this.primaryKey)
-      // }
-    }, 1000);
   }
 
   async loadComponent(){
     this.dynamicContent.clear();
-
     const componentRef = this.dynamicContent.createComponent(this.nzModalData.component);
     this.ExistingComponent = componentRef;
- 
+    // Capture SCode from freshly initialized formData (before API overwrites it)
+    setTimeout(() => {
+      const formData = componentRef.instance?.formData;
+      const code = Array.isArray(formData) ? formData[0]?.SCode : formData?.SCode;
+      if (code) this._capturedSCode = code;
+    }, 0);
   }
 
   save() {
@@ -67,9 +66,11 @@ export class BftFormComponent implements AfterViewInit {
   }
 
   get sCode(): string | undefined {
-  const formData = this.ExistingComponent?.instance?.formData;
-  return Array.isArray(formData) ? formData[0]?.SCode : formData?.SCode;
-}
+    // Use captured SCode (set from initial formData before API overwrites it)
+    if (this._capturedSCode) return this._capturedSCode;
+    const formData = this.ExistingComponent?.instance?.formData;
+    return Array.isArray(formData) ? formData[0]?.SCode : formData?.SCode;
+  }
 
 
 }

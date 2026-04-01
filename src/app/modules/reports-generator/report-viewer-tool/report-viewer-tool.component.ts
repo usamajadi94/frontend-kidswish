@@ -129,7 +129,6 @@ export class ReportViewerToolComponent {
             this.exportAsPDF();
         } else if (format === 'excel') {
             // handle excel export here
-            console.log('Export as Excel');
         }
     }
 

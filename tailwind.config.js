@@ -12,7 +12,7 @@ const generatePalette = require(
  * Tailwind-like color palettes automatically
  */
 const customPalettes = {
-    brand: generatePalette('#2196F3'),
+    brand: generatePalette('#0047BB'),
 };
 
 /**
@@ -62,32 +62,12 @@ const themes = {
     },
     medcloud: {
         primary: {
-            50: '#e6f4f3',
-            100: '#cceae9',
-            200: '#99d5d3',
-            300: '#66c0bd',
-            400: '#33aba7',
-            500: '#2b7a78',
-            600: '#256a69',
-            700: '#1f5959',
-            800: '#194949',
-            900: '#143939',
-            950: '#0a1e1e',
-            DEFAULT: '#2b7a78',
+            ...customPalettes.brand,
+            DEFAULT: '#0047BB',
         },
         accent: {
-            50: '#e5f7f6',
-            100: '#cceeee',
-            200: '#99ddcd',
-            300: '#66cdca',
-            400: '#33bcb8',
-            500: '#3AAFA9',
-            600: '#309d98',
-            700: '#278c87',
-            800: '#1d7a76',
-            900: '#136965',
-            950: '#0a4b47',
-            DEFAULT: '#3AAFA9',
+            ...customPalettes.brand,
+            DEFAULT: customPalettes.brand[400],
         },
         warn: {
             ...colors.red,

@@ -9,19 +9,12 @@ import { LayoutComponent } from 'app/layout/layout.component';
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 export const appRoutes: Route[] = [
 
-    // Redirect empty path to '/dashboards/project'
-    // {path: '', pathMatch : 'full', redirectTo: 'factory/dashboard'},
-    {path: '', pathMatch : 'full', redirectTo: 'pages/settings'},
+    {path: '', pathMatch : 'full', redirectTo: 'dashboard'},
 
-    // Redirect signed-in user to the '/dashboards/project'
-    //
-    // After the user signs in, the sign-in page will redirect the user to the 'signed-in-redirect'
-    // path. Below is another redirection for that path to redirect the user to the desired
-    // location. This is a small convenience to keep all main routes together here on this file.
     {
         path: 'signed-in-redirect',
         pathMatch : 'full',
-        redirectTo: 'example'
+        redirectTo: 'dashboard'
     },
 
     // Auth routes for guests
@@ -82,16 +75,13 @@ export const appRoutes: Route[] = [
             initialData: initialDataResolver
         },
         children: [
-            {path: 'home', loadChildren: () => import('app/modules/landing/home/home.routes')},
+            {path: 'dashboard', loadChildren: () => import('app/modules/admin-dashboard/admin-dashboard.routes')},
             {path: 'setup', loadChildren: () => import('app/modules/setup/setup.routes')},
-            {path: 'report', loadChildren: () => import('app/modules/reports-generator/report.routes')},
+            {path: 'products', loadChildren: () => import('app/modules/products/products.routes')},
             {path: 'security', loadChildren: () => import('app/modules/security/security.routes')},
-            {path: 'main', loadChildren: () => import('app/modules/main/main.routes')},
-            {path: 'factory', loadChildren: () => import('app/modules/factory/factory.routes')},
+            {path: 'reports', loadChildren: () => import('app/modules/reports-generator/report.routes')},
             // Pages
             {path: 'pages', children: [
-                // Authentication
-                {path: 'authentication', loadChildren: () => import('app/modules/admin/pages/authentication/authentication.routes')},
                 // Settings
                 {path: 'settings', loadChildren: () => import('app/modules/admin/pages/settings/settings.routes')},
             ]},

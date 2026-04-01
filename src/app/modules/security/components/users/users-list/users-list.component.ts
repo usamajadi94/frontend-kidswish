@@ -71,7 +71,6 @@ private modalService = inject(ModalService);
                 this.data = res;
             },
             error: (err) => {
-                console.error('Error fetching Users :', err);
             },
         });
     }

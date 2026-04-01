@@ -43,7 +43,6 @@ export class ReportViewerComponent implements OnInit {
         this.customers = res;
       },
       error: (err) => {
-        console.error('Error fetching items:', err);
       },
     });
   }
@@ -80,7 +79,6 @@ export class ReportViewerComponent implements OnInit {
           this.records = groupedInvoices;
         },
         error: (err) => {
-          console.error('Error fetching salesmans:', err);
         },
       }
       );

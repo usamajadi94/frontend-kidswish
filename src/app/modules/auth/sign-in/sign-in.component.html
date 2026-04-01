@@ -1,114 +1,231 @@
-<div class="flex min-w-0 flex-auto flex-col items-center sm:flex-row sm:justify-center md:items-start md:justify-start">
-    <div
-        class="w-full px-4 py-8 sm:bg-card sm:w-auto sm:rounded-2xl sm:p-12 sm:shadow md:flex md:h-full md:w-1/2 md:items-center md:justify-end md:rounded-none md:p-16 md:shadow-none">
-        <div class="mx-auto w-full max-w-80 sm:mx-0 sm:w-80">
+<div class="min-h-screen flex flex-col md:flex-row bg-white">
+
+    <!-- ─── LEFT PANEL — Branding ─────────────────────────────────── -->
+    <div class="hidden md:flex md:w-1/2 flex-col items-center justify-center relative overflow-hidden"
+         style="background: linear-gradient(135deg, #0047BB 0%, #0066FF 60%, #003A99 100%);">
+
+        <!-- Decorative circles -->
+        <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full opacity-10"
+             style="background: rgba(255,255,255,0.3);"></div>
+        <div class="absolute -bottom-32 -right-20 w-80 h-80 rounded-full opacity-10"
+             style="background: rgba(255,255,255,0.2);"></div>
+        <div class="absolute top-1/2 left-1/4 w-40 h-40 rounded-full opacity-5"
+             style="background: white; transform: translate(-50%,-50%);"></div>
+
+        <!-- Grid dots pattern -->
+        <svg class="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+                    <circle cx="3" cy="3" r="1.5" fill="white"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#dots)"/>
+        </svg>
+
+        <!-- Content -->
+        <div class="relative z-10 px-12 text-center max-w-md">
             <!-- Logo -->
-            <div class="flex justify-center">
-                <img src="images/logo/trackcloud/dabossicon.png" style="width: 100px;" />
+            <div class="flex justify-center mb-8">
+                <div class="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg"
+                     style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
+                    <img src="images/logo/trackcloud/kidswishlogo.png"
+                         class="w-14 h-14 object-contain" alt="Kids Wish Logo" />
+                </div>
             </div>
 
-            <!-- Title -->
-            <div class="mt-2 text-4xl font-extrabold leading-tight tracking-tight">
-                Sign in
+            <!-- Company name -->
+            <h1 class="text-white font-bold mb-3"
+                style="font-size: 2.25rem; line-height: 1.2; letter-spacing: -0.5px;">
+                KIDS WISH
+                <span class="block text-blue-200" style="font-size: 1.5rem; font-weight: 500;">
+                    ERP
+                </span>
+            </h1>
+
+            <!-- Divider -->
+            <div class="mx-auto my-5 w-16 h-0.5 rounded-full" style="background: rgba(255,255,255,0.4);"></div>
+
+            <!-- Tagline -->
+            <p class="text-blue-100 leading-relaxed" style="font-size: 1rem; opacity: 0.9;">
+                Streamlining Manufacturing,<br>Finance &amp; Operations
+            </p>
+
+            <!-- Feature pills -->
+            <div class="mt-10 flex flex-col gap-3">
+                <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-left"
+                     style="background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);">
+                    <span class="text-blue-200 text-lg">🏭</span>
+                    <span class="text-white text-sm font-medium">Manufacturing Management</span>
+                </div>
+                <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-left"
+                     style="background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);">
+                    <span class="text-blue-200 text-lg">💰</span>
+                    <span class="text-white text-sm font-medium">Finance & Expense Tracking</span>
+                </div>
+                <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-left"
+                     style="background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);">
+                    <span class="text-blue-200 text-lg">📦</span>
+                    <span class="text-white text-sm font-medium">Orders & Distribution</span>
+                </div>
             </div>
-            <!-- <div class="mt-0.5 flex items-baseline font-medium">
-                <div>Don't have an account?</div>
-                <a class="ml-1 text-primary-500 hover:underline" [routerLink]="['/sign-up']">Sign up
-                </a>
-            </div> -->
+        </div>
+    </div>
 
+    <!-- ─── RIGHT PANEL — Login Form ─────────────────────────────── -->
+    <div class="flex-1 flex flex-col items-center justify-center px-6 py-12 md:px-12 lg:px-20"
+         style="background: #F8FAFF;">
 
+        <!-- Mobile logo (shown only on small screens) -->
+        <div class="flex flex-col items-center mb-8 md:hidden">
+            <img src="images/logo/trackcloud/kidswishlogo.png" class="w-16 h-16 object-contain mb-3" alt="Logo" />
+            <h2 class="text-xl font-bold text-gray-800">KIDS WISH ERP</h2>
+        </div>
 
-            <!-- Alert -->
+        <!-- Card -->
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-xl px-8 py-10"
+             style="box-shadow: 0 8px 40px rgba(0,71,187,0.10);">
+
+            <!-- Heading -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900" style="letter-spacing: -0.3px;">
+                    Welcome back
+                </h2>
+                <p class="mt-1 text-sm text-gray-500">Sign in to your account to continue</p>
+            </div>
+
+            <!-- Error alert -->
             @if (showAlert) {
-            <fuse-alert class="mt-8" [appearance]="'outline'" [showIcon]="false" [type]="alert.type"
-                [@shake]="alert.type === 'error'">
-                {{ alert.message }}
-            </fuse-alert>
+            <div class="mb-6 flex items-start gap-3 px-4 py-3 rounded-xl text-sm font-medium"
+                 style="background: #FEF2F2; border: 1px solid #FECACA; color: #DC2626;"
+                 [@shake]="true">
+                <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                          clip-rule="evenodd"/>
+                </svg>
+                <span>{{ alert.message }}</span>
+            </div>
             }
 
-            <!-- Sign in form -->
-            <form class="mt-5" [formGroup]="signInForm" #signInNgForm="ngForm">
+            <!-- Form -->
+            <form [formGroup]="signInForm" #signInNgForm="ngForm" (ngSubmit)="signIn()">
 
-                <div class="w-full">
-                    <bft-input-email label="Email" [required]="true" name="email" [formControlName]="'email'" />
-                </div>
-                <div class="w-full">
-                    <bft-input-password label="Password" [required]="true" name="password"
-                        [formControlName]="'password'" #passwordField />
-                </div>
-
-                <!-- <div
-                    class="mt-1.5 inline-flex w-full items-center justify-between"
-                >
-                   
-                    <a
-                        class="text-md font-medium text-primary-500 hover:underline"
-                        [routerLink]="['/forgot-password']"
-                        >Forgot password?
-                    </a>
-                </div> -->
-
-                <button class="fuse-mat-button-large mt-6 w-full" mat-flat-button [color]="'primary'"
-                    [disabled]="signInForm.disabled" (click)="signIn()">
-                    @if (!signInForm.disabled) {
-                    <span> Sign in </span>
+                <!-- Email -->
+                <div class="mb-5">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                        Email Address
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <input
+                            type="email"
+                            formControlName="email"
+                            placeholder="you@company.com"
+                            autocomplete="email"
+                            class="w-full pl-10 pr-4 py-3 text-sm text-gray-900 bg-gray-50 border rounded-xl transition-all duration-200 outline-none"
+                            [class.border-gray-200]="!(signInForm.get('email').invalid && signInForm.get('email').touched)"
+                            [class.border-red-400]="signInForm.get('email').invalid && signInForm.get('email').touched"
+                            [class.bg-red-50]="signInForm.get('email').invalid && signInForm.get('email').touched"
+                            style="font-size: 0.875rem;"
+                        />
+                    </div>
+                    @if (signInForm.get('email').invalid && signInForm.get('email').touched) {
+                    <p class="mt-1.5 text-xs text-red-500">
+                        @if (signInForm.get('email').errors?.required) { Email is required. }
+                        @else { Please enter a valid email address. }
+                    </p>
                     }
+                </div>
+
+                <!-- Password -->
+                <div class="mb-5">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-sm font-semibold text-gray-700">Password</label>
+                        <a [routerLink]="['/forgot-password']"
+                           class="text-xs font-medium transition-colors duration-150"
+                           style="color: #0047BB;"
+                           onmouseover="this.style.color='#003A99'"
+                           onmouseout="this.style.color='#0047BB'">
+                            Forgot password?
+                        </a>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+                                 viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <input
+                            [type]="showPassword ? 'text' : 'password'"
+                            formControlName="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            class="w-full pl-10 pr-11 py-3 text-sm text-gray-900 bg-gray-50 border rounded-xl transition-all duration-200 outline-none"
+                            [class.border-gray-200]="!(signInForm.get('password').invalid && signInForm.get('password').touched)"
+                            [class.border-red-400]="signInForm.get('password').invalid && signInForm.get('password').touched"
+                            [class.bg-red-50]="signInForm.get('password').invalid && signInForm.get('password').touched"
+                        />
+                        <button
+                            type="button"
+                            (click)="showPassword = !showPassword"
+                            class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
+                            @if (!showPassword) {
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            } @else {
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                            </svg>
+                            }
+                        </button>
+                    </div>
+                    @if (signInForm.get('password').invalid && signInForm.get('password').touched) {
+                    <p class="mt-1.5 text-xs text-red-500">Password is required.</p>
+                    }
+                </div>
+
+                <!-- Submit button -->
+                <button
+                    type="submit"
+                    [disabled]="signInForm.disabled"
+                    class="w-full py-3 px-6 rounded-xl text-white text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 mt-6"
+                    style="background: #0047BB;"
+                    onmouseover="if(!this.disabled) this.style.background='#003A99'"
+                    onmouseout="if(!this.disabled) this.style.background='#0047BB'"
+                    [style.opacity]="signInForm.disabled ? '0.7' : '1'"
+                    [style.cursor]="signInForm.disabled ? 'not-allowed' : 'pointer'">
                     @if (signInForm.disabled) {
-                    <mat-progress-spinner [diameter]="24" [mode]="'indeterminate'"></mat-progress-spinner>
+                    <mat-progress-spinner [diameter]="20" [mode]="'indeterminate'" color="accent"
+                                          style="--mdc-circular-progress-active-indicator-color: white;">
+                    </mat-progress-spinner>
+                    <span>Signing in...</span>
+                    } @else {
+                    <span>Login</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    </svg>
                     }
                 </button>
 
-                <!-- <div class="mt-8 flex items-center">
-                    <div class="mt-px flex-auto border-t"></div>
-                    <div class="text-secondary mx-2">Or continue with</div>
-                    <div class="mt-px flex-auto border-t"></div>
-                </div> -->
-
             </form>
         </div>
-    </div>
-    <div
-        class="relative hidden h-full w-1/2 flex-auto items-center justify-center overflow-hidden side-nav border-l md:flex lg:px-28">
-        <!-- Background -->
-        <!-- Rings -->
-        <!-- prettier-ignore -->
-        <svg class="absolute inset-0 pointer-events-none" viewBox="0 0 960 540" width="100%" height="100%"
-            preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-            <g class="text-gray-700 opacity-25" fill="none" stroke="currentColor" stroke-width="100">
-                <circle r="234" cx="196" cy="23"></circle>
-                <circle r="234" cx="790" cy="491"></circle>
-            </g>
-        </svg>
-        <!-- Dots -->
-        <!-- prettier-ignore -->
-        <!-- <svg class="absolute -top-16 -right-16 text-gray-700" viewBox="0 0 220 192" width="220" height="192"
-            fill="none">
-            <defs>
-                <pattern id="837c3e70-6c3a-44e6-8854-cc48c737b659" x="0" y="0" width="20" height="20"
-                    patternUnits="userSpaceOnUse">
-                    <rect x="0" y="0" width="4" height="4" fill="currentColor"></rect>
-                </pattern>
-            </defs>
-            <rect width="220" height="192" fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)"></rect>
-        </svg> -->
-        <!-- Content -->
-        <div class="relative z-10 w-full max-w-2xl mt-20">
 
-            <div class="text-7xl font-bold leading-none text-gray-100 mt-20">
-                <div>Welcome to</div>
-                <div>Da Boss Leaf</div>
-            </div>
-            <div class="mt-6 text-lg leading-6 tracking-tight text-gray-400">
-                Fuse helps developers to build organized and well coded
-                dashboards full of beautiful and rich modules. Join us and start
-                building your application today.
-            </div>
-            <!-- <div class="flex justify-end">
-                <img src="images/logo/trackcloud/track.png" class="h-25" alt="" srcset="" style="width: 200px;">
-            </div> -->
-        </div>
-
-
+        <!-- Footer -->
+        <p class="mt-8 text-xs text-gray-400 text-center">
+            &copy; {{ 2025 }} Kids Wish ERP. All rights reserved.
+        </p>
     </div>
 </div>

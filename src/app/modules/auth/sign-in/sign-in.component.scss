@@ -1,0 +1,29 @@
+auth-sign-in {
+    display: flex;
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 100vh;
+
+    > div {
+        flex: 1 1 auto;
+    }
+
+    input[type='email'],
+    input[type='password'],
+    input[type='text'] {
+        &:focus {
+            border-color: #0047BB !important;
+            background-color: #fff !important;
+            box-shadow: 0 0 0 3px rgba(0, 71, 187, 0.10);
+        }
+    }
+
+    button[type='submit']:not(:disabled):active {
+        transform: scale(0.98);
+    }
+
+    // Spinner white override
+    mat-progress-spinner circle {
+        stroke: white !important;
+    }
+}

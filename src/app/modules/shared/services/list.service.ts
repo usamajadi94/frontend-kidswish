@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
 import { QueryService } from 'app/core/Base/services/query.service';
-import { DateTime } from 'luxon';
 
 @Injectable({
     providedIn: 'root',
@@ -8,21 +7,14 @@ import { DateTime } from 'luxon';
 export class ListService {
     private _QueryService = inject(QueryService);
 
-    getItemType() {
-        return this._QueryService.getQuery('getItemType');
+    getDepartment() {
+        return this._QueryService.getQuery('getDepartment');
     }
 
-    getSupplierInformation() {
-        return this._QueryService.getQuery('getSupplierInformation');
+    getDistributor() {
+        return this._QueryService.getQuery('getDistributor');
     }
 
-    getVehicleInformation() {
-        return this._QueryService.getQuery('getVehicleInformation');
-    }
-
-    getCustomerInformation() {
-        return this._QueryService.getQuery('getCustomerInformation');
-    }
     getGroups() {
         return this._QueryService.getQuery('getGroups');
     }
@@ -32,120 +24,131 @@ export class ListService {
     }
 
     getExpense(fromdate: any, todate: any) {
-        return this._QueryService.getQuery('getExpense',{
+        return this._QueryService.getQuery('getExpense', {
             fromdate: fromdate || '',
             todate: todate || '',
         });
     }
-    getEmployee(active:string = "") {
-        return this._QueryService.getQuery('getEmployee',{
-            active:active
-        });
-    }
-    getProduct() {
-        return this._QueryService.getQuery('getProducts');
-    }
-    getProductWithFlavor() {
-        return this._QueryService.getQuery('getProductsWithFlavor');
-    }
-    getFlavorOrder(fromDate: Date, endDate: Date, SupplierID:string , StatusID: string) {
-        return this._QueryService.getQuery('getFlavorOrder',{
-        fromdate: fromDate || '',
-        enddate: endDate || '',
-        supplierid: SupplierID || '',
-        statusid: StatusID || ''
-    });
-    }
-    
-    getCustomerOrders() {
-        return this._QueryService.getQuery('getCustomerOrders');
-    }
+
     getExpenseCategory() {
         return this._QueryService.getQuery('getExpenseCategory');
     }
-    
-    getInvoices(fromdate: any, todate: any) {
-        return this._QueryService.getQuery('getInvoices',{
+
+    getCustomerInformation() {
+        return this._QueryService.getQuery('getCustomerInformation');
+    }
+
+    getVendor() {
+        return this._QueryService.getQuery('getVendor');
+    }
+
+    getVendorType() {
+        return this._QueryService.getQuery('getVendorType');
+    }
+
+    getBankAccount() {
+        return this._QueryService.getQuery('getBankAccount');
+    }
+
+    getBankAccountSummary(id: number) {
+        return this._QueryService.getQuery('getBankAccountSummary', { id });
+    }
+
+    getBankAccountLedger(id: number, fromdate: string = '', todate: string = '') {
+        return this._QueryService.getQuery('getBankAccountLedger', { id, fromdate, todate });
+    }
+
+    getLegalEntity() {
+        return this._QueryService.getQuery('getLegalEntity');
+    }
+
+    getProduct() {
+        return this._QueryService.getQuery('getProduct');
+    }
+
+    getPaymentReceived() {
+        return this._QueryService.getQuery('getPaymentReceived');
+    }
+
+    getMakePayment() {
+        return this._QueryService.getQuery('getMakePayment');
+    }
+
+    getPettyCash() {
+        return this._QueryService.getQuery('getPettyCash');
+    }
+
+    getPettyCashSummary(id: number) {
+        return this._QueryService.getQuery('getPettyCashSummary', { id });
+    }
+
+    getPettyCashExpenses(id: number, fromdate: string = '', todate: string = '') {
+        return this._QueryService.getQuery('getPettyCashExpenses', { id, fromdate, todate });
+    }
+
+    getPettyCashFunding(id: number) {
+        return this._QueryService.getQuery('getPettyCashFunding', { id });
+    }
+
+    getAdminDashboardSummary(fromdate: string = '', todate: string = '') {
+        return this._QueryService.getQuery('getAdminDashboardSummary', { fromdate, todate });
+    }
+
+    getAdminBankBalances() {
+        return this._QueryService.getQuery('getAdminBankBalances');
+    }
+
+    getAdminPettyCashStatus() {
+        return this._QueryService.getQuery('getAdminPettyCashStatus');
+    }
+
+    getAdminExpenseByCategory(fromdate: string = '', todate: string = '') {
+        return this._QueryService.getQuery('getAdminExpenseByCategory', { fromdate, todate });
+    }
+
+    getAdminMonthlyFlow() {
+        return this._QueryService.getQuery('getAdminMonthlyFlow');
+    }
+
+    getAdminRecentTransactions() {
+        return this._QueryService.getQuery('getAdminRecentTransactions');
+    }
+
+    getLedger(fromdate: any, todate: any, txtype: string = '', accountid: any = '') {
+        return this._QueryService.getQuery('getLedger', {
             fromdate: fromdate || '',
-            todate: todate || '', 
+            todate: todate || '',
+            txtype: txtype || '',
+            accountid: accountid || '',
         });
     }
 
-    getExpenseDR(fromdate: any, todate: any) {
-        return this._QueryService.getQuery('getExpenseDR',{
+    getAccountStatementReport(accountid: any, fromdate: any, todate: any) {
+        return this._QueryService.getQuery('getAccountStatementReport', {
+            accountid: accountid || '',
             fromdate: fromdate || '',
             todate: todate || '',
         });
     }
 
-    getFlavorStock() {
-        return this._QueryService.getQuery('getFlavorStock');
-    }
-
-    getEmployeePayRoll(month: Date | null) {
-        return this._QueryService.getQuery('getEmployeePayRoll', {
-            month: month || '',
-        });
-    }
-
-    getEmployeeAttendance(month:Date) {
-        return this._QueryService.getQuery('getEmployeeAttendance',{
-            month:month
-        });
-    }
-    
-    getEmployeeAbsentSummary(salarytypeid:number,fromdate:Date = new Date(),todate:Date = new Date() ){
-        return this._QueryService.getQuery('getEmployeeAbsentSummary',{
-            salarytypeid:salarytypeid,
-            fromdate:fromdate,
-            todate:todate
-        });
-
-    }
-
-    getPipeLineOrder(month: Date | null) {
-        return this._QueryService.getQuery('getPipeLineOrder', {
-            month: month || '',
-        });
-    }
-
-        getProductionDetail(month: Date | null) {
-        return this._QueryService.getQuery('getProductionInformation', {
-            month: month || '',
-        });
-    }
-
-    getShipmentDetail(month: Date | null) {
-        return this._QueryService.getQuery('GetShipmentInformation', {
-            month: month || '',
-        });
-    }
-  
-    getSupplierItems() {
-        return this._QueryService.getQuery('getSupplierItems');
-    }
-
-    getSupplierOrders() {
-        return this._QueryService.getQuery('getSupplierOrders');
-    }
-
-    /*getShipments(month: Date | null) {
-        return this._QueryService.getQuery('getShipments', {
-            month: month || '',
-        });
-    }*/
-
-    getShipments(fromdate: any, todate: any) {
-        return this._QueryService.getQuery('getShipments',{
+    getPettyCashReport(pettycashid: any, fromdate: any, todate: any) {
+        return this._QueryService.getQuery('getPettyCashReport', {
+            pettycashid: pettycashid || '',
             fromdate: fromdate || '',
-            todate: todate || '', 
+            todate: todate || '',
         });
     }
 
-    getDashboardData(selectedMonth: Date | null) {
-        // const monthStr = selectedMonth ? DateTime.fromJSDate(selectedMonth).toFormat('yyyy-MM') : DateTime.now().toFormat('yyyy-MM');
-        return this._QueryService.getMultipleQuery('getDashboardData', {
-            date: selectedMonth
+    // Used by main module
+    getCustomerOrders() {
+        return this._QueryService.getQuery('getCustomerOrders');
+    }
+
+    getInvoices(fromdate: any, todate: any) {
+        return this._QueryService.getQuery('getInvoices', {
+            fromdate: fromdate || '',
+            todate: todate || '',
         });
     }
+
 }

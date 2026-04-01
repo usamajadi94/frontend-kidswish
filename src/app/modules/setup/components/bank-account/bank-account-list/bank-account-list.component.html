@@ -1,0 +1,18 @@
+<div class="absolute inset-0 flex min-w-0 flex-col overflow-y-auto p-6 md:p-8" cdkScrollable>
+    <div class="flex-0">
+        <div class="mb-4">
+            <div class="text-3xl font-semibold leading-8 tracking-tight">
+                {{ title }} List
+            </div>
+        </div>
+
+        <bft-table [dataSource]="data" [(isVisible)]="isVisible" [columns]="columns" (view)="onView($event)">
+            <wrapper-add [SCode]="SCode">
+                <bft-button name="New" accessKey="n" svgIcon="mat_solid:add" (onClick)="addBankAccount()" />
+            </wrapper-add>
+            <bft-button class="ml-3" name="Transfer" svgIcon="mat_solid:swap_horiz" (onClick)="openTransfer()" />
+            <bft-button class="ml-3" name="Setting" svgIcon="mat_solid:settings" (onClick)="isVisible = true" />
+            <bft-button class="ml-3" name="Export" svgIcon="feather:file" />
+        </bft-table>
+    </div>
+</div>

@@ -38,6 +38,13 @@ export class ExpenseListComponent extends BaseRoutedComponent {
       type: 'text',
     },
     {
+      header: 'Vendor',
+      name: 'VendorName',
+      isSort: true,
+      isFilterList: true,
+      type: 'text',
+    },
+    {
       header: 'Category',
       name: 'ExpenseCategory',
       isSort: true,
@@ -45,8 +52,8 @@ export class ExpenseListComponent extends BaseRoutedComponent {
       type: 'text',
     },
     {
-      header: 'Payment Method',
-      name: 'PaymentMethod',
+      header: 'Petty Cash',
+      name: 'PettyCash',
       isSort: true,
       isFilterList: true,
       type: 'text',
@@ -103,7 +110,6 @@ export class ExpenseListComponent extends BaseRoutedComponent {
         this.data = res;
       },
       error: (err) => {
-        console.error('Error fetching expense:', err);
       },
     });
   }

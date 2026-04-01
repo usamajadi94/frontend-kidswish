@@ -1,0 +1,163 @@
+<div class="absolute inset-0 flex min-w-0 flex-col overflow-y-auto p-6 md:p-8">
+
+    <!-- Top Bar -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <button class="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 transition-colors" (click)="goBack()">
+                ← Back
+            </button>
+            <span class="text-gray-300">|</span>
+            <div class="text-3xl font-semibold leading-8 tracking-tight">
+                {{ summary?.Name || 'Petty Cash Detail' }}
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <bft-button name="Add Expense" svgIcon="mat_solid:receipt_long" (onClick)="openAddExpense()" />
+            <bft-button name="Add Funds" svgIcon="mat_solid:account_balance_wallet" (onClick)="openAddFunds()" />
+            <bft-button name="Edit" svgIcon="mat_solid:edit" (onClick)="openEdit()" />
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+        <div class="rounded-xl border border-blue-200 bg-blue-50 p-5">
+            <div class="text-sm font-medium text-blue-600 mb-1">Total Funded</div>
+            <div class="text-2xl font-bold text-blue-800">
+                {{ (summary?.TotalFunded || 0) | currency:'PKR ':'symbol':'1.0-0' }}
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-red-200 bg-red-50 p-5">
+            <div class="text-sm font-medium text-red-600 mb-1">Total Expenses</div>
+            <div class="text-2xl font-bold text-red-800">
+                {{ (summary?.TotalExpenses || 0) | currency:'PKR ':'symbol':'1.0-0' }}
+            </div>
+        </div>
+
+        <div class="rounded-xl border p-5"
+             [class.border-green-200]="(summary?.Balance || 0) >= 0"
+             [class.bg-green-50]="(summary?.Balance || 0) >= 0"
+             [class.border-red-300]="(summary?.Balance || 0) < 0"
+             [class.bg-red-100]="(summary?.Balance || 0) < 0">
+            <div class="text-sm font-medium mb-1"
+                 [class.text-green-600]="(summary?.Balance || 0) >= 0"
+                 [class.text-red-600]="(summary?.Balance || 0) < 0">
+                Current Balance
+            </div>
+            <div class="text-2xl font-bold"
+                 [class.text-green-800]="(summary?.Balance || 0) >= 0"
+                 [class.text-red-800]="(summary?.Balance || 0) < 0">
+                {{ (summary?.Balance || 0) | currency:'PKR ':'symbol':'1.0-0' }}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tabs -->
+    <nz-tabset>
+
+        <!-- Tab 1: Store (Expense History) -->
+        <nz-tab nzTitle="Store">
+            <div class="pt-4">
+                <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+                    <h2 class="text-lg font-semibold text-gray-800">Expense History</h2>
+                    <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onDateChange($event)"
+                        nzFormat="dd/MM/yyyy" [nzPlaceHolder]="['From Date', 'To Date']">
+                    </nz-range-picker>
+                </div>
+
+                <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-3 py-1.5 text-left font-semibold text-gray-600 text-xs">Date</th>
+                                <th class="px-3 py-1.5 text-left font-semibold text-gray-600 text-xs">Category</th>
+                                <th class="px-3 py-1.5 text-left font-semibold text-gray-600 text-xs">Notes</th>
+                                <th class="px-3 py-1.5 text-left font-semibold text-gray-600 text-xs">Added By</th>
+                                <th class="px-3 py-1.5 text-right font-semibold text-gray-600 text-xs">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @if (expenses.length === 0) {
+                                <tr>
+                                    <td colspan="5" class="px-3 py-8 text-center text-gray-400 text-sm">No expenses found for selected period</td>
+                                </tr>
+                            } @else {
+                                @for (row of expenses; track row.ID) {
+                                    <tr class="hover:bg-blue-50 cursor-pointer transition-colors" (click)="viewExpense(row)">
+                                        <td class="px-3 py-1 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
+                                        <td class="px-3 py-1 text-gray-600 text-xs">
+                                            <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                                                {{ row.Category || '—' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-3 py-1 text-gray-500 text-xs">{{ row.Notes || '—' }}</td>
+                                        <td class="px-3 py-1 text-gray-500 text-xs">{{ row.AddedBy || '—' }}</td>
+                                        <td class="px-3 py-1 text-right font-semibold text-red-700 text-xs">
+                                            {{ row.Amount | currency:'PKR ':'symbol':'1.0-0' }}
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                        @if (expenses.length > 0) {
+                            <tfoot class="border-t-2 border-gray-300 bg-gray-50">
+                                <tr class="font-semibold text-gray-800">
+                                    <td colspan="4" class="px-3 py-1.5 text-right text-xs">Total</td>
+                                    <td class="px-3 py-1.5 text-right text-red-700 text-xs">
+                                        {{ totalExpenses | currency:'PKR ':'symbol':'1.0-0' }}
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        }
+                    </table>
+                </div>
+            </div>
+        </nz-tab>
+
+        <!-- Tab 2: Funding History -->
+        <nz-tab nzTitle="Funding History">
+            <div class="pt-4">
+                <h2 class="mb-3 text-lg font-semibold text-gray-800">Funding History</h2>
+
+                <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-600">Date</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-600">From (Bank Account)</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-600">Payment Type</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-600">Notes</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-600">Added By</th>
+                                <th class="px-4 py-3 text-right font-semibold text-gray-600">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @if (funding.length === 0) {
+                                <tr>
+                                    <td colspan="6" class="px-4 py-10 text-center text-gray-400">No funding transactions yet</td>
+                                </tr>
+                            } @else {
+                                @for (row of funding; track row.ID) {
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ row.Date | date:'dd/MM/yyyy' }}</td>
+                                        <td class="px-4 py-3 font-medium text-gray-800">{{ row.BankAccount || '—' }}</td>
+                                        <td class="px-4 py-3 text-gray-600">{{ row.PaymentType || '—' }}</td>
+                                        <td class="px-4 py-3 text-gray-500">{{ row.Notes || '—' }}</td>
+                                        <td class="px-4 py-3 text-gray-500">{{ row.AddedBy || '—' }}</td>
+                                        <td class="px-4 py-3 text-right font-semibold text-green-700">
+                                            {{ row.Amount | currency:'PKR ':'symbol':'1.0-0' }}
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </nz-tab>
+
+    </nz-tabset>
+
+</div>

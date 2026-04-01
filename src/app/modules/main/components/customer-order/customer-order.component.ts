@@ -94,7 +94,6 @@ export class CustomerOrderComponent
                 this.customers = res;
             },
             error: (err) => {
-                console.error('Error fetching suppliers:', err);
             },
         });
     }
@@ -105,7 +104,6 @@ export class CustomerOrderComponent
                 this.groupedPacks = this.groupByProduct(res);
             },
             error: (err) => {
-                console.error('Error fetching products with Flavor:', err);
             },
         });
     }

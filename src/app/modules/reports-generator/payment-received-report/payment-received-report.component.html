@@ -1,0 +1,70 @@
+<div class="absolute inset-0 flex min-w-0 flex-col overflow-y-auto p-6 md:p-8" cdkScrollable>
+    <div class="flex-0">
+        <div class="mb-5">
+            <div class="text-3xl font-semibold leading-8 tracking-tight">Payment Received</div>
+        </div>
+
+        <app-report-viewer-tool pageSize="A4" (filter)="open($event)" (pageIndexChanged)="onPageIndexChanged($event)">
+
+            @if (records && records.length > 0) {
+
+            <div #pageContent class="grid grid-cols-12 font-semibold text-gray-600 border-b border-gray-300 pb-2 text-sm mt-4 page-break-avoid">
+                <div class="col-span-2">Date</div>
+                <div class="col-span-3">Received From</div>
+                <div class="col-span-2">Party Type</div>
+                <div class="col-span-2">Deposited To</div>
+                <div class="col-span-2">Payment Type</div>
+                <div class="col-span-1 text-right">Amount</div>
+            </div>
+
+            @for (row of records; track $index) {
+            <div #pageContent class="grid grid-cols-12 text-sm py-2 border-b border-gray-100 page-break-avoid">
+                <div class="col-span-2">{{ row.Date | date:'dd/MM/yyyy' }}</div>
+                <div class="col-span-3 font-medium">{{ row.From || '-' }}</div>
+                <div class="col-span-2 text-gray-500 capitalize">{{ row.FromPartyType || '-' }}</div>
+                <div class="col-span-2">{{ row.To || '-' }}</div>
+                <div class="col-span-2 text-gray-500">{{ row.PaymentType || '-' }}</div>
+                <div class="col-span-1 text-right font-medium">{{ row.Amount | currency:'PKR ':'' }}</div>
+            </div>
+            }
+
+            <div #pageContent class="grid grid-cols-12 text-sm font-bold bg-gray-100 py-2 border-t-2 border-gray-400 mt-1 page-break-avoid">
+                <div class="col-span-11 text-right pr-2">Grand Total</div>
+                <div class="col-span-1 text-right">{{ grandTotal | currency:'PKR ':'' }}</div>
+            </div>
+
+            } @else {
+            <div #pageContent class="text-center text-gray-400 py-12 text-sm">No data found. Adjust filters and click Generate.</div>
+            }
+
+        </app-report-viewer-tool>
+    </div>
+</div>
+
+<nz-drawer nzWrapClassName="filter-modal" [nzClosable]="false" [nzVisible]="IsFilterDrawerVisible"
+    [nzPlacement]="'right'" (nzOnClose)="close()">
+    <ng-container *nzDrawerContent>
+        <div class="flex items-center justify-between w-full filters mb-2">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-[#E6F4F3] flex items-center justify-center pt-1">
+                    <mat-icon svgIcon="mat_solid:filter_alt" class="text-[#0047BB]"></mat-icon>
+                </div>
+                <h5 class="text-base font-medium mb-0">Filters</h5>
+            </div>
+            <mat-icon svgIcon="heroicons_solid:x-mark" (click)="close()" class="text-red-600 cursor-pointer"></mat-icon>
+        </div>
+        <div class="border-b-2 mb-3"></div>
+
+        <div class="grid grid-cols-1 gap-3">
+            <bft-input-date name="FromDate" label="From Date" [(ngModel)]="fromDate" />
+            <bft-input-date name="EndDate" label="To Date" [(ngModel)]="endDate" />
+        </div>
+
+        <div class="grid grid-cols-1 mt-4">
+            <div class="flex gap-2">
+                <bft-button name="Generate" icon="settings" (onClick)="onGenerate()" />
+                <bft-button name="Reset" icon="close" (onClick)="onReset()" />
+            </div>
+        </div>
+    </ng-container>
+</nz-drawer>

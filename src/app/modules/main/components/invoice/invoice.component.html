@@ -128,11 +128,11 @@
                     
                     <td class="py-0 px-2 border-r border-l">
                         <bft-input-currency name="Price" [required]="true" [(ngModel)]="element.Price"
-                            [skeleton]="isDataLoading" symbol="$" (change)="getTAmt(element)" />
+                            [skeleton]="isDataLoading" symbol="PKR" (change)="getTAmt(element)" />
                     </td>
                     <td class="py-0 px-2 border-r border-l">
                         <bft-input-currency name="NetAmt" [(ngModel)]="element.NetAmt" [skeleton]="isDataLoading"
-                            [disabled]="true" symbol="$" />
+                            [disabled]="true" symbol="PKR" />
                     </td>
 
                     <td class="py-0 px-2 border-r">
@@ -163,7 +163,7 @@
                     </td>
 
                     <td class=" px-3 py-2">
-                        <bft-input-currency name="subTotal" symbol="$" [disabled]="true" [(ngModel)]="subTotal"
+                        <bft-input-currency name="subTotal" symbol="PKR" [disabled]="true" [(ngModel)]="subTotal"
                             [skeleton]="isDataLoading" />
                     </td>
                 </tr>
@@ -173,7 +173,7 @@
                         Taxable
                     </td>
                     <td class=" px-3 py-2">
-                        <bft-input-currency name="Taxable" symbol="$" [(ngModel)]="formData.Taxable"
+                        <bft-input-currency name="Taxable" symbol="PKR" [(ngModel)]="formData.Taxable"
                             (change)="calculateTotals()" [skeleton]="isDataLoading" />
                     </td>
                 </tr>
@@ -193,7 +193,7 @@
                         Tax
                     </td>
                     <td class=" px-3 py-2">
-                        <bft-input-currency name="Tax" symbol="$" [(ngModel)]="formData.Tax"
+                        <bft-input-currency name="Tax" symbol="PKR" [(ngModel)]="formData.Tax"
                             (change)="calculateTotals()" [disabled]="true" [skeleton]="isDataLoading" />
                     </td>
                 </tr>
@@ -203,7 +203,7 @@
                         S & H
                     </td>
                     <td class=" px-3 py-2">
-                        <bft-input-currency name="SH" symbol="$" [(ngModel)]="formData.SH" (change)="calculateTotals()"
+                        <bft-input-currency name="SH" symbol="PKR" [(ngModel)]="formData.SH" (change)="calculateTotals()"
                             [skeleton]="isDataLoading" />
                     </td>
                 </tr>
@@ -214,7 +214,7 @@
                         Others
                     </td>
                     <td class=" px-3 py-2">
-                        <bft-input-currency name="Others" symbol="$" [(ngModel)]="formData.Others"
+                        <bft-input-currency name="Others" symbol="PKR" [(ngModel)]="formData.Others"
                             (change)="calculateTotals()" [skeleton]="isDataLoading" />
                     </td>
                 </tr>
@@ -226,7 +226,7 @@
                     </td>
                     <td class=" px-3 py-2">
                         <bft-input-currency name="Total" [(ngModel)]="formData.Total" (change)="calculateTotals()"
-                            [skeleton]="isDataLoading" symbol="$" [disabled]="true" />
+                            [skeleton]="isDataLoading" symbol="PKR" [disabled]="true" />
                     </td>
                 </tr>
             </thead>

@@ -7,41 +7,40 @@ import {
     UntypedFormGroup,
     Validators,
 } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
-import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
+import { FuseAlertType } from '@fuse/components/alert';
 import { ApiResponse } from 'app/core/Base/interface/IResponses';
 import { AuthService } from 'app/core/auth/auth.service';
 import { UserService } from 'app/core/user/user.service';
-import { BftInputEmailComponent } from '../../shared/components/fields/bft-input-email/bft-input-email.component';
-import { BftInputPasswordComponent } from '../../shared/components/fields/bft-input-password/bft-input-password.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'auth-sign-in',
     templateUrl: './sign-in.component.html',
+    styleUrl: './sign-in.component.scss',
     encapsulation: ViewEncapsulation.None,
     animations: fuseAnimations,
     standalone: true,
     imports: [
+        CommonModule,
         RouterLink,
-        FuseAlertComponent,
         FormsModule,
         ReactiveFormsModule,
-        MatButtonModule,
+        MatIconModule,
         MatProgressSpinnerModule,
-        BftInputEmailComponent,
-        BftInputPasswordComponent,
     ],
 })
 export class AuthSignInComponent implements OnInit {
     @ViewChild('signInNgForm') signInNgForm: NgForm;
     signInForm: UntypedFormGroup;
     showAlert: boolean = false;
+    showPassword: boolean = false;
 
     alert: { type: FuseAlertType; message: string } = {
-        type: 'success',
+        type: 'error',
         message: '',
     };
 
@@ -53,84 +52,48 @@ export class AuthSignInComponent implements OnInit {
         private _userService: UserService
     ) {}
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Lifecycle hooks
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * On init
-     */
     ngOnInit(): void {
-        // Create the form
         this.signInForm = this._formBuilder.group({
             email: ['', [Validators.required, Validators.email]],
             password: ['', Validators.required],
         });
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Sign in
-     */
     signIn(): void {
-        // Return if the form is invalid
         if (this.signInForm.invalid) {
+            this.signInForm.markAllAsTouched();
             return;
         }
-        // Disable the form
         this.signInForm.disable();
-
-        // Hide the alert
         this.showAlert = false;
 
-        // Sign in
         this._authService.signIn(this.signInForm.value).subscribe(
             (res: ApiResponse<any>) => {
                 if (this._authService.checkPasswordChange() == true) {
                     this._router.navigateByUrl('/change-password');
                 } else if (this._authService.checkMultipleEntity() == true) {
                     this._router.navigateByUrl('/switch-entity');
-                }else {
-                        this._userService
-                            .getUser()
-                            .subscribe((res: ApiResponse<any>) => {
-                                this._userService.setUserProfile(res.Data);
-                                if (res.Data?.value[0].IsPasswordChange) {
-                                    this._router.navigateByUrl(
-                                        '/change-password'
-                                    );
-                                } else {
-                                    const redirectURL =
-                                        this._activatedRoute.snapshot.queryParamMap.get(
-                                            'redirectURL'
-                                        ) || '/pages/settings';
-                                        // this._activatedRoute.snapshot.queryParamMap.get(
-                                        //     'redirectURL'
-                                        // ) || '/factory/dashboard';
-                                    this._router.navigateByUrl(redirectURL);
-                                }
-                            });
-
-                        // Navigate to the redirect url
-                    }
+                } else {
+                    this._userService.getUser().subscribe((res: ApiResponse<any>) => {
+                        this._userService.setUserProfile(res.Data);
+                        if (res.Data?.value[0].IsPasswordChange) {
+                            this._router.navigateByUrl('/change-password');
+                        } else {
+                            const redirectURL =
+                                this._activatedRoute.snapshot.queryParamMap.get('redirectURL') ||
+                                '/pages/settings';
+                            this._router.navigateByUrl(redirectURL);
+                        }
+                    });
+                }
             },
             (response) => {
-                // Re-enable the form
                 this.signInForm.enable();
-
-                // Reset the form
                 this.signInNgForm.resetForm();
-
-                // Set the alert
                 this.alert = {
                     type: 'error',
-                    message: response.error.Message,
+                    message: response.error?.Message || 'Invalid username or password.',
                 };
-
-                // Show the alert
                 this.showAlert = true;
             }
         );

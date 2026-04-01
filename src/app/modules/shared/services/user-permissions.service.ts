@@ -10,53 +10,22 @@ export class UserPermissionsService {
   constructor() { }
 
   isAddSectionAccessible(scode: string): boolean {
-    if(scode == null || scode == undefined || scode == ''){
-      return false;
-    }
-    let filterSectionAccess = LoginUser.SectionAccess.filter(a=> a.SCode == scode && a.RightID === Permission.Add);
-    if(filterSectionAccess.length > 0) {
-      return true;
-    }
-    else{
-      false
-    }
+    if (!scode) return false;
+    return LoginUser.SectionAccess.some(a => a.SCode == scode && a.RightID === Permission.Add);
   }
+
   isViewSectionAccessible(scode: string): boolean {
-    if(scode == null || scode == undefined || scode == ''){
-      return false;
-    }
-    let filterSectionAccess = LoginUser.SectionAccess.filter(a=> a.SCode == scode && a.RightID === Permission.View);
-    if(filterSectionAccess.length > 0) {
-      return true;
-    }
-    else{
-      false
-    }
+    if (!scode) return false;
+    return LoginUser.SectionAccess.some(a => a.SCode == scode && a.RightID === Permission.View);
   }
 
   isEditSectionAccessible(scode: string): boolean {
-    if(scode == null || scode == undefined || scode == ''){
-      return false;
-    }
-    let filterSectionAccess = LoginUser.SectionAccess.filter(a=> a.SCode == scode && a.RightID === Permission.Update);
-    if(filterSectionAccess.length > 0) {
-      return true;
-    }
-    else{
-      false
-    }
+    if (!scode) return false;
+    return LoginUser.SectionAccess.some(a => a.SCode == scode && a.RightID === Permission.Update);
   }
 
   isDeleteSectionAccessible(scode: string): boolean {
-    if(scode == null || scode == undefined || scode == ''){
-      return false;
-    }
-    let filterSectionAccess = LoginUser.SectionAccess.filter(a=> a.SCode == scode && a.RightID === Permission.Delete);
-    if(filterSectionAccess.length > 0) {
-      return true;
-    }
-    else{
-      false
-    }
+    if (!scode) return false;
+    return LoginUser.SectionAccess.some(a => a.SCode == scode && a.RightID === Permission.Delete);
   }
 }

@@ -453,8 +453,6 @@ export class BftTableComponent  implements OnInit, OnChanges, OnDestroy {
       // If no previous filter exists and no other column has filters applied, show all unique values from the data source for the current column
       if (lastRecordOfFilterStore === undefined && filtersAppliedToOtherColumns == false) {
 
-        console.log('lastrecord & filters not applied another', lastRecordOfFilterStore);
-
         this.filtersArr.splice(currentColumnIndex, 1); // Remove the current column's filter if it exists
         const uniqueValues = [...new Set(this.dataSource.map(item => item[this.currentColumn]))]; // Get unique values from the data source
         const mappedValue = uniqueValues.map(value => ({
@@ -487,7 +485,6 @@ export class BftTableComponent  implements OnInit, OnChanges, OnDestroy {
           });
         });
 
-        console.log('data2', data2);
         filteredData = data2;
       }
       else {
@@ -496,7 +493,6 @@ export class BftTableComponent  implements OnInit, OnChanges, OnDestroy {
           var data = this.dataSource.filter(a => a[lastRecordOfFilterStore.columnName] == element.text);
           if (data.length > 0)
             filteredData.push(data);
-          console.log('data', data);
         });
 
         filteredData = this.combineObj(filteredData); // Combine the filtered data into a single array

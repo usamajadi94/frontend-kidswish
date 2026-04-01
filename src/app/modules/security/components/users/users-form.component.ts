@@ -78,11 +78,8 @@ export class UsersFormComponent extends BaseComponent<
         this._listService.getGroups().subscribe({
             next: (res: any) => {
                 this.permissionGroups = res;
-                console.log('permission Res', this.permissionGroups);
             },
-            error: (err) => {
-                console.error('Error fetching Opening Stock:', err);
-            },
+            error: () => {},
         });
     }
 
@@ -97,16 +94,18 @@ export class UsersFormComponent extends BaseComponent<
         if (formData.UserName == null || formData.UserName.trim() == '') {
             this.validation.push('User Name is required.');
         }
-        if (formData.Password == null || formData.Password.trim() == '') {
+        if (this.primaryKey === 0 && (formData.Password == null || formData.Password.trim() == '')) {
             this.validation.push('Password is required.');
         }
         if (formData.Email == null || formData.Email.trim() == '') {
             this.validation.push('Email is required.');
         }
-        // Check if at least one permission group is selected
-        const hasSelectedGroup = this.permissionGroups.some(group => group.selected);
-        if (!hasSelectedGroup) {
-            this.validation.push('At least one permission must be selected.');
+        // Check if at least one permission group is selected (only required for new users)
+        if (this.primaryKey === 0) {
+            const hasSelectedGroup = this.permissionGroups.some(group => group.selected);
+            if (!hasSelectedGroup) {
+                this.validation.push('At least one permission must be selected.');
+            }
         }
         return this.validation.length > 0;
     }
@@ -132,6 +131,9 @@ export class UsersFormComponent extends BaseComponent<
     }
     
     public AfterGetData(): void {
+        // Restore section SCode for permission checks (API response overwrites it)
+        this.formData.SCode = componentRegister.user.SCode;
+
         const permission = this.formData.RBAC_User_Entity_Groups;
         permission.forEach((element) => {
             this.permissionGroups.forEach((group) => {

@@ -115,7 +115,6 @@ export class InvoiceComponent extends BaseComponent<
                 this.customers = res;
             },
             error: (err) => {
-                console.error('Error fetching items:', err);
             },
         });
     }
@@ -126,7 +125,6 @@ export class InvoiceComponent extends BaseComponent<
                 this.items = this.groupByProduct(res);
             },
             error: (err) => {
-                console.error('Error fetching items:', err);
             },
         });
     }

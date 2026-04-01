@@ -16,8 +16,6 @@ import { Subject, takeUntil } from 'rxjs';
 import { AccountComponent } from './account/account.component';
 import { SecurityComponent } from './security/security.component';
 import { CompanyComponent } from './company/company.component';
-import { ShipmentComponent } from './shipment/shipment.component';
-
 
 @Component({
 
@@ -35,7 +33,6 @@ import { ShipmentComponent } from './shipment/shipment.component';
     AccountComponent,
     SecurityComponent,
     CompanyComponent,
-    ShipmentComponent
   ],
 })
 export class SettingsComponent implements OnInit, OnDestroy {
@@ -70,13 +67,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
         title: 'Company',
         description:
           'Manage your company Information',
-      },
-       {
-        id: 'shipment',
-        icon: 'heroicons_outline:building-office-2',
-        title: 'Shipment',
-        description:
-          'Manage your Shipment Information',
       },
       {
         id: 'account',

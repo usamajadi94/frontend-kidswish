@@ -1,0 +1,135 @@
+<div class="absolute inset-0 flex min-w-0 flex-col overflow-y-auto p-6 md:p-8">
+
+    <div class="mb-6">
+        <div class="text-3xl font-semibold tracking-tight">Account Statement</div>
+        <div class="text-sm text-gray-400 mt-1">View full transaction history per bank account</div>
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-6 flex flex-wrap items-end gap-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div>
+            <div class="mb-1 text-xs font-medium text-gray-500">Bank Account *</div>
+            <nz-select [(ngModel)]="selectedAccount" (ngModelChange)="onAccountChange()"
+                nzPlaceHolder="Select Account" style="min-width: 220px" [nzAllowClear]="true">
+                @for (a of bankAccounts; track a.ID) {
+                    <nz-option [nzValue]="a.ID" [nzLabel]="a.Name"></nz-option>
+                }
+            </nz-select>
+        </div>
+        <div>
+            <div class="mb-1 text-xs font-medium text-gray-500">Date Range</div>
+            <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onDateChange($event)"
+                nzFormat="dd/MM/yyyy" [nzPlaceHolder]="['From Date', 'To Date']">
+            </nz-range-picker>
+        </div>
+    </div>
+
+    @if (!selectedAccount) {
+        <div class="flex flex-1 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white text-gray-400">
+            Select a bank account to view its statement
+        </div>
+    } @else {
+
+        <!-- Balance Cards -->
+        <div class="mb-6 grid grid-cols-3 gap-4">
+            <div class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm text-center">
+                <div class="text-xs text-gray-400 mb-1">Opening Balance</div>
+                <div class="text-xl font-bold text-gray-700">{{ openingBalance | currency:'PKR ':'symbol':'1.0-0' }}</div>
+            </div>
+            <div class="rounded-xl border border-green-100 bg-green-50 p-5 shadow-sm text-center">
+                <div class="text-xs text-green-500 mb-1">Total Credits</div>
+                <div class="text-xl font-bold text-green-700">{{ totalCredit | currency:'PKR ':'symbol':'1.0-0' }}</div>
+            </div>
+            <div class="rounded-xl border border-red-100 bg-red-50 p-5 shadow-sm text-center">
+                <div class="text-xs text-red-500 mb-1">Total Debits</div>
+                <div class="text-xl font-bold text-red-700">{{ totalDebit | currency:'PKR ':'symbol':'1.0-0' }}</div>
+            </div>
+        </div>
+
+        <!-- Closing Balance Banner -->
+        <div class="mb-4 flex items-center justify-between rounded-xl px-6 py-4 shadow-sm"
+            [class.bg-green-100]="closingBalance >= 0" [class.bg-red-100]="closingBalance < 0">
+            <div class="font-semibold" [class.text-green-700]="closingBalance >= 0" [class.text-red-700]="closingBalance < 0">
+                {{ selectedAccountName }} — Closing Balance
+            </div>
+            <div class="text-2xl font-bold" [class.text-green-700]="closingBalance >= 0" [class.text-red-700]="closingBalance < 0">
+                {{ closingBalance | currency:'PKR ':'symbol':'1.0-0' }}
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600 text-xs">Date</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600 text-xs">Type</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600 text-xs">From</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600 text-xs">To</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600 text-xs">Payment Via</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600 text-xs">Notes</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600 text-xs">Added By</th>
+                        <th class="px-4 py-3 text-right font-semibold text-green-700 text-xs">Credit (+)</th>
+                        <th class="px-4 py-3 text-right font-semibold text-red-700 text-xs">Debit (−)</th>
+                        <th class="px-4 py-3 text-right font-semibold text-gray-600 text-xs">Balance</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @if (isLoading) {
+                        @for (i of [1,2,3,4,5]; track i) {
+                            <tr>@for (j of [1,2,3,4,5,6,7,8,9,10]; track j) {
+                                <td class="px-4 py-3"><div class="h-4 w-20 animate-pulse rounded bg-gray-200"></div></td>
+                            }</tr>
+                        }
+                    } @else if (rows.length === 0) {
+                        <tr><td colspan="10" class="px-4 py-12 text-center text-gray-400">No transactions found</td></tr>
+                    } @else {
+                        @for (row of rows; track row.ID) {
+                            <tr class="hover:bg-gray-50 transition-colors"
+                                [class.bg-green-50]="row.Credit > 0"
+                                [class.bg-red-50]="row.Debit > 0">
+                                <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-700">{{ row.Date | date:'dd/MM/yyyy' }}</td>
+                                <td class="px-4 py-2 text-xs">
+                                    <span class="rounded-full px-2 py-0.5 text-xs font-medium {{ txBadgeClass(row.TransactionType) }}">
+                                        {{ txLabel(row.TransactionType) }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-2 text-xs text-gray-700 font-medium">{{ row.From || '—' }}</td>
+                                <td class="px-4 py-2 text-xs text-gray-700 font-medium">{{ row.To || '—' }}</td>
+                                <td class="px-4 py-2 text-xs text-gray-500">{{ row.PaymentType || '—' }}</td>
+                                <td class="px-4 py-2 text-xs text-gray-500">{{ row.Notes || '—' }}</td>
+                                <td class="px-4 py-2 text-xs text-gray-500">{{ row.AddedBy || '—' }}</td>
+                                <td class="px-4 py-2 text-right text-xs font-semibold text-green-700">
+                                    @if (row.Credit > 0) { {{ row.Credit | currency:'PKR ':'symbol':'1.0-0' }} }
+                                </td>
+                                <td class="px-4 py-2 text-right text-xs font-semibold text-red-700">
+                                    @if (row.Debit > 0) { {{ row.Debit | currency:'PKR ':'symbol':'1.0-0' }} }
+                                </td>
+                                <td class="px-4 py-2 text-right text-xs font-bold"
+                                    [class.text-green-700]="row.RunningBalance >= 0"
+                                    [class.text-red-700]="row.RunningBalance < 0">
+                                    {{ row.RunningBalance | currency:'PKR ':'symbol':'1.0-0' }}
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                @if (!isLoading && rows.length > 0) {
+                    <tfoot class="border-t-2 border-gray-300 bg-gray-50">
+                        <tr class="font-semibold">
+                            <td colspan="7" class="px-4 py-2 text-right text-xs">Totals</td>
+                            <td class="px-4 py-2 text-right text-xs text-green-700">{{ totalCredit | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                            <td class="px-4 py-2 text-right text-xs text-red-700">{{ totalDebit | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                            <td class="px-4 py-2 text-right text-xs"
+                                [class.text-green-700]="closingBalance >= 0"
+                                [class.text-red-700]="closingBalance < 0">
+                                {{ closingBalance | currency:'PKR ':'symbol':'1.0-0' }}
+                            </td>
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+        </div>
+    }
+
+</div>

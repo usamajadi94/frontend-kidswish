@@ -11,7 +11,6 @@ import {
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 import { Navigation } from 'app/core/navigation/navigation.types';
-import { LanguagesComponent } from 'app/layout/common/languages/languages.component';
 // import { MessagesComponent } from 'app/layout/common/messages/messages.component';
 import { UserComponent } from 'app/layout/common/user/user.component';
 import { Subject, takeUntil } from 'rxjs';
@@ -25,9 +24,7 @@ import { Subject, takeUntil } from 'rxjs';
         FuseLoadingBarComponent,
         MatButtonModule,
         MatIconModule,
-        LanguagesComponent,
         FuseFullscreenComponent,
-        // MessagesComponent,
         UserComponent,
         RouterOutlet,
         FuseVerticalNavigationComponent,

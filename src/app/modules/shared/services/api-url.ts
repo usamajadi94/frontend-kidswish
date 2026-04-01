@@ -16,30 +16,23 @@ export class apiUrls {
     static readonly settings = `${apiUrls.server}api/me/settings`;
     static readonly companyFetch = `${apiUrls.server}api/GetCompanyByClient`;
     
-    static readonly shipmentFetch = `${apiUrls.server}api/GetShipmentByClient`;
-    static readonly shipmentUpdate = `${apiUrls.server}api/ShipmentByClient`;
-
-    static readonly navigation = `${apiUrls.server}api/GetNavigation`;
+static readonly navigation = `${apiUrls.server}api/GetNavigation`;
     // Query service
     static readonly query = `${apiUrls.server}api/query`;
 
     // Setup Module Controllers
-    static readonly supplierInformationController = `api/supplierinformation`;
-    static readonly supplierItemsController = `api/supplieritems`;
-    static readonly supplierOrderLedgerController = `api/supplierorderledger`;
-    static readonly itemTypeController = `api/itemtype`;
-    static readonly customerInformatonController = `api/customerniformation`;
-    static readonly vehicleInformationController = `api/vehicleinformation`;
-    static readonly expenseController = `api/expense`;
-    static readonly employeeController = `api/employee`;
-    static readonly payrollController = `api/payroll`;
-    static readonly employeeAttendanceController = `api/empattendance`;
+    static readonly departmentController = `api/department`;
+    static readonly customerController = `api/customer`;
+    static readonly vendorController = `api/vendor`;
+    static readonly vendorTypeController = `api/vendortype`;
+    static readonly bankAccountController = `api/bankaccount`;
+    static readonly paymentTransactionController = `api/paymenttransaction`;
+    static readonly legalEntityController = `api/legalentity`;
     static readonly productController = `api/product`;
-    static readonly flavorOrder = `api/flavor/order`;
-    static readonly flavorOrderStatus = `${apiUrls.server}api/flavor/order/status`;
-    static readonly expenseDrController = `api/expensedr`;
-
+    static readonly distributorController = `api/distributor`;
+    static readonly expenseController = `api/expense`;
     static readonly expenseCategoryController = `api/expensecategory`;
+    static readonly pettyCashController = `api/pettycash`;
     // DMS
     static readonly invoiceController = `api/invoicemaster`;
     static readonly flavorStockController = `api/flavorstock`;
@@ -52,9 +45,4 @@ export class apiUrls {
     // Main
     static readonly customerOrderController = `api/customerorder`;
     
-    // Factory
-    static readonly productionOrder = `${apiUrls.server}api/factoryproduction`;
-    static readonly shipmentController = `api/shipment`;
-    
-    static readonly supplierOrderController = `api/supplierorder`;
 }

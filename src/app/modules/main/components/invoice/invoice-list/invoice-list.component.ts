@@ -109,7 +109,6 @@ export class InvoiceListComponent  extends BaseRoutedComponent {
         this.data = res;
       },
       error: (err) => {
-        console.error('Error fetching Area Information:', err);
       },
     });
   }

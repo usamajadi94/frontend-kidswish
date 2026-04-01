@@ -2,21 +2,19 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { UserPermissionsService } from 'app/modules/shared/services/user-permissions.service';
 
-export const permissionGuard: CanActivateFn = (route, state) => {
-  
+export const permissionGuard: CanActivateFn = (route) => {
   const userPermissionService = inject(UserPermissionsService);
-  const router: Router = inject(Router);
-  const requiredPermission = route?.data?.SCode as string;
+  const router = inject(Router);
+  const scode = route?.data?.SCode as string;
 
-  if(userPermissionService.isAddSectionAccessible(requiredPermission) || 
-    userPermissionService.isEditSectionAccessible(requiredPermission) ||
-    userPermissionService.isViewSectionAccessible(requiredPermission) ||
-    userPermissionService.isDeleteSectionAccessible(requiredPermission)){
-    return true
-  }
-  else{
-    router.navigate(['/404-not-found'])
-    return true;
-  }
-  return ;
+  const hasAccess =
+    userPermissionService.isViewSectionAccessible(scode) ||
+    userPermissionService.isAddSectionAccessible(scode) ||
+    userPermissionService.isEditSectionAccessible(scode) ||
+    userPermissionService.isDeleteSectionAccessible(scode);
+
+  if (hasAccess) return true;
+
+  router.navigate(['/404-not-found']);
+  return false;
 };

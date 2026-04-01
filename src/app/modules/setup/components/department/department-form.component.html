@@ -1,0 +1,5 @@
+<div class="flex flex-col gap-4">
+    <bft-input-text name="Name" label="Name" [(ngModel)]="formData.Name" [required]="true" [skeleton]="isDataLoading" />
+    <bft-textarea name="Description" label="Description" [(ngModel)]="formData.Description" [skeleton]="isDataLoading" />
+    <bft-checkbox name="IsActive" label="Active" [(ngModel)]="formData.IsActive" [skeleton]="isDataLoading" />
+</div>

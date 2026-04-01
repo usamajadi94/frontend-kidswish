@@ -1,0 +1,89 @@
+<div class="absolute inset-0 flex min-w-0 flex-col overflow-y-auto p-6 md:p-8">
+
+    <div class="mb-6">
+        <div class="text-3xl font-semibold tracking-tight">Petty Cash Report</div>
+        <div class="text-sm text-gray-400 mt-1">Daily expense breakdown per petty cash account</div>
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-5 flex flex-wrap items-end gap-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div>
+            <div class="mb-1 text-xs font-medium text-gray-500">Petty Cash Account</div>
+            <nz-select [(ngModel)]="selectedPettyCash" (ngModelChange)="onFilterChange()"
+                nzPlaceHolder="All Accounts" [nzAllowClear]="true" style="min-width: 220px">
+                @for (p of pettyCashList; track p.ID) {
+                    <nz-option [nzValue]="p.ID" [nzLabel]="p.Name"></nz-option>
+                }
+            </nz-select>
+        </div>
+        <div>
+            <div class="mb-1 text-xs font-medium text-gray-500">Date Range</div>
+            <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onDateChange($event)"
+                nzFormat="dd/MM/yyyy" [nzPlaceHolder]="['From Date', 'To Date']">
+            </nz-range-picker>
+        </div>
+    </div>
+
+    <!-- Summary Card -->
+    @if (!isLoading && rows.length > 0) {
+        <div class="mb-4 flex items-center justify-between rounded-xl bg-orange-50 border border-orange-100 px-6 py-4 shadow-sm">
+            <div class="text-sm font-medium text-orange-700">{{ rows.length }} expense(s)</div>
+            <div class="text-2xl font-bold text-orange-700">{{ grandTotal | currency:'PKR ':'symbol':'1.0-0' }}</div>
+        </div>
+    }
+
+    <!-- Table -->
+    <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 text-xs">Date</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 text-xs">Petty Cash Account</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 text-xs">Category</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 text-xs">Notes</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 text-xs">Added By</th>
+                    <th class="px-4 py-3 text-right font-semibold text-red-700 text-xs">Amount</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @if (isLoading) {
+                    @for (i of [1,2,3,4,5]; track i) {
+                        <tr>@for (j of [1,2,3,4,5,6]; track j) {
+                            <td class="px-4 py-3"><div class="h-4 w-24 animate-pulse rounded bg-gray-200"></div></td>
+                        }</tr>
+                    }
+                } @else if (rows.length === 0) {
+                    <tr><td colspan="6" class="px-4 py-12 text-center text-gray-400">No expenses found</td></tr>
+                } @else {
+                    @for (row of rows; track row.ID) {
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-2 text-xs text-gray-700 whitespace-nowrap">{{ row.Date | date:'dd/MM/yyyy' }}</td>
+                            <td class="px-4 py-2 text-xs font-medium text-gray-800">{{ row.PettyCashAccount || '—' }}</td>
+                            <td class="px-4 py-2 text-xs">
+                                <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                                    {{ row.Category || 'Uncategorized' }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-2 text-xs text-gray-500">{{ row.Notes || '—' }}</td>
+                            <td class="px-4 py-2 text-xs text-gray-500">{{ row.AddedBy || '—' }}</td>
+                            <td class="px-4 py-2 text-right text-xs font-bold text-red-700">
+                                {{ row.Amount | currency:'PKR ':'symbol':'1.0-0' }}
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+            @if (!isLoading && rows.length > 0) {
+                <tfoot class="border-t-2 border-gray-300 bg-gray-50">
+                    <tr>
+                        <td colspan="5" class="px-4 py-2 text-right text-xs font-semibold">Total</td>
+                        <td class="px-4 py-2 text-right text-xs font-bold text-red-700">
+                            {{ grandTotal | currency:'PKR ':'symbol':'1.0-0' }}
+                        </td>
+                    </tr>
+                </tfoot>
+            }
+        </table>
+    </div>
+
+</div>

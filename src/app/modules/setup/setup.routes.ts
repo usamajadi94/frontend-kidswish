@@ -1,43 +1,33 @@
 import { Routes } from '@angular/router';
-import { CustomerManagementListComponent } from './components/customer-management/customer-management-list/customer-management-list.component';
-import { EmployeeManagementListComponent } from './components/employee-mangement/employee-management-list/employee-management-list.component';
 import { ExpenseListComponent } from './components/expense/expense-list/expense-list.component';
-import { ItemTypeListComponent } from './components/item-type/item-type-list/item-type-list.component';
-import { SuppliersListComponent } from './components/suppliers/suppliers-list/suppliers-list.component';
-import { PackagingStockListComponent } from './components/packaging-stock/packaging-stock-list/packaging-stock-list.component';
-import { VehicleInformationListComponent } from './components/vehicle-information/vehicle-information-list/vehicle-information-list.component';
+import { ExpenseCategoryListComponent } from './components/expense-category/expense-category-list/expense-category-list.component';
+import { DepartmentListComponent } from './components/department/department-list/department-list.component';
+import { DistributorListComponent } from './components/distributor/distributor-list/distributor-list.component';
+import { CustomerListComponent } from './components/customer/customer-list/customer-list.component';
+import { VendorListComponent } from './components/vendor/vendor-list/vendor-list.component';
+import { VendorTypeListComponent } from './components/vendor-type/vendor-type-list/vendor-type-list.component';
+import { BankAccountListComponent } from './components/bank-account/bank-account-list/bank-account-list.component';
+import { LegalEntityListComponent } from './components/legal-entity/legal-entity-list/legal-entity-list.component';
+import { PaymentReceivedListComponent } from './components/payment-received/payment-received-list/payment-received-list.component';
+import { MakePaymentListComponent } from './components/make-payment/make-payment-list/make-payment-list.component';
+import { LedgerComponent } from './components/ledger/ledger.component';
+import { PettyCashListComponent } from './components/petty-cash/petty-cash-list/petty-cash-list.component';
+import { PettyCashDetailComponent } from './components/petty-cash/petty-cash-detail/petty-cash-detail.component';
+import { BankAccountDetailComponent } from './components/bank-account/bank-account-detail/bank-account-detail.component';
 import { permissionGuard } from 'app/core/auth/guards/permission.guard';
 import { componentRegister } from '../shared/services/component-register';
-import { ProductsListComponent } from './components/products/products-list/products-list.component';
-import { ExpenseCategoryListComponent } from './components/expense-category/expense-category-list/expense-category-list.component';
-import { ExpenseDrListComponent } from './components/expense-dr/expense-dr-list/expense-dr-list.component';
-import { FlavorStockListComponent } from './components/flavor-stock/flavor-stock-list/flavor-stock-list.component';
-import { PayrollListComponent } from './components/payroll-management/payroll-list/payroll-list.component';
-import { EmployeeAttendanceListComponent } from './components/employee-attendance/employee-attendance-list/employee-attendance-list.component';
-import { SupplierItemsListComponent } from './components/supplier-items/supplier-items-list/supplier-items-list.component';
-import { SupplierOrderListComponent } from './components/supplier-order/supplier-order-list/supplier-order-list.component';
 
 export default [
     {
-        path: 'item-type-list', 
-        component: ItemTypeListComponent, 
-        data: { SCode: componentRegister.itemType.SCode },
-        canActivate: [permissionGuard]
-    },
-    // {
-    //     path: 'customer-list', component: CustomerInformationListComponent, data: { SCode: componentRegister.customer.SCode },
-    //     canActivate: [permissionGuard]
-    // },
-    {
-        path: 'vehicle-list', 
-        component: VehicleInformationListComponent, 
-        data: { SCode: componentRegister.vehicle.SCode },
+        path: 'distributor-list',
+        component: DistributorListComponent,
+        data: { SCode: componentRegister.distributor.SCode },
         canActivate: [permissionGuard],
     },
     {
-        path: 'employee-management-list',
-        component: EmployeeManagementListComponent,
-        data: { SCode: componentRegister.employee.SCode },
+        path: 'department-list',
+        component: DepartmentListComponent,
+        data: { SCode: componentRegister.department.SCode },
         canActivate: [permissionGuard],
     },
     {
@@ -47,71 +37,75 @@ export default [
         canActivate: [permissionGuard],
     },
     {
-        path: 'customer-management-list',
-        component: CustomerManagementListComponent,
+        path: 'expense-category-list',
+        component: ExpenseCategoryListComponent,
+        data: { SCode: componentRegister.expenseCategory.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'customer-list',
+        component: CustomerListComponent,
         data: { SCode: componentRegister.customer.SCode },
         canActivate: [permissionGuard],
     },
-
     {
-        path: 'supplier-management-list',
-        component: SuppliersListComponent,
-        data: { SCode: componentRegister.supplier.SCode },
-        canActivate: [permissionGuard],
-    },
-        
-    {
-        path:'packaging-stock-list', 
-        component: PackagingStockListComponent, 
-        data: { SCode: componentRegister.packagingStock.SCode },
+        path: 'vendor-list',
+        component: VendorListComponent,
+        data: { SCode: componentRegister.vendor.SCode },
         canActivate: [permissionGuard],
     },
     {
-        path:'product-list', 
-        component: ProductsListComponent, 
-        data: { SCode: componentRegister.product.SCode },
-        canActivate: [permissionGuard]
-    },
-    {
-        path:'expense-category-list', 
-        component:ExpenseCategoryListComponent, 
-        data: { SCode: componentRegister.expenseCategory.SCode },
-        canActivate: [permissionGuard]
-    },
-    {
-        path:'expense-dr-list', 
-        component:ExpenseDrListComponent, 
-        data: { SCode: componentRegister.expenseDr.SCode },
-        canActivate: [permissionGuard]
-    },
-    {
-        path:'flavor-stock-list', 
-        component:FlavorStockListComponent, 
-        data: { SCode: componentRegister.flavorStock.SCode },
-        canActivate: [permissionGuard]
-    },
-    {
-        path:'emp-payroll-list', 
-        component:PayrollListComponent, 
-        data: { SCode: componentRegister.payroll.SCode },
-        canActivate: [permissionGuard]
-    },
-    {
-        path:'emp-attendance', 
-        component:EmployeeAttendanceListComponent, 
-        data: { SCode: componentRegister.employeeAttendance.SCode },
-        canActivate: [permissionGuard]
-    },
-    {
-        path: 'supplier-items-list',
-        component: SupplierItemsListComponent,
-        data: { SCode: componentRegister.supplierItems.SCode },
+        path: 'vendor-type-list',
+        component: VendorTypeListComponent,
+        data: { SCode: componentRegister.vendorType.SCode },
         canActivate: [permissionGuard],
     },
     {
-        path: 'supplier-order-list',
-        component: SupplierOrderListComponent,
-        data: { SCode: componentRegister.supplierOrder.SCode },
+        path: 'bank-account-list',
+        component: BankAccountListComponent,
+        data: { SCode: componentRegister.bankAccount.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'bank-account-detail/:id',
+        component: BankAccountDetailComponent,
+        data: { SCode: componentRegister.bankAccount.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'legal-entity-list',
+        component: LegalEntityListComponent,
+        data: { SCode: componentRegister.legalEntity.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'payment-received-list',
+        component: PaymentReceivedListComponent,
+        data: { SCode: componentRegister.paymentReceived.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'make-payment-list',
+        component: MakePaymentListComponent,
+        data: { SCode: componentRegister.makePayment.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'ledger',
+        component: LedgerComponent,
+        data: { SCode: componentRegister.ledger.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'petty-cash-list',
+        component: PettyCashListComponent,
+        data: { SCode: componentRegister.pettyCash.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'petty-cash-detail/:id',
+        component: PettyCashDetailComponent,
+        data: { SCode: componentRegister.pettyCash.SCode },
         canActivate: [permissionGuard],
     },
 ] as Routes;

@@ -62,7 +62,6 @@ export class CustomerOrderListComponent extends BaseRoutedComponent {
         this.data = res;
       },
       error: (err) => {
-        console.error('Error fetching Area Information:', err);
       },
     });
   }

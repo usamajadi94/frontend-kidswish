@@ -93,8 +93,6 @@ export class ChangePasswordComponent implements OnInit {
             IsPasswordChange: false,
         };
 
-        console.log('Payload:', payload);
-
         // API call yahan karein (example commented)
         this._authService.changePassword(payload).subscribe({
             next: (res) => {

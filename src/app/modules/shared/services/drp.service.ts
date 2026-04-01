@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { QueryService } from 'app/core/Base/services/query.service';
 import { apiUrls } from './api-url';
-import { catchError, map, Observable, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { ApiResponse } from 'app/core/Base/interface/IResponses';
 import { VW_Modules } from 'app/modules/security/models/VW_Permissions';
 
@@ -11,67 +11,63 @@ import { VW_Modules } from 'app/modules/security/models/VW_Permissions';
 export class DrpService {
     private _QueryService = inject(QueryService);
 
-    getSuppliersDrp() {
-        return this._QueryService.getQuery('getSupplierInformationDrp');
-    }
-
-    getCategoriesDrp() {
-        return this._QueryService.getQuery('getItemTypeDrp');
-    }
- 
-    getCustomerInformationDrp() {
-        return this._QueryService.getQuery('getCustomerInformationDrp');
-    }
-
-    getVehicleInformationDrp() {
-        return this._QueryService.getQuery('getVehicleInformationDrp');
-    }
-
-    /*
-    getModulesAndSections() {
-        return this._QueryService.getQuery('getModulesAndSections');
-    }
-    */
-
-
     getModulesAndSections(): Observable<VW_Modules[]> {
         return this._QueryService.get<VW_Modules[]>(`${apiUrls.moduleGetController}`).pipe(
             map((res: ApiResponse<VW_Modules[]>) => res.Data),
             catchError(this.handleError)
         );
     }
+
     getExpenseCategoryDrp() {
         return this._QueryService.getQuery('getExpenseCategoryDrp');
+    }
+
+    getDistributorDrp() {
+        return this._QueryService.getQuery('getDistributorDrp');
+    }
+
+    getVendorTypeDrp() {
+        return this._QueryService.getQuery('getVendorTypeDrp');
+    }
+
+    getBankAccountDrp() {
+        return this._QueryService.getQuery('getBankAccountDrp');
+    }
+
+    getVendorDrp() {
+        return this._QueryService.getQuery('getVendorDrp');
+    }
+
+    getDistributorCustomerDrp() {
+        return this._QueryService.getQuery('getDistributorCustomerDrp');
+    }
+
+    getPettyCashDrp() {
+        return this._QueryService.getQuery('getPettyCashDrp');
+    }
+
+    getUsersDrp() {
+        return this._QueryService.getQuery('getUsersDrp');
+    }
+
+    getLegalEntityDrp() {
+        return this._QueryService.getQuery('getLegalEntityDrp');
     }
 
     getPaymentMethodDrp() {
         return this._QueryService.getQuery('getPaymentMethodDrp');
     }
-    
-    getSalaryTypes() {
-        return this._QueryService.getQuery('getSalaryTypes');
-    }
 
-    getEmployeeHistoyByEmployee(employeeID: number) {
-        return this._QueryService.getQuery('getEmployeeHistoyByEmployee',{employeeid:employeeID});
-    }
-
-    private handleError(error: any) {
-        console.error('API Error:', error);
-        return throwError(() => error);
-    }
-
-    getSupplierItemsDrp() {
-        return this._QueryService.getQuery('getSupplierItemsDrp');
+    // Used by main/reports modules
+    getCustomerInformationDrp() {
+        return this._QueryService.getQuery('getCustomerInformationDrp');
     }
 
     getProductsDrp() {
         return this._QueryService.getQuery('getProductsDrp');
     }
-    
-    getSupplierOrderLedger(supplierordermasterid:string) {
-        return this._QueryService.getQuery('getSupplierOrderLedger',{
-            supplierordermasterid:supplierordermasterid
-        });
+
+    private handleError(error: any) {
+        return throwError(() => error);
     }
 }

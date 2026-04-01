@@ -65,7 +65,6 @@ export class GroupListComponent extends BaseRoutedComponent {
                 this.data = res;
             },
             error: (err) => {
-                console.error('Error fetching Opening Stock:', err);
             },
         });
     }
