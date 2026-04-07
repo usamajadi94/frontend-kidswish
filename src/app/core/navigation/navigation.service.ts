@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { FuseNavigationItem } from '@fuse/components/navigation';
 import { Navigation } from 'app/core/navigation/navigation.types';
+import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { map, Observable, ReplaySubject, shareReplay, tap } from 'rxjs';
 import { ApiResponse } from '../Base/interface/IResponses';
@@ -9,6 +10,7 @@ import { ApiResponse } from '../Base/interface/IResponses';
 @Injectable({ providedIn: 'root' })
 export class NavigationService {
     private _httpClient = inject(HttpClient);
+    private _localStorage = inject(LocalStorageService);
     private _navigation: ReplaySubject<Navigation> =
         new ReplaySubject<Navigation>(1);
     private _navigationCache$: Observable<Navigation> | null = null;
@@ -40,7 +42,13 @@ export class NavigationService {
 
     // Create and cache the observable with shareReplay(1) to cache the result
     this._navigationCache$ = this._httpClient.get<ApiResponse<any[]>>(apiUrls.navigation).pipe(
-        map((navigation: ApiResponse<any[]>) => this.buildNavigationVariants(navigation)),
+        map((navigation: ApiResponse<any[]>) => {
+            // Detect distributor: their nav has order-submit, no dashboard
+            const links = navigation.Data?.flatMap((g: any) => g.children?.map((c: any) => c.link) || []) || [];
+            const isDistributor = links.includes('/orders/order-submit');
+            this._localStorage.isDistributor = isDistributor ? 'true' : 'false';
+            return this.buildNavigationVariants(navigation);
+        }),
         tap((navObj: Navigation) => {
             this._navigation.next(navObj);
         }),

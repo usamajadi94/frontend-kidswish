@@ -61,9 +61,16 @@ export class LocalStorageService {
         return localStorage.getItem('isPasswordChanged') ?? '';
     }
 
+    set isDistributor(value: string) {
+        localStorage.setItem('isDistributor', value);
+    }
+    get isDistributor(): string {
+        return localStorage.getItem('isDistributor') ?? 'false';
+    }
+
     // Clear All (Only These Keys)
     clearAll(): void {
-        ['isMultipleEntity','accessToken','refreshToken', 'cid', 'uid', 'eid', 'isPasswordChange'].forEach((key) =>
+        ['isMultipleEntity','accessToken','refreshToken', 'cid', 'uid', 'eid', 'isPasswordChange', 'isDistributor'].forEach((key) =>
             localStorage.removeItem(key)
         );
     }

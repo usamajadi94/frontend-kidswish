@@ -30,6 +30,13 @@ private modalService = inject(ModalService);
             isFilterList: true,
             type: 'text',
         },
+        {
+            header: 'Role',
+            name: 'Role',
+            isSort: true,
+            isFilterList: true,
+            type: 'text',
+        },
        
         {
             header: 'Phone',
