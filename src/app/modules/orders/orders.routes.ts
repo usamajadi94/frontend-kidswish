@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { DistributorGuard, NoDistributorGuard } from 'app/core/auth/guards/distributor.guard';
 
-export const ordersRoutes: Routes = [
+export default [
     {
         path: 'order-submit',
         canActivate: [DistributorGuard],
@@ -22,4 +22,4 @@ export const ordersRoutes: Routes = [
         path: 'order-detail/:id',
         loadComponent: () => import('./order-detail/order-detail.component').then(m => m.OrderDetailComponent),
     },
-];
+] as Routes;
