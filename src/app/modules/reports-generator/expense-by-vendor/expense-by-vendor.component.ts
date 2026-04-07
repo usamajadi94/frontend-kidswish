@@ -32,6 +32,7 @@ export class ExpenseByVendorComponent {
     private _currencyPipe = inject(CurrencyPipe);
 
     records: any[] = [];
+    grouped: { vendorName: string; contactName: string; items: any[]; subtotal: number }[] = [];
     fromDate: Date = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
     endDate: Date = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
     vendorID: number = null;
@@ -40,7 +41,19 @@ export class ExpenseByVendorComponent {
     currentPageIndex = 0;
 
     get grandTotal(): number {
-        return this.records.reduce((sum, r) => sum + (r.TotalAmount || 0), 0);
+        return this.grouped.reduce((sum, g) => sum + g.subtotal, 0);
+    }
+
+    private buildGrouped(rows: any[]) {
+        const map = new Map<string, { vendorName: string; contactName: string; items: any[]; subtotal: number }>();
+        for (const r of rows) {
+            const key = r.VendorName || '(No Vendor)';
+            if (!map.has(key)) map.set(key, { vendorName: key, contactName: r.ContactName || '-', items: [], subtotal: 0 });
+            const g = map.get(key)!;
+            g.items.push(r);
+            g.subtotal += +(r.Amount || 0);
+        }
+        this.grouped = Array.from(map.values());
     }
 
     ngOnInit(): void {
@@ -52,6 +65,7 @@ export class ExpenseByVendorComponent {
         this._ReportService.getExpenseByVendorReport(this.fromDate, this.endDate, this.vendorID).subscribe({
             next: (res: any) => {
                 this.records = res;
+                this.buildGrouped(res);
                 this.IsFilterDrawerVisible = false;
             },
         });

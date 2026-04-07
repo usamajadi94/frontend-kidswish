@@ -1,0 +1,137 @@
+<div class="absolute inset-0 overflow-y-auto">
+<div class="px-6 pt-4 pb-8 md:px-8 md:pt-5 min-h-full">
+
+    <div class="mb-4">
+        <div class="text-3xl font-semibold leading-8 tracking-tight">Submit Order</div>
+    </div>
+
+    <!-- Order Header -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Order No <span class="text-red-500">*</span></label>
+                <input type="text" [(ngModel)]="invoiceNo" placeholder="e.g. ORD-001"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Order Date <span class="text-red-500">*</span></label>
+                <input type="date" [(ngModel)]="orderDate"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+                <input type="text" [(ngModel)]="notes" placeholder="Optional"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Groups -->
+    @for (group of groups; track $index; let gi = $index) {
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm mb-4 overflow-hidden">
+
+        <!-- Customer Header -->
+        <div class="flex items-center justify-between px-5 py-3 bg-blue-50 border-b border-blue-100">
+            <div class="flex items-center gap-3 flex-1 flex-wrap">
+                <span class="text-xs font-semibold text-blue-600 bg-blue-100 rounded-full w-6 h-6 flex items-center justify-center shrink-0">
+                    {{ gi + 1 }}
+                </span>
+                <nz-select [(ngModel)]="group.CustomerID" nzShowSearch nzAllowClear
+                    nzPlaceHolder="Select customer..." class="min-w-[200px]" nzSize="default">
+                    @for (c of customers; track c.ID) {
+                        <nz-option [nzValue]="c.ID" [nzLabel]="c.Name" />
+                    }
+                </nz-select>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-blue-700 whitespace-nowrap">Invoice No <span class="text-red-500">*</span></label>
+                    <input type="text" [(ngModel)]="group.InvoiceNo" placeholder="e.g. INV-001"
+                        class="border border-blue-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-36 bg-white" />
+                </div>
+            </div>
+            <button (click)="removeCustomer(gi)" [disabled]="groups.length === 1"
+                class="ml-4 text-red-400 hover:text-red-600 disabled:opacity-30 transition-colors flex items-center gap-1 text-xs shrink-0">
+                <mat-icon class="text-base leading-none">delete</mat-icon> Remove
+            </button>
+        </div>
+
+        <!-- Products Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-100">
+                    <tr>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 w-8">#</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500">Product <span class="text-red-500">*</span></th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 w-24">Qty <span class="text-red-500">*</span></th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 w-24">Carton</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500">Notes</th>
+                        <th class="px-3 py-2 w-10"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @for (row of group.products; track $index; let pi = $index) {
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-3 py-2 text-gray-400 text-xs">{{ pi + 1 }}</td>
+                        <td class="px-3 py-2">
+                            <nz-select [(ngModel)]="row.ProductID" nzShowSearch nzAllowClear
+                                nzPlaceHolder="Select product" class="w-full min-w-[180px]" nzSize="small">
+                                @for (p of products; track p.ID) {
+                                    <nz-option [nzValue]="p.ID" [nzLabel]="p.Name" />
+                                }
+                            </nz-select>
+                        </td>
+                        <td class="px-3 py-2">
+                            <input type="number" [(ngModel)]="row.Qty" min="1"
+                                class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                        </td>
+                        <td class="px-3 py-2">
+                            <input type="number" [(ngModel)]="row.Carton" min="0"
+                                class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                        </td>
+                        <td class="px-3 py-2">
+                            <input type="text" [(ngModel)]="row.Notes" placeholder="Optional"
+                                class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                        </td>
+                        <td class="px-3 py-2 text-center">
+                            <button (click)="removeProduct(gi, pi)" [disabled]="group.products.length === 1"
+                                class="text-red-400 hover:text-red-600 disabled:opacity-30 transition-colors">
+                                <mat-icon class="text-base leading-none">remove_circle_outline</mat-icon>
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add Product Row -->
+        <div class="px-5 py-2 border-t border-gray-100">
+            <button (click)="addProduct(gi)"
+                class="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                <mat-icon class="text-base leading-none">add</mat-icon> Add Product
+            </button>
+        </div>
+
+    </div>
+    }
+
+    <!-- Add Customer -->
+    <div class="mb-6">
+        <button (click)="addCustomer()"
+            class="flex items-center gap-2 border-2 border-dashed border-blue-300 hover:border-blue-500 rounded-xl px-5 py-3 text-blue-600 hover:text-blue-800 font-medium text-sm w-full justify-center transition-colors">
+            <mat-icon class="text-base leading-none">person_add</mat-icon> Add Another Customer
+        </button>
+    </div>
+
+    <!-- Summary -->
+    <div class="text-xs text-gray-500 mb-4">
+        {{ groups.length }} customer(s) · {{ totalProductLines }} product line(s)
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3">
+        <bft-button name="Submit Order" icon="save" (onClick)="submit()" [loading]="isSaving" />
+        <bft-button name="Reset" icon="close" (onClick)="reset()" />
+    </div>
+
+</div>
+</div>

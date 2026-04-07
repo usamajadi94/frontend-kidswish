@@ -6,29 +6,51 @@
 
         <app-report-viewer-tool pageSize="A4" (filter)="open($event)" (pageIndexChanged)="onPageIndexChanged($event)">
 
-            @if (records && records.length > 0) {
+            @if (grouped && grouped.length > 0) {
 
-            <!-- Report Header -->
-            <div #pageContent class="grid grid-cols-12 font-semibold text-gray-600 border-b border-gray-300 pb-2 text-sm mt-4 page-break-avoid">
-                <div class="col-span-4">Vendor</div>
-                <div class="col-span-3">Contact Name</div>
-                <div class="col-span-2 text-center">Expenses</div>
-                <div class="col-span-2 text-right">Last Expense</div>
-                <div class="col-span-1 text-right">Total Amount</div>
+            <!-- Column Headers -->
+            <div #pageContent class="grid grid-cols-12 font-semibold text-gray-500 border-b-2 border-gray-300 pb-2 text-xs uppercase tracking-wide mt-4 page-break-avoid">
+                <div class="col-span-2">Date</div>
+                <div class="col-span-3">Category</div>
+                <div class="col-span-3">Petty Cash / Fund</div>
+                <div class="col-span-3">Notes</div>
+                <div class="col-span-1 text-right">Amount</div>
             </div>
 
-            @for (row of records; track $index) {
-            <div #pageContent class="grid grid-cols-12 text-sm py-2 border-b border-gray-100 page-break-avoid">
-                <div class="col-span-4 font-medium">{{ row.VendorName || '(No Vendor)' }}</div>
-                <div class="col-span-3 text-gray-600">{{ row.ContactName || '-' }}</div>
-                <div class="col-span-2 text-center">{{ row.ExpenseCount }}</div>
-                <div class="col-span-2 text-right">{{ row.LastExpenseDate | date:'dd/MM/yyyy' }}</div>
-                <div class="col-span-1 text-right font-medium">{{ row.TotalAmount | currency:'PKR ':'' }}</div>
+            @for (group of grouped; track group.vendorName) {
+
+            <!-- Vendor Header -->
+            <div #pageContent class="mt-4 mb-1 page-break-avoid">
+                <div class="flex items-baseline gap-3 bg-blue-50 border-l-4 border-blue-500 px-3 py-2 rounded-r">
+                    <span class="font-semibold text-blue-800 text-sm">{{ group.vendorName }}</span>
+                    @if (group.contactName && group.contactName !== '-') {
+                        <span class="text-xs text-blue-500">{{ group.contactName }}</span>
+                    }
+                    <span class="ml-auto text-xs text-blue-500">{{ group.items.length }} expense{{ group.items.length !== 1 ? 's' : '' }}</span>
+                </div>
+            </div>
+
+            <!-- Expense Rows -->
+            @for (row of group.items; track row.ID) {
+            <div #pageContent class="grid grid-cols-12 text-sm py-1.5 border-b border-gray-100 hover:bg-gray-50 page-break-avoid">
+                <div class="col-span-2 text-gray-600">{{ row.Date | date:'dd/MM/yyyy' }}</div>
+                <div class="col-span-3">{{ row.CategoryName || '-' }}</div>
+                <div class="col-span-3 text-gray-500 text-xs self-center">{{ row.PettyCashName || '-' }}</div>
+                <div class="col-span-3 text-gray-400 text-xs self-center truncate" [title]="row.Notes">{{ row.Notes || '-' }}</div>
+                <div class="col-span-1 text-right font-medium">{{ row.Amount | currency:'PKR ':'' }}</div>
             </div>
             }
 
+            <!-- Vendor Subtotal -->
+            <div #pageContent class="grid grid-cols-12 text-sm font-semibold bg-blue-50 py-1.5 px-0 border-t border-blue-200 mb-3 page-break-avoid">
+                <div class="col-span-11 text-right pr-2 text-blue-700">Subtotal — {{ group.vendorName }}</div>
+                <div class="col-span-1 text-right text-blue-800">{{ group.subtotal | currency:'PKR ':'' }}</div>
+            </div>
+
+            }
+
             <!-- Grand Total -->
-            <div #pageContent class="grid grid-cols-12 text-sm font-bold bg-gray-100 py-2 px-0 border-t-2 border-gray-400 mt-1 page-break-avoid">
+            <div #pageContent class="grid grid-cols-12 text-sm font-bold bg-gray-100 py-2 px-0 border-t-2 border-gray-400 mt-2 page-break-avoid">
                 <div class="col-span-11 text-right pr-2">Grand Total</div>
                 <div class="col-span-1 text-right">{{ grandTotal | currency:'PKR ':'' }}</div>
             </div>

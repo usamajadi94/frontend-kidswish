@@ -35,8 +35,7 @@ static readonly navigation = `${apiUrls.server}api/GetNavigation`;
     static readonly pettyCashController = `api/pettycash`;
     // DMS
     static readonly invoiceController = `api/invoicemaster`;
-    static readonly flavorStockController = `api/flavorstock`;
-    
+
     // Security
     static readonly rbacGroupsController = `api/group`;
     static readonly moduleGetController = `api/group/getmodulesections`;
@@ -44,5 +43,6 @@ static readonly navigation = `${apiUrls.server}api/GetNavigation`;
     
     // Main
     static readonly customerOrderController = `api/customerorder`;
+    static readonly distributorOrderController = `api/distributor-order`;
     
 }

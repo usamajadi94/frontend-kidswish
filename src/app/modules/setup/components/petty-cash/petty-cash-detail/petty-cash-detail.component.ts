@@ -10,6 +10,7 @@ import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-bu
 import { PettyCashFormComponent } from '../petty-cash-form.component';
 import { PettyCashFundComponent } from '../petty-cash-fund.component';
 import { ExpenseFormComponent } from '../../expense/expense-form.component';
+import { ExpenseMultiFormComponent } from '../../expense/expense-multi-form.component';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 
 @Component({
@@ -38,9 +39,6 @@ export class PettyCashDetailComponent implements OnInit {
 
     ngOnInit() {
         this.pettyCashId = +this._route.snapshot.params['id'];
-        const today = new Date();
-        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-        this.dateRange = [firstDay, today];
         this.loadAll();
     }
 
@@ -57,8 +55,8 @@ export class PettyCashDetailComponent implements OnInit {
     }
 
     loadExpenses() {
-        const from = this.dateRange?.[0]?.toISOString() || '';
-        const to   = this.dateRange?.[1]?.toISOString() || '';
+        const from = this.dateRange?.[0] ? this.dateRange[0].toISOString().split('T')[0] : '';
+        const to   = this.dateRange?.[1] ? this.dateRange[1].toISOString().split('T')[0] : '';
         this._listService.getPettyCashExpenses(this.pettyCashId, from, to).subscribe({
             next: (res: any[]) => { this.expenses = res || []; },
         });
@@ -75,13 +73,13 @@ export class PettyCashDetailComponent implements OnInit {
     }
 
     openAddExpense() {
-        this._modalService.openModal({ component: ExpenseFormComponent, title: componentRegister.expense.Title, Data: { PettyCashID: this.pettyCashId } }, 1000)
-            .afterClose.subscribe((res: boolean) => { if (res) this.loadExpenses(); });
+        this._modalService.openModal({ component: ExpenseMultiFormComponent, title: 'Add Expenses', Data: { PettyCashID: this.pettyCashId, PettyCashName: this.summary?.Name } }, 1200)
+            .afterClose.subscribe((res: any) => { if (res) this.loadAll(); });
     }
 
     viewExpense(row: any) {
         this._modalService.openModal({ component: ExpenseFormComponent, title: componentRegister.expense.Title, ID: row.ID }, 1000)
-            .afterClose.subscribe((res: boolean) => { if (res) this.loadExpenses(); });
+            .afterClose.subscribe((res: any) => { if (res) this.loadAll(); });
     }
 
     openEdit() {
