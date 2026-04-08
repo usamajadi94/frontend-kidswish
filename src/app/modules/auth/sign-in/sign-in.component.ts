@@ -81,7 +81,7 @@ export class AuthSignInComponent implements OnInit {
                         } else {
                             const redirectURL =
                                 this._activatedRoute.snapshot.queryParamMap.get('redirectURL') ||
-                                '/pages/settings';
+                                '/dashboard';
                             this._router.navigateByUrl(redirectURL);
                         }
                     });
