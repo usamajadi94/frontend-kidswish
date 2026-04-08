@@ -63,9 +63,10 @@ export class SwitchEntityComponent implements OnInit {
             .subscribe((res) => {
                 if (res) {
                     this._localStorageService.eid = item.EID;
+                    this.__userService.clearUserCache();
                     this.__userService.getUser().subscribe((res) => {
-                        this.__userService.setUserProfile(res);
-                        this._router.navigate(['/home']);
+                        this.__userService.setUserProfile(res.Data);
+                        this._router.navigate(['/dashboard']);
                     })
                 }
             })
