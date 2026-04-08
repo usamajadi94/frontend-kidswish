@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-4">
     <bft-input-text name="Name" label="Vendor Name" [(ngModel)]="formData.Name" [required]="true" [skeleton]="isDataLoading" />
-    <bft-select name="TypeID" label="Type" [displayList]="vendorTypes" valueField="ID" displayField="Name"
-        [(ngModel)]="formData.TypeID" [clearable]="true" [skeleton]="isDataLoading" />
+    <bft-select name="TypeIDs" label="Type" [displayList]="vendorTypes" valueField="ID" displayField="Name"
+        [(ngModel)]="formData.TypeIDs" [mode]="'multiple'" [skeleton]="isDataLoading" />
     <div class="grid grid-cols-2 gap-4">
         <bft-input-text name="ContactName" label="Contact Name" [(ngModel)]="formData.ContactName" [skeleton]="isDataLoading" />
         <bft-input-text name="PhoneNo" label="Phone No" [(ngModel)]="formData.PhoneNo" [skeleton]="isDataLoading" />

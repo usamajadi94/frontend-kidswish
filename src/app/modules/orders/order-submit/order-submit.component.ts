@@ -14,7 +14,6 @@ import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-bu
 
 interface ProductRow {
     ProductID: number | null;
-    Qty: number;
     Carton: number;
     Notes: string;
 }
@@ -69,11 +68,7 @@ export class OrderSubmitComponent implements OnInit {
     }
 
     private emptyProduct(): ProductRow {
-        return { ProductID: null, Qty: 1, Carton: 0, Notes: '' };
-    }
-
-    customerName(id: number): string {
-        return this.customers.find(c => c.ID === id)?.Name || '';
+        return { ProductID: null, Carton: 1, Notes: '' };
     }
 
     get totalProductLines(): number {
@@ -86,24 +81,22 @@ export class OrderSubmitComponent implements OnInit {
             g.CustomerID &&
             g.InvoiceNo.trim() &&
             g.products.length > 0 &&
-            g.products.every(p => p.ProductID && p.Qty > 0)
+            g.products.every(p => p.ProductID && p.Carton > 0)
         );
     }
 
     submit() {
         if (!this.isValid) {
-            this._msg.warning('Order No, Customer, Invoice No, Product, and Qty are required.');
+            this._msg.warning('Order No, Customer, Invoice No, Product, and Carton qty are required.');
             return;
         }
         this.isSaving = true;
 
-        // Flatten groups → items
         const items = this.groups.flatMap(g =>
             g.products.map(p => ({
                 CustomerID: g.CustomerID,
                 InvoiceNo: g.InvoiceNo,
                 ProductID: p.ProductID,
-                Qty: p.Qty,
                 Carton: p.Carton,
                 Notes: p.Notes,
             }))

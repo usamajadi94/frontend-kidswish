@@ -47,6 +47,8 @@ export class NavigationService {
             const links = navigation.Data?.flatMap((g: any) => g.children?.map((c: any) => c.link) || []) || [];
             const isDistributor = links.includes('/orders/order-submit');
             this._localStorage.isDistributor = isDistributor ? 'true' : 'false';
+            const isGlobalAdmin = links.includes('/clients/client-list');
+            this._localStorage.isGlobalAdmin = isGlobalAdmin ? 'true' : 'false';
             return this.buildNavigationVariants(navigation);
         }),
         tap((navObj: Navigation) => {

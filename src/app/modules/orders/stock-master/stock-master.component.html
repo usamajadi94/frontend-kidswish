@@ -1,0 +1,79 @@
+<div class="absolute inset-0 overflow-y-auto">
+    <div class="min-h-full p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold">Stock Master</h2>
+            <button mat-flat-button color="primary" (click)="openForm()">+ Add / Update Stock</button>
+        </div>
+
+        <!-- Form Panel -->
+        @if (showForm) {
+        <div class="bg-white border rounded-lg p-4 mb-4 shadow-sm">
+            <h3 class="font-medium mb-3">{{ editingId ? 'Edit' : 'Set' }} Stock</h3>
+            <div class="grid grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Product *</label>
+                    <select [(ngModel)]="form.ProductID" class="w-full border rounded px-2 py-1.5 text-sm" [disabled]="!!editingId">
+                        <option [ngValue]="null">-- Select --</option>
+                        @for (p of productsDrp; track p.ID) {
+                            <option [ngValue]="p.ID">{{ p.Name }}</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Total (Cartons)</label>
+                    <input type="number" [(ngModel)]="form.TotalStock" class="w-full border rounded px-2 py-1.5 text-sm" min="0" />
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Available (Cartons)</label>
+                    <input type="number" [(ngModel)]="form.AvailableStock" class="w-full border rounded px-2 py-1.5 text-sm" min="0" />
+                </div>
+            </div>
+            @if (errorMsg) {
+                <p class="text-red-500 text-xs mt-2">{{ errorMsg }}</p>
+            }
+            <div class="flex gap-2 mt-3">
+                <button mat-flat-button color="primary" (click)="save()" [disabled]="isSaving">{{ isSaving ? 'Saving...' : 'Save' }}</button>
+                <button mat-stroked-button (click)="showForm = false">Cancel</button>
+            </div>
+        </div>
+        }
+
+        <!-- Table -->
+        <div class="bg-white border rounded-lg overflow-hidden">
+            @if (isLoading) {
+                <div class="p-6 text-center text-gray-400">Loading...</div>
+            } @else if (stockList.length === 0) {
+                <div class="p-6 text-center text-gray-400">No stock records yet. Add products to track stock.</div>
+            } @else {
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="text-left px-4 py-2 font-medium text-gray-600">Product</th>
+                            <th class="text-right px-4 py-2 font-medium text-gray-600">Total (Cartons)</th>
+                            <th class="text-right px-4 py-2 font-medium text-gray-600">Available (Cartons)</th>
+                            <th class="text-right px-4 py-2 font-medium text-gray-600">Last Updated</th>
+                            <th class="px-4 py-2"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (row of stockList; track row.ID) {
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-2">{{ row.ProductName }}</td>
+                            <td class="px-4 py-2 text-right">{{ row.TotalStock | number:'1.0-3' }}</td>
+                            <td class="px-4 py-2 text-right">
+                                <span [class]="row.AvailableStock <= 0 ? 'text-red-600 font-medium' : ''">
+                                    {{ row.AvailableStock | number:'1.0-3' }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-2 text-right text-gray-400 text-xs">{{ row.ModifiedDate | date:'dd MMM yyyy' }}</td>
+                            <td class="px-4 py-2 text-right">
+                                <button class="text-blue-500 hover:underline text-xs" (click)="openForm(row)">Edit</button>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>

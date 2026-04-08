@@ -1,0 +1,94 @@
+<div class="absolute inset-0 overflow-y-auto">
+    <div class="min-h-full p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold">Dispatch List</h2>
+            <div class="flex items-center gap-3">
+                <input type="date" [(ngModel)]="filterDate" class="border rounded px-2 py-1.5 text-sm" />
+                <button mat-flat-button color="primary" (click)="load()">Refresh</button>
+            </div>
+        </div>
+
+        @if (errorMsg) { <p class="text-red-500 text-sm mb-3">{{ errorMsg }}</p> }
+        @if (successMsg) { <p class="text-green-600 text-sm mb-3">{{ successMsg }}</p> }
+
+        @if (isLoading) {
+            <div class="text-center text-gray-400 py-8">Loading...</div>
+        } @else {
+            <!-- Pending Confirmation -->
+            <div class="mb-6">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">Pending Confirmation ({{ planned.length }})</h3>
+                @if (planned.length === 0) {
+                    <div class="bg-gray-50 border rounded p-4 text-sm text-gray-400">No pending dispatches for this date.</div>
+                } @else {
+                    <div class="bg-white border rounded-lg overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead class="bg-amber-50 border-b">
+                                <tr>
+                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Order #</th>
+                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Customer</th>
+                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Product</th>
+                                    <th class="text-right px-3 py-2 font-medium text-gray-600">Qty</th>
+                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Notes</th>
+                                    <th class="px-3 py-2"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (d of planned; track d.ID) {
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="px-3 py-2">{{ d.OrderInvoiceNo || 'Order #' + d.OrderID }}</td>
+                                    <td class="px-3 py-2">{{ d.CustomerName }}</td>
+                                    <td class="px-3 py-2">{{ d.ProductName }}</td>
+                                    <td class="px-3 py-2 text-right font-medium">{{ d.PlannedQty }}</td>
+                                    <td class="px-3 py-2 text-gray-400 text-xs">{{ d.Notes }}</td>
+                                    <td class="px-3 py-2 text-right">
+                                        <button mat-flat-button color="primary"
+                                            class="text-xs mr-2"
+                                            (click)="confirm(d.ID)"
+                                            [disabled]="confirmingId === d.ID">
+                                            {{ confirmingId === d.ID ? '...' : 'Confirm Dispatch' }}
+                                        </button>
+                                        <button class="text-red-400 hover:text-red-600 text-xs" (click)="deletePlan(d.ID)">Remove</button>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+
+            <!-- Confirmed -->
+            <div>
+                <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">Confirmed Today ({{ confirmed.length }})</h3>
+                @if (confirmed.length === 0) {
+                    <div class="bg-gray-50 border rounded p-4 text-sm text-gray-400">No confirmed dispatches for this date.</div>
+                } @else {
+                    <div class="bg-white border rounded-lg overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead class="bg-green-50 border-b">
+                                <tr>
+                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Order #</th>
+                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Customer</th>
+                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Product</th>
+                                    <th class="text-right px-3 py-2 font-medium text-gray-600">Qty</th>
+                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (d of confirmed; track d.ID) {
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="px-3 py-2">{{ d.OrderInvoiceNo || 'Order #' + d.OrderID }}</td>
+                                    <td class="px-3 py-2">{{ d.CustomerName }}</td>
+                                    <td class="px-3 py-2">{{ d.ProductName }}</td>
+                                    <td class="px-3 py-2 text-right font-medium text-green-700">{{ d.PlannedQty }}</td>
+                                    <td class="px-3 py-2 text-gray-400 text-xs">{{ d.Notes }}</td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

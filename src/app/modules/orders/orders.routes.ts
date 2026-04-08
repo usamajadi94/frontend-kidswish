@@ -22,4 +22,19 @@ export default [
         path: 'order-detail/:id',
         loadComponent: () => import('./order-detail/order-detail.component').then(m => m.OrderDetailComponent),
     },
+    {
+        path: 'stock-master',
+        canActivate: [NoDistributorGuard],
+        loadComponent: () => import('./stock-master/stock-master.component').then(m => m.StockMasterComponent),
+    },
+    {
+        path: 'dispatch-planning',
+        canActivate: [NoDistributorGuard],
+        loadComponent: () => import('./dispatch-planning/dispatch-planning.component').then(m => m.DispatchPlanningComponent),
+    },
+    {
+        path: 'dispatch-list',
+        canActivate: [NoDistributorGuard],
+        loadComponent: () => import('./dispatch-list/dispatch-list.component').then(m => m.DispatchListComponent),
+    },
 ] as Routes;

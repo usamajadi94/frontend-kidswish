@@ -1,0 +1,85 @@
+<div class="absolute inset-0 overflow-y-auto">
+    <div class="min-h-full p-6">
+        <h2 class="text-xl font-semibold mb-4">Dispatch Planning</h2>
+
+        <!-- Order selector -->
+        <div class="bg-white border rounded-lg p-4 mb-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Select In-Process Order *</label>
+                    @if (isLoadingOrders) { <p class="text-sm text-gray-400">Loading orders...</p> }
+                    @else if (inProcessOrders.length === 0) {
+                        <p class="text-sm text-amber-600">No orders are currently In Process. Mark an order as In Process first.</p>
+                    } @else {
+                        <select [(ngModel)]="selectedOrderId" (ngModelChange)="onOrderChange()" class="w-full border rounded px-2 py-1.5 text-sm">
+                            <option [ngValue]="null">-- Select Order --</option>
+                            @for (o of inProcessOrders; track o.ID) {
+                                <option [ngValue]="o.ID">{{ o.InvoiceNo || 'Order #' + o.ID }} — {{ o.SubmittedBy }} ({{ o.OrderDate | date:'dd MMM' }})</option>
+                            }
+                        </select>
+                    }
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Dispatch Date</label>
+                    <input type="date" [(ngModel)]="dispatchDate" class="w-full border rounded px-2 py-1.5 text-sm" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        @if (selectedOrderId && orderItems.length > 0) {
+        <div class="bg-white border rounded-lg overflow-hidden mb-4">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="text-left px-3 py-2 font-medium text-gray-600">Customer</th>
+                        <th class="text-left px-3 py-2 font-medium text-gray-600">Product</th>
+                        <th class="text-right px-3 py-2 font-medium text-gray-600">Ordered</th>
+                        <th class="text-right px-3 py-2 font-medium text-gray-600">Dispatched</th>
+                        <th class="text-right px-3 py-2 font-medium text-gray-600">Remaining</th>
+                        <th class="text-right px-3 py-2 font-medium text-gray-600">Avail. Stock</th>
+                        <th class="text-center px-3 py-2 font-medium text-gray-600">Dispatch Qty</th>
+                        <th class="text-left px-3 py-2 font-medium text-gray-600">Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (item of orderItems; track item.ItemID) {
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-3 py-2">{{ item.CustomerName }}</td>
+                        <td class="px-3 py-2">{{ item.ProductName }}</td>
+                        <td class="px-3 py-2 text-right">{{ item.OrderedQty }}</td>
+                        <td class="px-3 py-2 text-right text-green-600">{{ item.DispatchedQty }}</td>
+                        <td class="px-3 py-2 text-right font-medium">{{ item.RemainingQty }}</td>
+                        <td class="px-3 py-2 text-right">
+                            <span [class]="item.AvailableStock < item.RemainingQty ? 'text-amber-600' : 'text-gray-700'">
+                                {{ item.AvailableStock }}
+                            </span>
+                        </td>
+                        <td class="px-3 py-2">
+                            <input type="number" [(ngModel)]="plannedQtys[item.ItemID]"
+                                class="w-24 border rounded px-2 py-1 text-sm text-right"
+                                min="0" [max]="item.RemainingQty" />
+                        </td>
+                        <td class="px-3 py-2">
+                            <input type="text" [(ngModel)]="plannedNotes[item.ItemID]"
+                                class="w-full border rounded px-2 py-1 text-sm" placeholder="Optional" />
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (errorMsg) { <p class="text-red-500 text-sm mb-2">{{ errorMsg }}</p> }
+        @if (successMsg) { <p class="text-green-600 text-sm mb-2">{{ successMsg }}</p> }
+
+        <button mat-flat-button color="primary" (click)="savePlan()" [disabled]="isSaving || !hasEntries">
+            {{ isSaving ? 'Saving...' : 'Save Dispatch Plan' }}
+        </button>
+        }
+
+        @if (selectedOrderId && orderItems.length === 0 && !isLoadingItems) {
+            <p class="text-sm text-gray-400 mt-4">All items for this order are fully dispatched.</p>
+        }
+    </div>
+</div>

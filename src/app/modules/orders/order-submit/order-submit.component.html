@@ -61,8 +61,7 @@
                     <tr>
                         <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 w-8">#</th>
                         <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500">Product <span class="text-red-500">*</span></th>
-                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 w-24">Qty <span class="text-red-500">*</span></th>
-                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 w-24">Carton</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 w-28">Carton <span class="text-red-500">*</span></th>
                         <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500">Notes</th>
                         <th class="px-3 py-2 w-10"></th>
                     </tr>
@@ -80,11 +79,7 @@
                             </nz-select>
                         </td>
                         <td class="px-3 py-2">
-                            <input type="number" [(ngModel)]="row.Qty" min="1"
-                                class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400" />
-                        </td>
-                        <td class="px-3 py-2">
-                            <input type="number" [(ngModel)]="row.Carton" min="0"
+                            <input type="number" [(ngModel)]="row.Carton" min="1"
                                 class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400" />
                         </td>
                         <td class="px-3 py-2">
