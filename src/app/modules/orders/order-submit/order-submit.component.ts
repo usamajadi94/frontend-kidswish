@@ -20,7 +20,6 @@ interface ProductRow {
 
 interface CustomerGroup {
     CustomerID: number | null;
-    InvoiceNo: string;
     products: ProductRow[];
 }
 
@@ -49,10 +48,18 @@ export class OrderSubmitComponent implements OnInit {
         this._drp.getProductsDrp().subscribe({ next: (res: any) => { this.products = res || []; } });
         this._drp.getCustomerInformationDrp().subscribe({ next: (res: any) => { this.customers = res || []; } });
         this.addCustomer();
+        this.loadNextOrderNo();
+    }
+
+    loadNextOrderNo() {
+        const headers = new HttpHeaders({ uid: this._localStorage.uid, cid: this._localStorage.cid, eid: this._localStorage.eid });
+        this._http.get<any>(`${apiUrls.server}${apiUrls.distributorOrderController}/next-order-no`, { headers }).subscribe({
+            next: (res) => { this.invoiceNo = res?.InvoiceNo || ''; },
+        });
     }
 
     addCustomer() {
-        this.groups.push({ CustomerID: null, InvoiceNo: '', products: [this.emptyProduct()] });
+        this.groups.push({ CustomerID: null, products: [this.emptyProduct()] });
     }
 
     removeCustomer(gi: number) {
@@ -68,7 +75,7 @@ export class OrderSubmitComponent implements OnInit {
     }
 
     private emptyProduct(): ProductRow {
-        return { ProductID: null, Carton: 1, Notes: '' };
+        return { ProductID: null, Carton: null as any, Notes: '' };
     }
 
     get totalProductLines(): number {
@@ -76,10 +83,8 @@ export class OrderSubmitComponent implements OnInit {
     }
 
     get isValid(): boolean {
-        if (!this.invoiceNo.trim()) return false;
         return this.groups.every(g =>
             g.CustomerID &&
-            g.InvoiceNo.trim() &&
             g.products.length > 0 &&
             g.products.every(p => p.ProductID && p.Carton > 0)
         );
@@ -87,7 +92,7 @@ export class OrderSubmitComponent implements OnInit {
 
     submit() {
         if (!this.isValid) {
-            this._msg.warning('Order No, Customer, Invoice No, Product, and Carton qty are required.');
+            this._msg.warning('Customer, Product, and Carton qty are required.');
             return;
         }
         this.isSaving = true;
@@ -95,7 +100,6 @@ export class OrderSubmitComponent implements OnInit {
         const items = this.groups.flatMap(g =>
             g.products.map(p => ({
                 CustomerID: g.CustomerID,
-                InvoiceNo: g.InvoiceNo,
                 ProductID: p.ProductID,
                 Carton: p.Carton,
                 Notes: p.Notes,

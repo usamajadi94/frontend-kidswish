@@ -2,15 +2,76 @@
     <div class="min-h-full p-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-semibold">Stock Master</h2>
-            <button mat-flat-button color="primary" (click)="openForm()">+ Add / Update Stock</button>
+            <div class="flex gap-2">
+                <button mat-stroked-button (click)="openTxn()">
+                    <mat-icon class="mr-1 text-base">history</mat-icon> Transactions
+                </button>
+                <button mat-flat-button color="primary" (click)="openAdd()">+ Add Daily Stock</button>
+            </div>
         </div>
 
-        <!-- Form Panel -->
-        @if (showForm) {
+        <!-- Per-Product Cards -->
+        @if (productCards.length > 0) {
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-5">
+            @for (c of productCards; track c.ProductID) {
+            <div class="border rounded-lg p-3 text-center"
+                [class]="c.StockStatus === 'low' ? 'bg-orange-50 border-orange-200' : 'bg-green-50 border-green-200'">
+                <div class="flex items-center justify-center gap-1 mb-1">
+                    <mat-icon class="text-base leading-none" [class]="stockColor(c.StockStatus)">
+                        {{ c.StockStatus === 'low' ? 'warning' : 'check_circle' }}
+                    </mat-icon>
+                    <p class="text-xs font-semibold truncate" [class]="c.StockStatus === 'low' ? 'text-orange-700' : 'text-green-700'">
+                        {{ c.ProductName }}
+                    </p>
+                </div>
+                <p class="text-2xl font-bold" [class]="c.StockStatus === 'low' ? 'text-orange-600' : 'text-green-800'">
+                    {{ c.AvailableStock | number:'1.0-0' }}
+                </p>
+                <p class="text-xs mt-0.5" [class]="c.StockStatus === 'low' ? 'text-orange-400' : 'text-green-500'">
+                    Total: {{ c.TotalStock | number:'1.0-0' }}
+                </p>
+            </div>
+            }
+        </div>
+        }
+
+        <!-- Daily Add Form -->
+        @if (showAddForm) {
         <div class="bg-white border rounded-lg p-4 mb-4 shadow-sm">
-            <h3 class="font-medium mb-3">{{ editingId ? 'Edit' : 'Set' }} Stock</h3>
-            <div class="grid grid-cols-3 gap-3">
+            <h3 class="font-medium mb-3">Add Daily Production Stock</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Product *</label>
+                    <select [(ngModel)]="addForm.ProductID" class="w-full border rounded px-2 py-1.5 text-sm">
+                        <option [ngValue]="null">-- Select --</option>
+                        @for (p of productsDrp; track p.ID) {
+                            <option [ngValue]="p.ID">{{ p.Name }}</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Cartons Ready Today *</label>
+                    <input type="number" [(ngModel)]="addForm.Qty" min="1" class="w-full border rounded px-2 py-1.5 text-sm" placeholder="Enter qty" />
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+                    <input type="text" [(ngModel)]="addForm.Notes" class="w-full border rounded px-2 py-1.5 text-sm" placeholder="Optional" />
+                </div>
+            </div>
+            @if (errorMsg) { <p class="text-red-500 text-xs mt-2">{{ errorMsg }}</p> }
+            <div class="flex gap-2 mt-3">
+                <button mat-flat-button color="primary" (click)="saveAdd()" [disabled]="isSaving">{{ isSaving ? 'Saving...' : 'Add Stock' }}</button>
+                <button mat-stroked-button (click)="showAddForm = false">Cancel</button>
+            </div>
+        </div>
+        }
+
+        <!-- Edit Threshold Form -->
+        @if (showEditForm) {
+        <div class="bg-white border rounded-lg p-4 mb-4 shadow-sm">
+            <h3 class="font-medium mb-3">Edit Stock Settings</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="col-span-2 sm:col-span-1">
                     <label class="block text-xs font-medium text-gray-600 mb-1">Product *</label>
                     <select [(ngModel)]="form.ProductID" class="w-full border rounded px-2 py-1.5 text-sm" [disabled]="!!editingId">
                         <option [ngValue]="null">-- Select --</option>
@@ -20,54 +81,109 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Total (Cartons)</label>
-                    <input type="number" [(ngModel)]="form.TotalStock" class="w-full border rounded px-2 py-1.5 text-sm" min="0" />
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Total Stock</label>
+                    <input type="number" [(ngModel)]="form.TotalStock" class="w-full border rounded px-2 py-1.5 text-sm" min="0" placeholder="0" />
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Available (Cartons)</label>
-                    <input type="number" [(ngModel)]="form.AvailableStock" class="w-full border rounded px-2 py-1.5 text-sm" min="0" />
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Available Stock</label>
+                    <input type="number" [(ngModel)]="form.AvailableStock" class="w-full border rounded px-2 py-1.5 text-sm" min="0" placeholder="0" />
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Low Stock Threshold</label>
+                    <input type="number" [(ngModel)]="form.LowStockThreshold" class="w-full border rounded px-2 py-1.5 text-sm" min="0" placeholder="10" />
                 </div>
             </div>
-            @if (errorMsg) {
-                <p class="text-red-500 text-xs mt-2">{{ errorMsg }}</p>
-            }
+            @if (errorMsg) { <p class="text-red-500 text-xs mt-2">{{ errorMsg }}</p> }
             <div class="flex gap-2 mt-3">
                 <button mat-flat-button color="primary" (click)="save()" [disabled]="isSaving">{{ isSaving ? 'Saving...' : 'Save' }}</button>
-                <button mat-stroked-button (click)="showForm = false">Cancel</button>
+                <button mat-stroked-button (click)="showEditForm = false">Cancel</button>
             </div>
         </div>
         }
 
-        <!-- Table -->
+        <!-- Transactions Panel -->
+        @if (showTxn) {
+        <div class="bg-white border rounded-lg p-4 mb-4 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-medium">Stock Transactions</h3>
+                <button mat-icon-button (click)="showTxn = false"><mat-icon>close</mat-icon></button>
+            </div>
+            @if (transactions.length === 0) {
+                <p class="text-gray-400 text-sm text-center py-4">No transactions found.</p>
+            } @else {
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="text-left px-3 py-2 text-xs font-medium text-gray-600">Date</th>
+                        <th class="text-left px-3 py-2 text-xs font-medium text-gray-600">Product</th>
+                        <th class="text-center px-3 py-2 text-xs font-medium text-gray-600">Type</th>
+                        <th class="text-right px-3 py-2 text-xs font-medium text-gray-600">Qty</th>
+                        <th class="text-right px-3 py-2 text-xs font-medium text-gray-600">Before</th>
+                        <th class="text-right px-3 py-2 text-xs font-medium text-gray-600">After</th>
+                        <th class="text-left px-3 py-2 text-xs font-medium text-gray-600">Ref</th>
+                        <th class="text-left px-3 py-2 text-xs font-medium text-gray-600">Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (t of transactions; track t.ID) {
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-3 py-1.5 text-xs text-gray-500">{{ t.Date | date:'dd MMM HH:mm' }}</td>
+                        <td class="px-3 py-1.5 font-medium">{{ t.ProductName }}</td>
+                        <td class="px-3 py-1.5 text-center">
+                            <span [class]="t.Type === 'IN' ? 'bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium' : 'bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-medium'">
+                                {{ t.Type }}
+                            </span>
+                        </td>
+                        <td class="px-3 py-1.5 text-right font-mono">{{ t.Qty }}</td>
+                        <td class="px-3 py-1.5 text-right text-gray-500 font-mono">{{ t.Before }}</td>
+                        <td class="px-3 py-1.5 text-right font-mono">{{ t.After }}</td>
+                        <td class="px-3 py-1.5 text-xs text-gray-500">{{ t.RefType }}</td>
+                        <td class="px-3 py-1.5 text-xs text-gray-500">{{ t.Notes }}</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            }
+        </div>
+        }
+
+        <!-- Stock Table -->
         <div class="bg-white border rounded-lg overflow-hidden">
             @if (isLoading) {
                 <div class="p-6 text-center text-gray-400">Loading...</div>
             } @else if (stockList.length === 0) {
-                <div class="p-6 text-center text-gray-400">No stock records yet. Add products to track stock.</div>
+                <div class="p-6 text-center text-gray-400">No stock records yet.</div>
             } @else {
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 border-b">
                         <tr>
+                            <th class="text-center px-3 py-2 font-medium text-gray-600 w-10"></th>
                             <th class="text-left px-4 py-2 font-medium text-gray-600">Product</th>
-                            <th class="text-right px-4 py-2 font-medium text-gray-600">Total (Cartons)</th>
-                            <th class="text-right px-4 py-2 font-medium text-gray-600">Available (Cartons)</th>
-                            <th class="text-right px-4 py-2 font-medium text-gray-600">Last Updated</th>
+                            <th class="text-right px-4 py-2 font-medium text-gray-600">Total</th>
+                            <th class="text-right px-4 py-2 font-medium text-gray-600">Available</th>
+                            <th class="text-right px-4 py-2 font-medium text-gray-600">Threshold</th>
+                            <th class="text-right px-4 py-2 font-medium text-gray-600">Updated</th>
                             <th class="px-4 py-2"></th>
                         </tr>
                     </thead>
                     <tbody>
                         @for (row of stockList; track row.ID) {
                         <tr class="border-b hover:bg-gray-50">
-                            <td class="px-4 py-2">{{ row.ProductName }}</td>
-                            <td class="px-4 py-2 text-right">{{ row.TotalStock | number:'1.0-3' }}</td>
-                            <td class="px-4 py-2 text-right">
-                                <span [class]="row.AvailableStock <= 0 ? 'text-red-600 font-medium' : ''">
-                                    {{ row.AvailableStock | number:'1.0-3' }}
-                                </span>
+                            <td class="px-3 py-2 text-center">
+                                <mat-icon [class]="stockColor(row.StockStatus)" [title]="stockLabel(row.StockStatus)" class="text-xl leading-none">
+                                    {{ row.StockStatus === 'low' ? 'warning' : 'check_circle' }}
+                                </mat-icon>
                             </td>
-                            <td class="px-4 py-2 text-right text-gray-400 text-xs">{{ row.ModifiedDate | date:'dd MMM yyyy' }}</td>
+                            <td class="px-4 py-2 font-medium">{{ row.ProductName }}</td>
+                            <td class="px-4 py-2 text-right font-mono">{{ row.TotalStock | number:'1.0-0' }}</td>
+                            <td class="px-4 py-2 text-right font-mono" [class]="row.StockStatus === 'low' ? 'text-orange-600 font-semibold' : ''">
+                                {{ row.AvailableStock | number:'1.0-0' }}
+                            </td>
+                            <td class="px-4 py-2 text-right text-gray-400 font-mono">{{ row.LowStockThreshold | number:'1.0-0' }}</td>
+                            <td class="px-4 py-2 text-right text-gray-400 text-xs">{{ row.ModifiedDate | date:'dd MMM yy' }}</td>
                             <td class="px-4 py-2 text-right">
-                                <button class="text-blue-500 hover:underline text-xs" (click)="openForm(row)">Edit</button>
+                                <button class="text-blue-500 hover:underline text-xs mr-3" (click)="openTxn(row)">History</button>
+                                <button class="text-blue-500 hover:underline text-xs" (click)="openForm(row)">Settings</button>
                             </td>
                         </tr>
                         }

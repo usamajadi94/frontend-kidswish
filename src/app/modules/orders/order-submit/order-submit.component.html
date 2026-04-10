@@ -10,8 +10,8 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Order No <span class="text-red-500">*</span></label>
-                <input type="text" [(ngModel)]="invoiceNo" placeholder="e.g. ORD-001"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                <input type="text" [value]="invoiceNo" readonly
+                    class="w-full border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-sm text-gray-600 font-mono" />
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Order Date <span class="text-red-500">*</span></label>
@@ -42,11 +42,6 @@
                         <nz-option [nzValue]="c.ID" [nzLabel]="c.Name" />
                     }
                 </nz-select>
-                <div class="flex items-center gap-2">
-                    <label class="text-xs font-medium text-blue-700 whitespace-nowrap">Invoice No <span class="text-red-500">*</span></label>
-                    <input type="text" [(ngModel)]="group.InvoiceNo" placeholder="e.g. INV-001"
-                        class="border border-blue-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-36 bg-white" />
-                </div>
             </div>
             <button (click)="removeCustomer(gi)" [disabled]="groups.length === 1"
                 class="ml-4 text-red-400 hover:text-red-600 disabled:opacity-30 transition-colors flex items-center gap-1 text-xs shrink-0">
@@ -79,7 +74,7 @@
                             </nz-select>
                         </td>
                         <td class="px-3 py-2">
-                            <input type="number" [(ngModel)]="row.Carton" min="1"
+                            <input type="number" [(ngModel)]="row.Carton" min="1" placeholder="Qty"
                                 class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400" />
                         </td>
                         <td class="px-3 py-2">

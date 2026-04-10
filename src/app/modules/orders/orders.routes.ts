@@ -3,6 +3,11 @@ import { DistributorGuard, NoDistributorGuard } from 'app/core/auth/guards/distr
 
 export default [
     {
+        path: 'order-dashboard',
+        canActivate: [NoDistributorGuard],
+        loadComponent: () => import('./order-dashboard/order-dashboard.component').then(m => m.OrderDashboardComponent),
+    },
+    {
         path: 'order-submit',
         canActivate: [DistributorGuard],
         loadComponent: () => import('./order-submit/order-submit.component').then(m => m.OrderSubmitComponent),

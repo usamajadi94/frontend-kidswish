@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { DrpService } from 'app/modules/shared/services/drp.service';
@@ -10,7 +11,7 @@ import { apiUrls } from 'app/modules/shared/services/api-url';
 @Component({
     selector: 'app-stock-master',
     standalone: true,
-    imports: [CommonModule, FormsModule, MatButtonModule],
+    imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule],
     templateUrl: './stock-master.component.html',
 })
 export class StockMasterComponent implements OnInit {
@@ -19,57 +20,93 @@ export class StockMasterComponent implements OnInit {
     private _drp = inject(DrpService);
 
     stockList: any[] = [];
+    productCards: any[] = [];
+    transactions: any[] = [];
     productsDrp: any[] = [];
     isLoading = false;
     isSaving = false;
-    showForm = false;
+    showAddForm = false;
+    showTxn = false;
+    showEditForm = false;
+    editingId: number | null = null;
     errorMsg = '';
 
-    form = { ProductID: null as any, TotalStock: 0, AvailableStock: 0 };
-    editingId: number | null = null;
+    // Daily add form
+    addForm = { ProductID: null as any, Qty: null as any, Notes: '' };
+
+    // Edit threshold form
+    form = { ProductID: null as any, TotalStock: null as any, AvailableStock: null as any, LowStockThreshold: null as any, Notes: '' };
 
     get authHeaders() {
         return new HttpHeaders({ uid: this._localStorage.uid, cid: this._localStorage.cid, eid: this._localStorage.eid });
     }
 
     ngOnInit() {
-        this.loadStock();
-        this.loadProducts();
+        this._drp.getProductsDrp().subscribe({ next: (res: any) => { this.productsDrp = res || []; } });
+        this.loadAll();
     }
 
-    loadStock() {
+    loadAll() {
         this.isLoading = true;
-        this._http.get<any[]>(`${apiUrls.server}${apiUrls.stockMasterController}`, { headers: this.authHeaders }).subscribe({
-            next: (res: any) => { this.stockList = res || []; this.isLoading = false; },
-            error: () => { this.isLoading = false; },
-        });
+        Promise.all([
+            this._http.get<any[]>(`${apiUrls.server}${apiUrls.stockMasterController}`, { headers: this.authHeaders }).toPromise(),
+            this._http.get<any[]>(`${apiUrls.server}${apiUrls.stockMasterController}/product-cards`, { headers: this.authHeaders }).toPromise(),
+        ]).then(([list, cards]) => {
+            this.stockList = list || [];
+            this.productCards = cards || [];
+            this.isLoading = false;
+        }).catch(() => { this.isLoading = false; });
     }
 
-    loadProducts() {
-        this._drp.getProductsDrp().subscribe({
-            next: (res: any) => { this.productsDrp = res || []; },
+    openAdd() {
+        this.addForm = { ProductID: null, Qty: 0, Notes: '' };
+        this.errorMsg = '';
+        this.showAddForm = true;
+        this.showEditForm = false;
+    }
+
+    saveAdd() {
+        if (!this.addForm.ProductID || this.addForm.Qty <= 0) {
+            this.errorMsg = 'Product and Qty > 0 required'; return;
+        }
+        this.isSaving = true;
+        this._http.post<any>(`${apiUrls.server}${apiUrls.stockMasterController}/add`, this.addForm, { headers: this.authHeaders }).subscribe({
+            next: () => { this.isSaving = false; this.showAddForm = false; this.loadAll(); },
+            error: (e) => { this.isSaving = false; this.errorMsg = e?.error?.message || 'Failed'; },
         });
     }
 
     openForm(row?: any) {
+        this.editingId = row?.ID || null;
+        this.form = {
+            ProductID: row?.ProductID || null,
+            TotalStock: row?.TotalStock ?? null,
+            AvailableStock: row?.AvailableStock ?? null,
+            LowStockThreshold: row?.LowStockThreshold ?? null,
+            Notes: '',
+        };
         this.errorMsg = '';
-        if (row) {
-            this.form = { ProductID: row.ProductID, TotalStock: row.TotalStock, AvailableStock: row.AvailableStock };
-            this.editingId = row.ID;
-        } else {
-            this.form = { ProductID: null, TotalStock: 0, AvailableStock: 0 };
-            this.editingId = null;
-        }
-        this.showForm = true;
+        this.showEditForm = true;
+        this.showAddForm = false;
     }
 
     save() {
-        if (!this.form.ProductID) return;
+        if (!this.form.ProductID) { this.errorMsg = 'Product required'; return; }
         this.isSaving = true;
-        this.errorMsg = '';
         this._http.post<any>(`${apiUrls.server}${apiUrls.stockMasterController}`, this.form, { headers: this.authHeaders }).subscribe({
-            next: () => { this.isSaving = false; this.showForm = false; this.loadStock(); },
-            error: (e) => { this.isSaving = false; this.errorMsg = e?.error?.message || 'Failed to save'; },
+            next: () => { this.isSaving = false; this.showEditForm = false; this.loadAll(); },
+            error: (e) => { this.isSaving = false; this.errorMsg = e?.error?.message || 'Failed'; },
         });
     }
+
+    openTxn(row?: any) {
+        const productId = row?.ProductID;
+        this._http.get<any[]>(
+            `${apiUrls.server}${apiUrls.stockMasterController}/transactions${productId ? '?productId=' + productId : ''}`,
+            { headers: this.authHeaders }
+        ).subscribe({ next: (res) => { this.transactions = res || []; this.showTxn = true; } });
+    }
+
+    stockColor(status: string) { return status === 'low' ? 'text-orange-500' : 'text-green-500'; }
+    stockLabel(status: string) { return status === 'low' ? 'Low Stock' : 'In Stock'; }
 }

@@ -42,17 +42,33 @@
             <div class="mt-3 text-sm text-gray-500"><span class="font-medium">Notes:</span> {{ order.Notes }}</div>
         }
 
-        <!-- Admin: Mark In Process -->
-        @if (isAdmin && order.Status === 'Submitted') {
-        <div class="mt-4 flex items-center gap-3">
-            @if (hasInsufficientStock) {
-                <span class="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded px-2 py-1">
-                    ⚠ Some products have insufficient stock — you can still process the order
-                </span>
+        <!-- Admin: Status actions -->
+        @if (isAdmin) {
+        <div class="mt-4 flex items-center gap-3 flex-wrap">
+            @if (order.Status === 'Submitted') {
+                @if (hasInsufficientStock) {
+                    <span class="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+                        ⚠ Some products have insufficient stock — you can still process the order
+                    </span>
+                }
+                <button mat-flat-button color="primary" (click)="markInProcess()" [disabled]="isUpdatingStatus">
+                    {{ isUpdatingStatus ? 'Updating...' : 'Mark as In Process' }}
+                </button>
             }
-            <button mat-flat-button color="primary" (click)="markInProcess()" [disabled]="isUpdatingStatus">
-                {{ isUpdatingStatus ? 'Updating...' : 'Mark as In Process' }}
-            </button>
+            @if (order.Status === 'In Process') {
+                <button mat-flat-button color="accent" (click)="completeOrder()" [disabled]="isUpdatingStatus">
+                    {{ isUpdatingStatus ? 'Updating...' : 'Mark as Completed' }}
+                </button>
+            }
+            @if (order.Status === 'Completed') {
+                <button mat-flat-button color="primary" (click)="generateInvoice()" [disabled]="isGeneratingInvoice">
+                    {{ isGeneratingInvoice ? 'Generating...' : 'Generate Invoice' }}
+                </button>
+                <button mat-stroked-button (click)="printInvoice()">
+                    <mat-icon class="text-base mr-1">print</mat-icon> Print Invoice
+                </button>
+                @if (invoiceMsg) { <span class="text-xs text-green-600">{{ invoiceMsg }}</span> }
+            }
             @if (statusError) { <span class="text-xs text-red-500">{{ statusError }}</span> }
         </div>
         }
@@ -91,10 +107,10 @@
                 <tr class="hover:bg-gray-50">
                     <td class="px-4 py-2 text-gray-400 text-xs">{{ i + 1 }}</td>
                     <td class="px-4 py-2 font-medium">{{ item.ProductName || '—' }}</td>
-                    <td class="px-4 py-2 text-right">{{ item.Carton }}</td>
+                    <td class="px-4 py-2 text-right">{{ item.Carton | number:'1.0-0' }}</td>
                     @if (isAdmin) {
-                        <td class="px-4 py-2 text-right text-green-700">{{ item.DispatchedQty || 0 }}</td>
-                        <td class="px-4 py-2 text-right font-medium">{{ item.RemainingQty }}</td>
+                        <td class="px-4 py-2 text-right text-green-700">{{ (item.DispatchedQty || 0) | number:'1.0-0' }}</td>
+                        <td class="px-4 py-2 text-right font-medium">{{ item.RemainingQty | number:'1.0-0' }}</td>
                         <td class="px-4 py-2 text-center">
                             @if (item.StockStatus === 'Sufficient') {
                                 <span class="text-xs text-green-600 bg-green-50 rounded px-1.5 py-0.5">✓ OK</span>

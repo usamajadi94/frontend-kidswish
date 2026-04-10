@@ -47,18 +47,18 @@
                     <tr class="border-b hover:bg-gray-50">
                         <td class="px-3 py-2">{{ item.CustomerName }}</td>
                         <td class="px-3 py-2">{{ item.ProductName }}</td>
-                        <td class="px-3 py-2 text-right">{{ item.OrderedQty }}</td>
-                        <td class="px-3 py-2 text-right text-green-600">{{ item.DispatchedQty }}</td>
-                        <td class="px-3 py-2 text-right font-medium">{{ item.RemainingQty }}</td>
+                        <td class="px-3 py-2 text-right">{{ item.OrderedQty | number:'1.0-0' }}</td>
+                        <td class="px-3 py-2 text-right text-green-600">{{ item.DispatchedQty | number:'1.0-0' }}</td>
+                        <td class="px-3 py-2 text-right font-medium">{{ item.RemainingQty | number:'1.0-0' }}</td>
                         <td class="px-3 py-2 text-right">
                             <span [class]="item.AvailableStock < item.RemainingQty ? 'text-amber-600' : 'text-gray-700'">
-                                {{ item.AvailableStock }}
+                                {{ item.AvailableStock | number:'1.0-0' }}
                             </span>
                         </td>
                         <td class="px-3 py-2">
                             <input type="number" [(ngModel)]="plannedQtys[item.ItemID]"
                                 class="w-24 border rounded px-2 py-1 text-sm text-right"
-                                min="0" [max]="item.RemainingQty" />
+                                min="0" [max]="item.RemainingQty" placeholder="0" />
                         </td>
                         <td class="px-3 py-2">
                             <input type="text" [(ngModel)]="plannedNotes[item.ItemID]"

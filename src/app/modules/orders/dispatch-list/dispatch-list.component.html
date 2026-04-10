@@ -1,94 +1,123 @@
 <div class="absolute inset-0 overflow-y-auto">
     <div class="min-h-full p-6">
-        <div class="flex items-center justify-between mb-4">
+
+        <!-- Header -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <h2 class="text-xl font-semibold">Dispatch List</h2>
-            <div class="flex items-center gap-3">
-                <input type="date" [(ngModel)]="filterDate" class="border rounded px-2 py-1.5 text-sm" />
-                <button mat-flat-button color="primary" (click)="load()">Refresh</button>
+            <div class="flex items-center gap-2">
+                <input type="date" [(ngModel)]="selectedDate" class="border rounded px-2 py-1 text-sm" />
+                <button mat-stroked-button (click)="today()">Today</button>
+                <button mat-flat-button color="primary" (click)="load()">
+                    <mat-icon class="text-base mr-1">refresh</mat-icon> Refresh
+                </button>
             </div>
         </div>
 
+        <!-- Summary Pills -->
+        <div class="flex gap-3 mb-4">
+            <span class="bg-yellow-50 border border-yellow-300 text-yellow-700 text-xs font-medium px-3 py-1 rounded-full">
+                Planned: {{ totalPlanned | number:'1.0-0' }}
+            </span>
+            <span class="bg-green-50 border border-green-300 text-green-700 text-xs font-medium px-3 py-1 rounded-full">
+                Confirmed: {{ totalConfirmed | number:'1.0-0' }}
+            </span>
+        </div>
+
         @if (errorMsg) { <p class="text-red-500 text-sm mb-3">{{ errorMsg }}</p> }
-        @if (successMsg) { <p class="text-green-600 text-sm mb-3">{{ successMsg }}</p> }
 
         @if (isLoading) {
-            <div class="text-center text-gray-400 py-8">Loading...</div>
+            <div class="text-center py-10 text-gray-400">Loading...</div>
+        } @else if (groups.length === 0) {
+            <div class="text-center py-10 text-gray-400">No dispatch entries for {{ selectedDate }}.</div>
         } @else {
-            <!-- Pending Confirmation -->
-            <div class="mb-6">
-                <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">Pending Confirmation ({{ planned.length }})</h3>
-                @if (planned.length === 0) {
-                    <div class="bg-gray-50 border rounded p-4 text-sm text-gray-400">No pending dispatches for this date.</div>
-                } @else {
-                    <div class="bg-white border rounded-lg overflow-hidden">
-                        <table class="w-full text-sm">
-                            <thead class="bg-amber-50 border-b">
-                                <tr>
-                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Order #</th>
-                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Customer</th>
-                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Product</th>
-                                    <th class="text-right px-3 py-2 font-medium text-gray-600">Qty</th>
-                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Notes</th>
-                                    <th class="px-3 py-2"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (d of planned; track d.ID) {
-                                <tr class="border-b hover:bg-gray-50">
-                                    <td class="px-3 py-2">{{ d.OrderInvoiceNo || 'Order #' + d.OrderID }}</td>
-                                    <td class="px-3 py-2">{{ d.CustomerName }}</td>
-                                    <td class="px-3 py-2">{{ d.ProductName }}</td>
-                                    <td class="px-3 py-2 text-right font-medium">{{ d.PlannedQty }}</td>
-                                    <td class="px-3 py-2 text-gray-400 text-xs">{{ d.Notes }}</td>
-                                    <td class="px-3 py-2 text-right">
-                                        <button mat-flat-button color="primary"
-                                            class="text-xs mr-2"
-                                            (click)="confirm(d.ID)"
-                                            [disabled]="confirmingId === d.ID">
-                                            {{ confirmingId === d.ID ? '...' : 'Confirm Dispatch' }}
-                                        </button>
-                                        <button class="text-red-400 hover:text-red-600 text-xs" (click)="deletePlan(d.ID)">Remove</button>
-                                    </td>
-                                </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
+
+        @for (grp of groups; track grp.OrderID) {
+        <div class="bg-white border rounded-lg mb-4 shadow-sm overflow-hidden">
+
+            <!-- Group Header — clickable to expand/collapse -->
+            <div class="bg-gray-50 border-b px-4 py-2 flex flex-wrap items-center justify-between gap-2 cursor-pointer select-none"
+                 (click)="toggleGroup(grp.OrderID)">
+                <div class="flex items-center gap-2 flex-1 flex-wrap">
+                    <mat-icon class="text-base text-gray-400 leading-none transition-transform"
+                              [class.rotate-90]="isExpanded(grp.OrderID)">
+                        chevron_right
+                    </mat-icon>
+                    <span class="font-semibold text-sm">Order: {{ grp.OrderInvoiceNo }}</span>
+                    <span class="text-gray-500 text-xs">{{ grp.OrderDate | date:'dd MMM yyyy' }}</span>
+                    <span class="text-gray-400 text-xs">by {{ grp.SubmittedBy }}</span>
+                    @if (grp.OrderStatus === 'Completed') {
+                        <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full">
+                            Completed
+                        </span>
+                    }
+                </div>
+                <div class="flex items-center gap-2" (click)="$event.stopPropagation()">
+                    @if (grp.OrderStatus === 'Completed') {
+                        <button mat-flat-button color="primary" class="text-xs !min-h-6 !h-7 !px-3"
+                            (click)="printInvoice(grp)" [disabled]="busyInvoiceId === grp.OrderID">
+                            <mat-icon class="text-sm mr-1">receipt</mat-icon>
+                            {{ busyInvoiceId === grp.OrderID ? '...' : 'Invoice' }}
+                        </button>
+                    }
+                    <span class="text-xs text-gray-400">{{ grp.items.length }} item(s)</span>
+                </div>
             </div>
 
-            <!-- Confirmed -->
-            <div>
-                <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">Confirmed Today ({{ confirmed.length }})</h3>
-                @if (confirmed.length === 0) {
-                    <div class="bg-gray-50 border rounded p-4 text-sm text-gray-400">No confirmed dispatches for this date.</div>
-                } @else {
-                    <div class="bg-white border rounded-lg overflow-hidden">
-                        <table class="w-full text-sm">
-                            <thead class="bg-green-50 border-b">
-                                <tr>
-                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Order #</th>
-                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Customer</th>
-                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Product</th>
-                                    <th class="text-right px-3 py-2 font-medium text-gray-600">Qty</th>
-                                    <th class="text-left px-3 py-2 font-medium text-gray-600">Notes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (d of confirmed; track d.ID) {
-                                <tr class="border-b hover:bg-gray-50">
-                                    <td class="px-3 py-2">{{ d.OrderInvoiceNo || 'Order #' + d.OrderID }}</td>
-                                    <td class="px-3 py-2">{{ d.CustomerName }}</td>
-                                    <td class="px-3 py-2">{{ d.ProductName }}</td>
-                                    <td class="px-3 py-2 text-right font-medium text-green-700">{{ d.PlannedQty }}</td>
-                                    <td class="px-3 py-2 text-gray-400 text-xs">{{ d.Notes }}</td>
-                                </tr>
+            <!-- Items Table — only shown when expanded -->
+            @if (isExpanded(grp.OrderID)) {
+            <table class="w-full text-sm">
+                <thead class="border-b bg-gray-50/50">
+                    <tr>
+                        <th class="text-left px-4 py-2 text-xs font-medium text-gray-600">Customer</th>
+                        <th class="text-left px-4 py-2 text-xs font-medium text-gray-600">Product</th>
+                        <th class="text-right px-4 py-2 text-xs font-medium text-gray-600">Qty</th>
+                        <th class="text-center px-4 py-2 text-xs font-medium text-gray-600">Status</th>
+                        <th class="text-left px-4 py-2 text-xs font-medium text-gray-600">DO / GP</th>
+                        <th class="px-4 py-2"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (item of grp.items; track item.ID) {
+                    <tr class="border-b hover:bg-gray-50" [class.bg-green-50]="item.Status === 'Confirmed'">
+                        <td class="px-4 py-2">{{ item.CustomerName }}</td>
+                        <td class="px-4 py-2">{{ item.ProductName }}</td>
+                        <td class="px-4 py-2 text-right font-mono font-medium">{{ item.PlannedQty | number:'1.0-0' }}</td>
+                        <td class="px-4 py-2 text-center">
+                            <span [class]="item.Status === 'Confirmed'
+                                ? 'bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-medium'
+                                : 'bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-medium'">
+                                {{ item.Status }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2 text-xs font-mono text-gray-500">
+                            @if (item.DONo) { {{ item.DONo }} | {{ item.GatepassNo }} }
+                        </td>
+                        <td class="px-4 py-2 text-right">
+                            <div class="flex items-center justify-end gap-1">
+                                @if (item.Status === 'Planned') {
+                                    <button mat-flat-button color="primary" class="text-xs !min-h-6 !h-6 !px-2"
+                                        (click)="confirm(item)" [disabled]="busyId === item.ID">
+                                        {{ busyId === item.ID ? '...' : 'Confirm' }}
+                                    </button>
+                                    <button mat-icon-button class="!w-7 !h-7" (click)="delete(item)" [disabled]="busyId === item.ID">
+                                        <mat-icon class="text-base text-red-400">delete</mat-icon>
+                                    </button>
+                                } @else {
+                                    <button mat-stroked-button class="text-xs !min-h-6 !h-6 !px-2" (click)="printDO(item)">DO</button>
+                                    <button mat-stroked-button class="text-xs !min-h-6 !h-6 !px-2" (click)="printGatepass(item)">GP</button>
+                                    <button mat-icon-button class="!w-7 !h-7" (click)="revert(item)" [disabled]="busyId === item.ID" title="Revert (today only)">
+                                        <mat-icon class="text-base text-yellow-600">undo</mat-icon>
+                                    </button>
                                 }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-            </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            }
+        </div>
+        }
         }
     </div>
 </div>
