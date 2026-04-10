@@ -75,9 +75,16 @@ export class LocalStorageService {
         return localStorage.getItem('isGlobalAdmin') ?? 'false';
     }
 
+    set isAdmin(value: string) {
+        localStorage.setItem('isAdmin', value);
+    }
+    get isAdmin(): string {
+        return localStorage.getItem('isAdmin') ?? 'false';
+    }
+
     // Clear All (Only These Keys)
     clearAll(): void {
-        ['isMultipleEntity','accessToken','refreshToken', 'cid', 'uid', 'eid', 'isPasswordChange', 'isDistributor', 'isGlobalAdmin'].forEach((key) =>
+        ['isMultipleEntity','accessToken','refreshToken', 'cid', 'uid', 'eid', 'isPasswordChange', 'isDistributor', 'isGlobalAdmin', 'isAdmin'].forEach((key) =>
             localStorage.removeItem(key)
         );
     }

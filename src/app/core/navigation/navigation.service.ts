@@ -43,12 +43,18 @@ export class NavigationService {
     // Create and cache the observable with shareReplay(1) to cache the result
     this._navigationCache$ = this._httpClient.get<ApiResponse<any[]>>(apiUrls.navigation).pipe(
         map((navigation: ApiResponse<any[]>) => {
+            // Guard against API error response (Data may be null/undefined)
+            if (!navigation?.Data || !Array.isArray(navigation.Data)) {
+                navigation = { ...navigation, Data: [] };
+            }
             // Detect distributor: their nav has order-submit, no dashboard
-            const links = navigation.Data?.flatMap((g: any) => g.children?.map((c: any) => c.link) || []) || [];
+            const links = navigation.Data.flatMap((g: any) => g.children?.map((c: any) => c.link) || []);
             const isDistributor = links.includes('/orders/order-submit');
             this._localStorage.isDistributor = isDistributor ? 'true' : 'false';
             const isGlobalAdmin = links.includes('/clients/client-list');
             this._localStorage.isGlobalAdmin = isGlobalAdmin ? 'true' : 'false';
+            // Non-distributor users who receive admin navigation have full route access
+            this._localStorage.isAdmin = !isDistributor ? 'true' : 'false';
             return this.buildNavigationVariants(navigation);
         }),
         tap((navObj: Navigation) => {
