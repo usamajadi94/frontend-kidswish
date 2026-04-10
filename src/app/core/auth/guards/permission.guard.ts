@@ -8,6 +8,15 @@ export const permissionGuard: CanActivateFn = (route) => {
   const router = inject(Router);
   const scode = route?.data?.SCode as string;
 
+  // GlobalAdmin / Owner / Admin bypass all section-level permission checks
+  const user = LoginUser.User;
+  if (user) {
+    const isTruthy = (v: any) => v === true || v === 1 || v === '1' || v?.[0] === 1;
+    if (isTruthy(user.IsGlobalAdmin) || isTruthy(user.IsOwner) || isTruthy(user.IsAdmin)) {
+      return true;
+    }
+  }
+
   // If no permissions loaded yet (empty SectionAccess), allow access
   if (!LoginUser.SectionAccess || LoginUser.SectionAccess.length === 0) return true;
 

@@ -4,8 +4,10 @@ export class CurrentUser {
     LastName: string | null = null;
     FullName: string | null = null;
     Email: string | null = null;
-    IsOwner: boolean | null = null;
-    IsActive: boolean | null = null;
+    IsOwner: any = null;
+    IsActive: any = null;
+    IsAdmin: any = null;
+    IsGlobalAdmin: any = null;
     ClientID:string | null = null;
     EntityID:string | null = null;
     EntityName:string | null = null;
