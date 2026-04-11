@@ -4,7 +4,7 @@ import { FuseNavigationItem } from '@fuse/components/navigation';
 import { Navigation } from 'app/core/navigation/navigation.types';
 import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
-import { map, Observable, ReplaySubject, shareReplay, tap } from 'rxjs';
+import { catchError, map, Observable, of, ReplaySubject, shareReplay, tap } from 'rxjs';
 import { ApiResponse } from '../Base/interface/IResponses';
 
 @Injectable({ providedIn: 'root' })
@@ -59,6 +59,14 @@ export class NavigationService {
         }),
         tap((navObj: Navigation) => {
             this._navigation.next(navObj);
+        }),
+        catchError(() => {
+            // If navigation API fails, return empty nav so the resolver never errors
+            this._localStorage.isDistributor = 'false';
+            this._localStorage.isAdmin = 'true';
+            const empty = this.buildNavigationVariants({ Data: [] } as any);
+            this._navigation.next(empty);
+            return of(empty);
         }),
         shareReplay(1) // Cache the result and share it with all subscribers
     );
