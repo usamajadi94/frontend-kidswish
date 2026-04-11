@@ -16,6 +16,10 @@ export const NoDistributorGuard: CanActivateFn = () => {
     const localStorage = inject(LocalStorageService);
     const router = inject(Router);
 
+    // Admin users always get through (belt-and-suspenders)
+    if (localStorage.isAdmin === 'true' || localStorage.isGlobalAdmin === 'true') {
+        return true;
+    }
     if (localStorage.isDistributor !== 'true') {
         return true;
     }
