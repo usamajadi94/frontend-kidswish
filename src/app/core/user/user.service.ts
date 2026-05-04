@@ -81,6 +81,7 @@ export class UserService {
                 this._localStorage.cid = response?.Data?.value[0].CID;
                 this._localStorage.uid = response?.Data?.value[0].UID;
                 this._localStorage.eid = response?.Data?.value[0].EID;
+                this._localStorage.isDistributor = response?.Data?.value[0].IsDistributor ? 'true' : 'false';
                 this._cachedUserResponse = response;
                 return of(response);
             })
