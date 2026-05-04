@@ -78,6 +78,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             payment:  'bg-red-100 text-red-800',
             topup:    'bg-blue-100 text-blue-800',
             transfer: 'bg-purple-100 text-purple-800',
+            opening:  'bg-gray-100 text-gray-600',
         };
         return m[type] || 'bg-gray-100 text-gray-700';
     }
@@ -86,6 +87,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         const m: Record<string, string> = {
             received: 'Received', payment: 'Payment',
             topup: 'PC Topup', transfer: 'Transfer',
+            opening: 'Opening Bal.',
         };
         return m[type] || type;
     }

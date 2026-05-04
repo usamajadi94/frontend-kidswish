@@ -10,3 +10,121 @@
     <bft-textarea name="Address" label="Address" [(ngModel)]="formData.Address" [skeleton]="isDataLoading" />
     <bft-checkbox name="IsActive" label="Active" [(ngModel)]="formData.IsActive" [skeleton]="isDataLoading" />
 </div>
+
+<!-- Product Pricing Section — only when editing existing customer -->
+@if (primaryKey > 0) {
+<div class="mt-6 border-t pt-5">
+    <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-gray-700">Product Pricing</h3>
+        @if (pricingSuccess) {
+            <span class="text-xs text-green-600">{{ pricingSuccess }}</span>
+        }
+        @if (pricingError) {
+            <span class="text-xs text-red-500">{{ pricingError }}</span>
+        }
+    </div>
+
+    @if (isPricingLoading) {
+        <div class="text-sm text-gray-400 py-3">Loading...</div>
+    } @else if (pricingProducts.length === 0) {
+        <div class="text-sm text-gray-400 py-3">No products found.</div>
+    } @else {
+        <div class="rounded-lg border overflow-hidden">
+            <table class="w-full text-xs">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="text-left px-3 py-2 font-medium text-gray-600">Product</th>
+                        <th class="text-right px-3 py-2 font-medium text-gray-600">Default</th>
+                        <th class="text-right px-3 py-2 font-medium text-gray-600">Customer Rate</th>
+                        <th class="text-left px-3 py-2 font-medium text-gray-600">Updated</th>
+                        <th class="px-3 py-2 w-28"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (p of pricingProducts; track p.ProductID) {
+                    <tr class="border-b last:border-0 hover:bg-gray-50">
+                        <td class="px-3 py-2 font-medium text-gray-800">{{ p.ProductName }}</td>
+                        <td class="px-3 py-2 text-right text-gray-400">{{ p.DefaultPrice | number:'1.2-2' }}</td>
+                        <td class="px-3 py-2 text-right">
+                            @if (editingProductId === p.ProductID) {
+                                <input type="number" [(ngModel)]="editPrice" min="0" step="0.01"
+                                    class="border rounded px-1.5 py-0.5 text-xs w-24 text-right" />
+                            } @else {
+                                <span class="font-semibold text-blue-700">{{ p.CustomerPrice | number:'1.2-2' }}</span>
+                            }
+                        </td>
+                        <td class="px-3 py-2 text-gray-400">
+                            {{ p.LastUpdated ? (p.LastUpdated | date:'dd MMM yy') : '—' }}
+                            @if (p.UpdatedBy) {
+                                <span class="block text-gray-300">{{ p.UpdatedBy }}</span>
+                            }
+                        </td>
+                        <td class="px-3 py-2">
+                            <div class="flex items-center gap-1 justify-end">
+                                @if (editingProductId === p.ProductID) {
+                                    <button mat-flat-button color="primary" class="!text-xs !min-h-0 !h-6 !px-2"
+                                        (click)="savePrice(p)" [disabled]="isSavingPrice">
+                                        {{ isSavingPrice ? '...' : 'Save' }}
+                                    </button>
+                                    <button mat-stroked-button class="!text-xs !min-h-0 !h-6 !px-2"
+                                        (click)="cancelEdit()">Cancel</button>
+                                } @else {
+                                    <button mat-stroked-button class="!text-xs !min-h-0 !h-6 !px-2"
+                                        (click)="startEdit(p)">Edit</button>
+                                    <button mat-stroked-button class="!text-xs !min-h-0 !h-6 !px-2"
+                                        (click)="openHistory(p)">History</button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+}
+
+<!-- Price History Modal -->
+@if (historyModal) {
+<div class="fixed inset-0 bg-black/40 z-[1100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md">
+        <div class="flex items-center justify-between px-5 py-3 border-b">
+            <h3 class="font-semibold text-sm">Price History — {{ historyProduct?.ProductName }}</h3>
+            <button (click)="closeHistory()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+        </div>
+        <div class="p-4">
+            @if (isHistoryLoading) {
+                <div class="text-center text-gray-400 py-4 text-sm">Loading...</div>
+            } @else if (historyRows.length === 0) {
+                <div class="text-center text-gray-400 py-4 text-sm">No price history found.</div>
+            } @else {
+                <table class="w-full text-xs">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="text-right px-3 py-1.5 font-medium text-gray-600">Price</th>
+                            <th class="text-left px-3 py-1.5 font-medium text-gray-600">Date</th>
+                            <th class="text-left px-3 py-1.5 font-medium text-gray-600">Changed By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (h of historyRows; track h.ID; let i = $index) {
+                        <tr class="border-t" [class.bg-blue-50]="i === 0">
+                            <td class="px-3 py-1.5 text-right font-semibold" [class.text-blue-700]="i === 0">
+                                {{ h.Price | number:'1.2-2' }}
+                                @if (i === 0) { <span class="text-blue-400 font-normal ml-1">(current)</span> }
+                            </td>
+                            <td class="px-3 py-1.5 text-gray-500">{{ h.ChangedOn | date:'dd MMM yyyy HH:mm' }}</td>
+                            <td class="px-3 py-1.5 text-gray-500">{{ h.ChangedBy || '—' }}</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+        <div class="px-5 py-3 border-t flex justify-end">
+            <button mat-stroked-button (click)="closeHistory()">Close</button>
+        </div>
+    </div>
+</div>
+}

@@ -16,6 +16,7 @@
         </div>
     </ng-container>
 </fuse-vertical-navigation>
+
 <!-- Wrapper -->
 <div class="flex w-full min-w-0 flex-auto flex-col">
     <!-- Header -->
@@ -29,33 +30,40 @@
         <!-- Components -->
         <div class="ml-auto flex items-center space-x-0.5 pl-2 sm:space-x-2">
             <fuse-fullscreen class="hidden md:block"></fuse-fullscreen>
-            <!-- <search [appearance]="'bar'"></search> -->
-            <!-- <shortcuts></shortcuts> -->
-            <!-- <messages></messages> -->
-            <!-- <notifications></notifications> -->
+            <app-notifications-bell></app-notifications-bell>
             <button class="lg:hidden" mat-icon-button>
-                <!-- (click)="quickChat.toggle()" -->
                 <mat-icon [svgIcon]="'heroicons_outline:chat-bubble-left-right'"></mat-icon>
             </button>
             <user></user>
         </div>
     </div>
 
+    <!-- Sub Navigation Bar -->
+    @if (subNavItems.length > 0) {
+    <div class="bg-white border-b flex items-center gap-1 px-4 overflow-x-auto print:hidden" style="min-height:42px;">
+        @for (item of subNavItems; track item.id) {
+        <a
+            [routerLink]="item.link"
+            class="flex items-center gap-1.5 px-3 py-2 text-sm rounded-md whitespace-nowrap transition-colors cursor-pointer no-underline"
+            [class.text-primary]="isSubNavActive(item.link)"
+            [class.bg-primary-50]="isSubNavActive(item.link)"
+            [class.font-semibold]="isSubNavActive(item.link)"
+            [class.text-gray-500]="!isSubNavActive(item.link)"
+            [class.hover:bg-gray-100]="!isSubNavActive(item.link)"
+        >
+            @if (item.icon) {
+            <mat-icon class="icon-size-4" [svgIcon]="item.icon"></mat-icon>
+            }
+            {{ item.title }}
+        </a>
+        }
+    </div>
+    }
+
     <!-- Content -->
     <div class="flex flex-auto flex-col layout-body">
-        <!-- *ngIf="true" hack is required here for router-outlet to work correctly.
-             Otherwise, layout changes won't be registered and the view won't be updated! -->
         @if (true) {
         <router-outlet></router-outlet>
         }
     </div>
-
-    <!-- Footer -->
-    <!-- <div
-        class="bg-card relative z-49 flex h-14 w-full flex-0 items-center justify-start border-t px-4 dark:bg-transparent md:px-6 print:hidden">
-        <span class="text-secondary font-medium">Fuse &copy; {{ currentYear }}</span>
-    </div> -->
 </div>
-
-<!-- Quick chat -->
-<!-- <quick-chat #quickChat="quickChat"></quick-chat> -->

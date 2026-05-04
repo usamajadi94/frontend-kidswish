@@ -2,6 +2,7 @@ import { Route } from '@angular/router';
 import { initialDataResolver } from 'app/app.resolvers';
 import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
+import { NoDistributorGuard } from 'app/core/auth/guards/distributor.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
 
 // prettier-ignore
@@ -75,13 +76,15 @@ export const appRoutes: Route[] = [
             initialData: initialDataResolver
         },
         children: [
-            {path: 'dashboard', loadChildren: () => import('app/modules/admin-dashboard/admin-dashboard.routes')},
+            {path: 'dashboard', canActivate: [NoDistributorGuard], loadChildren: () => import('app/modules/admin-dashboard/admin-dashboard.routes')},
             {path: 'setup', loadChildren: () => import('app/modules/setup/setup.routes')},
             {path: 'products', loadChildren: () => import('app/modules/products/products.routes')},
             {path: 'security', loadChildren: () => import('app/modules/security/security.routes')},
             {path: 'reports', loadChildren: () => import('app/modules/reports-generator/report.routes')},
             {path: 'orders', loadChildren: () => import('app/modules/orders/orders.routes')},
             {path: 'clients', loadChildren: () => import('app/modules/clients/clients.routes')},
+            {path: 'receivable', loadChildren: () => import('app/modules/receivable/receivable.routes')},
+            {path: 'notifications', loadChildren: () => import('app/modules/notifications/notifications.routes')},
             // Pages
             {path: 'pages', children: [
                 // Settings

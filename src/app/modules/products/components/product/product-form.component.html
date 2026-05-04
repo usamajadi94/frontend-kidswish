@@ -3,5 +3,6 @@
     <bft-input-text name="Code" label="Code" [(ngModel)]="formData.Code" [skeleton]="isDataLoading" />
     <bft-select name="LegalEntityID" label="Legal Entity" [displayList]="legalEntities" valueField="ID" displayField="Name"
         [(ngModel)]="formData.LegalEntityID" [skeleton]="isDataLoading" />
+    <bft-input-text name="CartonPrice" label="Carton Price (PKR)" [(ngModel)]="formData.CartonPrice" [skeleton]="isDataLoading" />
     <bft-textarea name="Description" label="Description" [(ngModel)]="formData.Description" [skeleton]="isDataLoading" />
 </div>

@@ -5,14 +5,33 @@
         <bft-input-currency name="Amount" label="Amount" symbol="PKR" [(ngModel)]="formData.Amount" [skeleton]="isDataLoading" />
     </div>
 
-    <bft-select name="PaymentType" label="Payment Type" [displayList]="paymentTypes" valueField="ID" displayField="Name"
-        [(ngModel)]="formData.PaymentType" [skeleton]="isDataLoading" />
+    <div class="flex items-end gap-4">
+        <div class="w-48">
+            <bft-select name="PaymentType" label="Payment Type" [displayList]="paymentTypes" valueField="ID" displayField="Name"
+                [(ngModel)]="formData.PaymentType" [skeleton]="isDataLoading" />
+        </div>
+        <div class="flex items-center gap-2 pb-2">
+            <input type="checkbox" id="isDailyExpense" name="isDailyExpense" [(ngModel)]="isDailyExpense"
+                class="w-4 h-4 rounded border-gray-300 text-blue-600 cursor-pointer" />
+            <label for="isDailyExpense" class="text-sm font-medium text-gray-700 cursor-pointer select-none whitespace-nowrap">
+                Daily Expense
+            </label>
+        </div>
+    </div>
 
     <bft-select name="FromPartyID" label="From (Bank Account)" [displayList]="bankAccounts" valueField="ID" displayField="Name"
         [(ngModel)]="formData.FromPartyID" [clearable]="true" [skeleton]="isDataLoading" />
 
-    <bft-select name="ToPartyID" label="To (Vendor)" [displayList]="vendors" valueField="ID" displayField="Name"
+    <bft-select name="ToPartyID" [label]="isDailyExpense ? 'To (Vendor / Optional)' : 'To (Vendor)'"
+        [displayList]="vendors" valueField="ID" displayField="Name"
         [(ngModel)]="formData.ToPartyID" [clearable]="true" [skeleton]="isDataLoading" />
+
+    @if (isDailyExpense) {
+        <bft-select name="DailyExpensePettyCashID" label="Daily Expense Account *" [displayList]="pettyCashList" valueField="ID" displayField="Name"
+            [(ngModel)]="dailyExpensePettyCashID" [clearable]="true" [skeleton]="isDataLoading" />
+        <bft-select name="DailyExpenseCategoryID" label="Expense Category *" [displayList]="expenseCategories" valueField="ID" displayField="Description"
+            [(ngModel)]="dailyExpenseCategoryID" [clearable]="true" [skeleton]="isDataLoading" />
+    }
 
     <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes" [skeleton]="isDataLoading" />
 

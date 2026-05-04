@@ -43,6 +43,11 @@ export class OrderDetailComponent implements OnInit {
         return this.order?.Items?.some((i: any) => i.StockStatus === 'Insufficient') ?? false;
     }
 
+    get allDispatched(): boolean {
+        if (!this.order?.Items?.length) return false;
+        return this.order.Items.every((i: any) => parseFloat(i.RemainingQty) === 0);
+    }
+
     ngOnInit() {
         const id = this._route.snapshot.params['id'];
         this.loadOrder(id);

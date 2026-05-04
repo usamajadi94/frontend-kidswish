@@ -1,0 +1,132 @@
+<div class="absolute inset-0 flex min-w-0 flex-col overflow-y-auto p-6 md:p-8">
+
+    <!-- Header -->
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="text-3xl font-semibold leading-8 tracking-tight">Customer Ledger</div>
+        @if (dateRange?.length || selectedCustomer) {
+            <button class="text-sm text-red-400 hover:text-red-600 transition-colors" (click)="clearFilters()">
+                ✕ Clear Filters
+            </button>
+        }
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+        <nz-select
+            [(ngModel)]="selectedCustomer"
+            (ngModelChange)="onCustomerChange()"
+            nzPlaceHolder="All Customers"
+            [nzAllowClear]="true"
+            [nzShowSearch]="true"
+            style="min-width: 220px">
+            @for (c of customers; track c.ID) {
+                <nz-option [nzValue]="c.ID" [nzLabel]="c.Name"></nz-option>
+            }
+        </nz-select>
+
+        <nz-range-picker
+            [(ngModel)]="dateRange"
+            (ngModelChange)="onDateChange($event)"
+            nzFormat="dd/MM/yyyy"
+            [nzPlaceHolder]="['From Date', 'To Date']">
+        </nz-range-picker>
+    </div>
+
+    <!-- Summary Cards (when customer selected) -->
+    @if (selectedCustomer && !isLoading && rows.length > 0) {
+        <div class="mb-4 grid grid-cols-3 gap-4">
+            <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm text-center">
+                <div class="text-xs text-gray-500 mb-1">Total Invoiced</div>
+                <div class="text-lg font-bold text-red-700">{{ totalInvoiced | currency:'PKR ':'symbol':'1.0-0' }}</div>
+            </div>
+            <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm text-center">
+                <div class="text-xs text-gray-500 mb-1">Total Received</div>
+                <div class="text-lg font-bold text-green-700">{{ totalReceived | currency:'PKR ':'symbol':'1.0-0' }}</div>
+            </div>
+            <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm text-center">
+                <div class="text-xs text-gray-500 mb-1">Outstanding</div>
+                <div class="text-lg font-bold" [class.text-red-700]="closingBalance > 0" [class.text-green-700]="closingBalance <= 0">
+                    {{ closingBalance | currency:'PKR ':'symbol':'1.0-0' }}
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Table -->
+    <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Date</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Type</th>
+                    @if (!selectedCustomer) {
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Customer</th>
+                    }
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">Notes</th>
+                    <th class="px-4 py-3 text-right font-semibold text-red-700 whitespace-nowrap">Invoice (Dr)</th>
+                    <th class="px-4 py-3 text-right font-semibold text-green-700 whitespace-nowrap">Payment (Cr)</th>
+                    <th class="px-4 py-3 text-right font-semibold text-gray-600 whitespace-nowrap">Balance</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+
+                @if (isLoading) {
+                    @for (i of [1,2,3,4,5]; track i) {
+                        <tr>@for (j of [1,2,3,4,5,6]; track j) {
+                            <td class="px-4 py-3"><div class="h-4 w-24 animate-pulse rounded bg-gray-200"></div></td>
+                        }</tr>
+                    }
+                } @else if (rows.length === 0) {
+                    <tr>
+                        <td colspan="7" class="px-4 py-12 text-center text-gray-400">No transactions found</td>
+                    </tr>
+                } @else {
+                    @for (row of rows; track row.ID) {
+                        <tr class="transition-colors hover:bg-gray-50">
+                            <td class="px-4 py-2 whitespace-nowrap text-gray-700 text-xs">
+                                {{ row.Date | date:'dd/MM/yyyy' }}
+                            </td>
+                            <td class="px-4 py-2 whitespace-nowrap text-xs">
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {{ typeBadgeClass(row.Type) }}">
+                                    {{ typeLabel(row.Type) }}
+                                </span>
+                            </td>
+                            @if (!selectedCustomer) {
+                                <td class="px-4 py-2 text-gray-700 text-xs font-medium">{{ row.CustomerName || '—' }}</td>
+                            }
+                            <td class="px-4 py-2 text-gray-500 text-xs">{{ row.Notes || '—' }}</td>
+                            <td class="px-4 py-2 text-right font-medium text-red-700 text-xs">
+                                {{ row.Invoiced > 0 ? (row.Invoiced | currency:'PKR ':'symbol':'1.0-0') : '—' }}
+                            </td>
+                            <td class="px-4 py-2 text-right font-medium text-green-700 text-xs">
+                                {{ row.Received > 0 ? (row.Received | currency:'PKR ':'symbol':'1.0-0') : '—' }}
+                            </td>
+                            <td class="px-4 py-2 text-right font-semibold text-xs"
+                                [class.text-red-700]="row.Balance > 0"
+                                [class.text-green-700]="row.Balance <= 0">
+                                {{ row.Balance | currency:'PKR ':'symbol':'1.0-0' }}
+                            </td>
+                        </tr>
+                    }
+                }
+
+            </tbody>
+
+            @if (!isLoading && rows.length > 0) {
+                <tfoot class="border-t-2 border-gray-300 bg-gray-50">
+                    <tr class="font-semibold text-gray-800">
+                        <td [attr.colspan]="selectedCustomer ? 3 : 4" class="px-4 py-2 text-right text-xs">Totals</td>
+                        <td class="px-4 py-2 text-right text-red-700 text-xs">{{ totalInvoiced | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                        <td class="px-4 py-2 text-right text-green-700 text-xs">{{ totalReceived | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                        <td class="px-4 py-2 text-right text-xs"
+                            [class.text-red-700]="closingBalance > 0"
+                            [class.text-green-700]="closingBalance <= 0">
+                            {{ closingBalance | currency:'PKR ':'symbol':'1.0-0' }}
+                        </td>
+                    </tr>
+                </tfoot>
+            }
+        </table>
+    </div>
+
+</div>

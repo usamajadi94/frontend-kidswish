@@ -1,0 +1,146 @@
+<div class="absolute inset-0 overflow-y-auto">
+    <div class="min-h-full p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold">Receivable / Payable</h2>
+            <button mat-flat-button color="primary" (click)="openPayment()">+ Record Payment</button>
+        </div>
+
+        <!-- Cards -->
+        <div class="grid grid-cols-3 gap-3 mb-5">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                <p class="text-xs text-blue-600 font-medium mb-1">Total Invoiced</p>
+                <p class="text-2xl font-bold text-blue-800">{{ (cards.TotalReceivable || 0) | number:'1.0-0' }}</p>
+            </div>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                <p class="text-xs text-green-600 font-medium mb-1">Total Received</p>
+                <p class="text-2xl font-bold text-green-800">{{ (cards.TotalReceived || 0) | number:'1.0-0' }}</p>
+            </div>
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+                <p class="text-xs text-red-600 font-medium mb-1">Outstanding</p>
+                <p class="text-2xl font-bold text-red-700">{{ (cards.Outstanding || 0) | number:'1.0-0' }}</p>
+            </div>
+        </div>
+
+        @if (successMsg) { <p class="text-green-600 text-sm mb-3">{{ successMsg }}</p> }
+        @if (errorMsg) { <p class="text-red-500 text-sm mb-3">{{ errorMsg }}</p> }
+
+        <!-- Payment Form -->
+        @if (showPaymentForm) {
+        <div class="bg-white border rounded-lg p-4 mb-4 shadow-sm">
+            <h3 class="font-medium mb-3">Record Payment Received</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Customer *</label>
+                    <select [(ngModel)]="payForm.CustomerID" class="w-full border rounded px-2 py-1.5 text-sm">
+                        <option [ngValue]="null">-- Select --</option>
+                        @for (c of customers; track c.CustomerID) {
+                            <option [ngValue]="c.CustomerID">{{ c.CustomerName }}</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Amount *</label>
+                    <input type="number" [(ngModel)]="payForm.Amount" class="w-full border rounded px-2 py-1.5 text-sm" min="0" placeholder="0" />
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Payment Type</label>
+                    <select [(ngModel)]="payForm.PaymentType" class="w-full border rounded px-2 py-1.5 text-sm">
+                        <option>Cash</option><option>Bank Transfer</option><option>Cheque</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Date</label>
+                    <input type="date" [(ngModel)]="payForm.Date" class="w-full border rounded px-2 py-1.5 text-sm" />
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+                    <input type="text" [(ngModel)]="payForm.Notes" class="w-full border rounded px-2 py-1.5 text-sm" />
+                </div>
+            </div>
+            <div class="flex gap-2 mt-3">
+                <button mat-flat-button color="primary" (click)="savePayment()" [disabled]="isSaving">{{ isSaving ? 'Saving...' : 'Save' }}</button>
+                <button mat-stroked-button (click)="showPaymentForm = false">Cancel</button>
+            </div>
+        </div>
+        }
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Customer List -->
+            <div class="bg-white border rounded-lg overflow-hidden">
+                <div class="px-4 py-2 bg-gray-50 border-b font-medium text-sm">Customers</div>
+                @if (isLoading) {
+                    <div class="p-4 text-center text-gray-400 text-sm">Loading...</div>
+                } @else {
+                <table class="w-full text-sm">
+                    <thead class="border-b">
+                        <tr>
+                            <th class="text-left px-4 py-2 text-xs font-medium text-gray-600">Customer</th>
+                            <th class="text-right px-4 py-2 text-xs font-medium text-gray-600">Invoiced</th>
+                            <th class="text-right px-4 py-2 text-xs font-medium text-gray-600">Received</th>
+                            <th class="text-right px-4 py-2 text-xs font-medium text-gray-600">Due</th>
+                            <th class="px-2 py-2"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (c of customers; track c.CustomerID) {
+                        <tr class="border-b hover:bg-gray-50 cursor-pointer" [class.bg-blue-50]="selectedCustomer?.CustomerID === c.CustomerID" (click)="selectCustomer(c)">
+                            <td class="px-4 py-2">
+                                <div class="font-medium">{{ c.CustomerName }}</div>
+                                @if (c.PhoneNo) { <div class="text-xs text-gray-400">{{ c.PhoneNo }}</div> }
+                            </td>
+                            <td class="px-4 py-2 text-right font-mono text-xs">{{ c.TotalInvoiced | number:'1.0-0' }}</td>
+                            <td class="px-4 py-2 text-right font-mono text-xs text-green-600">{{ c.TotalReceived | number:'1.0-0' }}</td>
+                            <td class="px-4 py-2 text-right font-mono text-xs" [class.text-red-600]="c.Outstanding > 0" [class.font-semibold]="c.Outstanding > 0">
+                                {{ c.Outstanding | number:'1.0-0' }}
+                            </td>
+                            <td class="px-2 py-2">
+                                <button mat-icon-button class="!w-6 !h-6" (click)="$event.stopPropagation(); openPayment(c)" title="Record Payment">
+                                    <mat-icon class="text-base text-green-500">add_circle</mat-icon>
+                                </button>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+                }
+            </div>
+
+            <!-- Ledger -->
+            <div class="bg-white border rounded-lg overflow-hidden">
+                <div class="px-4 py-2 bg-gray-50 border-b font-medium text-sm">
+                    {{ selectedCustomer ? selectedCustomer.CustomerName + ' — Ledger' : 'Select a customer to view ledger' }}
+                </div>
+                @if (!selectedCustomer) {
+                    <div class="p-4 text-center text-gray-400 text-sm">Click a customer to view transactions.</div>
+                } @else if (ledger.length === 0) {
+                    <div class="p-4 text-center text-gray-400 text-sm">No transactions.</div>
+                } @else {
+                <table class="w-full text-sm">
+                    <thead class="border-b">
+                        <tr>
+                            <th class="text-left px-3 py-2 text-xs font-medium text-gray-600">Date</th>
+                            <th class="text-left px-3 py-2 text-xs font-medium text-gray-600">Type</th>
+                            <th class="text-right px-3 py-2 text-xs font-medium text-gray-600">Amount</th>
+                            <th class="text-left px-3 py-2 text-xs font-medium text-gray-600">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (t of ledger; track t.ID) {
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-3 py-1.5 text-xs text-gray-500">{{ t.Date | date:'dd MMM yy' }}</td>
+                            <td class="px-3 py-1.5">
+                                <span [class]="t.Type === 'Receivable' ? 'bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs' : 'bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs'">
+                                    {{ t.Type === 'Receivable' ? 'Invoice' : 'Payment' }}
+                                </span>
+                            </td>
+                            <td class="px-3 py-1.5 text-right font-mono">{{ t.Amount | number:'1.0-0' }}</td>
+                            <td class="px-3 py-1.5 text-xs text-gray-500">{{ t.Notes }}</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>

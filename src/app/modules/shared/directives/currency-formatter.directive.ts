@@ -11,7 +11,7 @@ export class CurrencyFormatterDirective {
   constructor(private elementRef: ElementRef) {
     this.el = this.elementRef.nativeElement;
     setTimeout(() => {
-      this.formatCurrency(this.el.value || '0'); // 👈 YEH LINE ADD KARO
+      if (this.el.value) this.formatCurrency(this.el.value);
     });
   }
   

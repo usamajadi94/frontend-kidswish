@@ -15,6 +15,7 @@ import { FuseAlertType } from '@fuse/components/alert';
 import { ApiResponse } from 'app/core/Base/interface/IResponses';
 import { AuthService } from 'app/core/auth/auth.service';
 import { UserService } from 'app/core/user/user.service';
+import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -49,7 +50,8 @@ export class AuthSignInComponent implements OnInit {
         private _authService: AuthService,
         private _formBuilder: UntypedFormBuilder,
         private _router: Router,
-        private _userService: UserService
+        private _userService: UserService,
+        private _ls: LocalStorageService,
     ) {}
 
     ngOnInit(): void {
@@ -81,7 +83,7 @@ export class AuthSignInComponent implements OnInit {
                         } else {
                             const redirectURL =
                                 this._activatedRoute.snapshot.queryParamMap.get('redirectURL') ||
-                                '/dashboard';
+                                (this._ls.isDistributor === 'true' ? '/orders/my-orders' : '/dashboard');
                             this._router.navigateByUrl(redirectURL);
                         }
                     });

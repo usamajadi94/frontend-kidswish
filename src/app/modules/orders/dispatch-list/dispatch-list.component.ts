@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
+import { ModalService } from 'app/modules/shared/services/modal.service';
 
 @Component({
     selector: 'app-dispatch-list',
@@ -16,6 +17,7 @@ import { apiUrls } from 'app/modules/shared/services/api-url';
 export class DispatchListComponent implements OnInit {
     private _localStorage = inject(LocalStorageService);
     private _http = inject(HttpClient);
+    private _modal = inject(ModalService);
 
     groups: any[] = [];
     isLoading = false;
@@ -58,47 +60,67 @@ export class DispatchListComponent implements OnInit {
     }
 
     confirm(item: any) {
-        if (!confirm(`Confirm dispatch: ${item.PlannedQty} x ${item.ProductName} → ${item.CustomerName}?`)) return;
-        this.busyId = item.ID;
-        this._http.post<any>(`${apiUrls.server}${apiUrls.dispatchController}/confirm/${item.ID}`, {}, { headers: this.authHeaders }).subscribe({
-            next: (res) => {
-                this.busyId = null;
-                item.Status = 'Confirmed';
-                item.DONo = res.doNo;
-                item.GatepassNo = res.gatepassNo;
-                this.load(); // reload to pick up OrderStatus change
-            },
-            error: (e) => { this.busyId = null; this.errorMsg = e?.error?.message || 'Failed to confirm'; },
+        this._modal.confirmModal({
+            title: 'Confirm Dispatch',
+            message: `Confirm dispatch of <b>${item.PlannedQty} carton(s)</b> of <b>${item.ProductName}</b> to <b>${item.CustomerName}</b>?`,
+            icon: 'heroicons_outline:check-circle',
+        }).afterClosed().subscribe((result) => {
+            if (!result) return;
+            this.busyId = item.ID;
+            this._http.post<any>(`${apiUrls.server}${apiUrls.dispatchController}/confirm/${item.ID}`, {}, { headers: this.authHeaders }).subscribe({
+                next: (res) => {
+                    this.busyId = null;
+                    item.Status = 'Confirmed';
+                    item.DONo = res.doNo;
+                    item.GatepassNo = res.gatepassNo;
+                    this.load();
+                },
+                error: (e) => { this.busyId = null; this.errorMsg = e?.error?.message || 'Failed to confirm'; },
+            });
         });
     }
 
     revert(item: any) {
-        if (!confirm(`Revert dispatch: ${item.PlannedQty} x ${item.ProductName}? Stock will be restored.`)) return;
-        this.busyId = item.ID;
-        this._http.post<any>(`${apiUrls.server}${apiUrls.dispatchController}/revert/${item.ID}`, {}, { headers: this.authHeaders }).subscribe({
-            next: () => { this.busyId = null; this.load(); },
-            error: (e) => { this.busyId = null; this.errorMsg = e?.error?.message || 'Failed to revert'; },
+        this._modal.confirmModal({
+            title: 'Revert Dispatch',
+            message: `Revert dispatch of <b>${item.PlannedQty} carton(s)</b> of <b>${item.ProductName}</b>? Stock will be restored.`,
+            icon: 'heroicons_outline:arrow-uturn-left',
+        }).afterClosed().subscribe((result) => {
+            if (!result) return;
+            this.busyId = item.ID;
+            this._http.post<any>(`${apiUrls.server}${apiUrls.dispatchController}/revert/${item.ID}`, {}, { headers: this.authHeaders }).subscribe({
+                next: () => { this.busyId = null; this.load(); },
+                error: (e) => { this.busyId = null; this.errorMsg = e?.error?.message || 'Failed to revert'; },
+            });
         });
     }
 
     delete(item: any) {
-        if (!confirm('Delete this planned dispatch entry?')) return;
-        this.busyId = item.ID;
-        this._http.delete<any>(`${apiUrls.server}${apiUrls.dispatchController}/plan/${item.ID}`, { headers: this.authHeaders }).subscribe({
-            next: () => { this.busyId = null; this.load(); },
-            error: (e) => { this.busyId = null; this.errorMsg = e?.error?.message || 'Failed to delete'; },
+        this._modal.confirmModal({
+            title: 'Delete Dispatch Entry',
+            message: `Delete this planned dispatch entry for <b>${item.ProductName}</b>?`,
+            icon: 'heroicons_outline:trash',
+        }).afterClosed().subscribe((result) => {
+            if (!result) return;
+            this.busyId = item.ID;
+            this._http.delete<any>(`${apiUrls.server}${apiUrls.dispatchController}/plan/${item.ID}`, { headers: this.authHeaders }).subscribe({
+                next: () => { this.busyId = null; this.load(); },
+                error: (e) => { this.busyId = null; this.errorMsg = e?.error?.message || 'Failed to delete'; },
+            });
         });
     }
 
-    printDO(item: any) {
-        this._http.get<any>(`${apiUrls.server}${apiUrls.dispatchController}/do/${item.ID}`, { headers: this.authHeaders }).subscribe({
-            next: (data) => this.openDoWindow('DO', data),
+    printOrderDO(grp: any) {
+        this._http.get<any>(`${apiUrls.server}${apiUrls.dispatchController}/order-do/${grp.OrderID}`, { headers: this.authHeaders }).subscribe({
+            next: (data) => this.openOrderDoWindow('DO', data),
+            error: (e) => { this.errorMsg = e?.error?.message || 'Failed to load DO data'; },
         });
     }
 
-    printGatepass(item: any) {
-        this._http.get<any>(`${apiUrls.server}${apiUrls.dispatchController}/do/${item.ID}`, { headers: this.authHeaders }).subscribe({
-            next: (data) => this.openDoWindow('GP', data),
+    printOrderGP(grp: any) {
+        this._http.get<any>(`${apiUrls.server}${apiUrls.dispatchController}/order-do/${grp.OrderID}`, { headers: this.authHeaders }).subscribe({
+            next: (data) => this.openOrderDoWindow('GP', data),
+            error: (e) => { this.errorMsg = e?.error?.message || 'Failed to load GP data'; },
         });
     }
 
@@ -110,33 +132,78 @@ export class DispatchListComponent implements OnInit {
         });
     }
 
-    private openDoWindow(type: 'DO' | 'GP', d: any) {
-        const title = type === 'DO' ? `DELIVERY ORDER — ${d.DONo}` : `GATE PASS — ${d.GatepassNo}`;
-        const refNo = type === 'DO' ? d.DONo : d.GatepassNo;
-        const html = `<!DOCTYPE html><html><head><title>${title}</title>
+    private openOrderDoWindow(type: 'DO' | 'GP', d: any) {
+        const items: any[] = d.Items || [];
+        const docLabel = type === 'DO' ? 'DELIVERY ORDER' : 'GATE PASS';
+        const dateStr = items[0]?.Date ? new Date(items[0].Date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+
+        // Group items by customer
+        const customerMap = new Map<string, any[]>();
+        for (const item of items) {
+            const key = item.CustomerName || '—';
+            if (!customerMap.has(key)) customerMap.set(key, []);
+            customerMap.get(key)!.push(item);
+        }
+
+        let customerSections = '';
+        customerMap.forEach((citems, cname) => {
+            const addr = citems[0]?.CustomerAddress || '';
+            const refLabel = type === 'DO' ? 'DO No.' : 'GP No.';
+            const itemRows = citems.map((i: any) => {
+                const ref = type === 'DO' ? i.DONo : i.GatepassNo;
+                return `<tr>
+                  <td style="padding:8px 12px">${i.ProductName}</td>
+                  <td style="padding:8px 12px;text-align:right;font-weight:600">${i.Qty}</td>
+                  <td style="padding:8px 12px"><span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;font-family:monospace">${ref || '—'}</span></td>
+                </tr>`;
+            }).join('');
+            customerSections += `
+              <div style="margin-bottom:16px">
+                <div style="background:#eff6ff;border-left:3px solid #1a56db;padding:8px 12px;font-weight:600;font-size:13px;color:#1e40af">
+                  ${cname}${addr ? `<span style="font-size:11px;color:#64748b;margin-left:10px;font-weight:400">${addr}</span>` : ''}
+                </div>
+                <table style="width:100%;border-collapse:collapse;border:1px solid #e2e8f0">
+                  <thead><tr style="background:#f8fafc">
+                    <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:600;text-transform:uppercase;color:#64748b;border-bottom:1px solid #e2e8f0">Product</th>
+                    <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:600;text-transform:uppercase;color:#64748b;border-bottom:1px solid #e2e8f0">Qty (Cartons)</th>
+                    <th style="padding:8px 12px;font-size:11px;font-weight:600;text-transform:uppercase;color:#64748b;border-bottom:1px solid #e2e8f0">${refLabel}</th>
+                  </tr></thead>
+                  <tbody>${itemRows}</tbody>
+                </table>
+              </div>`;
+        });
+
+        const html = `<!DOCTYPE html><html><head><title>${docLabel} — ${d.OrderInvoiceNo}</title>
         <style>
-          body{font-family:Arial,sans-serif;padding:30px;font-size:13px}
-          h2{text-align:center;margin-bottom:4px}
-          .sub{text-align:center;color:#666;margin-bottom:20px;font-size:12px}
-          table{width:100%;border-collapse:collapse;margin-top:16px}
-          th,td{border:1px solid #ccc;padding:8px 10px;text-align:left}
-          th{background:#f0f0f0;font-weight:600}
-          .sig{display:flex;justify-content:space-between;margin-top:60px}
-          .sig div{text-align:center;width:180px}
-          .sig .line{border-top:1px solid #333;padding-top:6px;margin-top:30px}
+          *{margin:0;padding:0;box-sizing:border-box}
+          body{font-family:'Segoe UI',Arial,sans-serif;padding:32px;font-size:13px;color:#1a1a1a}
+          @media print{body{padding:16px}}
         </style></head><body>
-        <h2>${title}</h2>
-        <p class="sub">Ref No: ${refNo} | Order: ${d.OrderInvoiceNo || '—'} | Date: ${new Date(d.Date).toLocaleDateString()}</p>
-        <table>
-          <tr><th>Customer</th><td>${d.CustomerName}</td><th>Address</th><td>${d.CustomerAddress || '—'}</td></tr>
-          <tr><th>Product</th><td>${d.ProductName}</td><th>Qty (Cartons)</th><td>${d.Qty}</td></tr>
-          ${d.CartonPrice ? `<tr><th>Price / Carton</th><td>PKR ${d.CartonPrice}</td><th>Total</th><td>PKR ${(d.Qty * d.CartonPrice).toLocaleString()}</td></tr>` : ''}
-          ${d.Notes ? `<tr><th>Notes</th><td colspan="3">${d.Notes}</td></tr>` : ''}
-        </table>
-        <div class="sig">
-          <div><div class="line">Prepared By</div></div>
-          <div><div class="line">Store Keeper</div></div>
-          <div><div class="line">Customer / Receiver</div></div>
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:3px solid #1a56db">
+          <div>
+            <div style="font-size:24px;font-weight:800;color:#1a56db;letter-spacing:-0.5px">Kids<span style="color:#f59e0b">Wish</span></div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:2px">Quality Products · Trusted Delivery</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1px">${docLabel}</div>
+            <div style="font-size:13px;color:#6b7280;margin-top:2px">Order: <strong>${d.OrderInvoiceNo}</strong></div>
+          </div>
+        </div>
+        <!-- Meta -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 24px;background:#f8fafc;border-radius:8px;padding:12px 16px;border:1px solid #e2e8f0;margin-bottom:20px">
+          <div><div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#94a3b8">Date</div><div style="font-size:13px;font-weight:500">${dateStr}</div></div>
+          <div><div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#94a3b8">Prepared By</div><div style="font-size:13px;font-weight:500">${d.SubmittedBy || '—'}</div></div>
+          <div><div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#94a3b8">Total Items</div><div style="font-size:13px;font-weight:500">${items.length} line(s)</div></div>
+        </div>
+        <!-- Customer Sections -->
+        ${customerSections}
+        <!-- Signatures -->
+        <div style="display:flex;justify-content:space-between;margin-top:56px">
+          <div style="text-align:center;width:160px"><div style="border-top:1px solid #94a3b8;padding-top:6px;margin-top:36px;font-size:12px;color:#64748b">Prepared By</div></div>
+          <div style="text-align:center;width:160px"><div style="border-top:1px solid #94a3b8;padding-top:6px;margin-top:36px;font-size:12px;color:#64748b">Store Keeper</div></div>
+          <div style="text-align:center;width:160px"><div style="border-top:1px solid #94a3b8;padding-top:6px;margin-top:36px;font-size:12px;color:#64748b">Authorized By</div></div>
+          <div style="text-align:center;width:160px"><div style="border-top:1px solid #94a3b8;padding-top:6px;margin-top:36px;font-size:12px;color:#64748b">Customer / Receiver</div></div>
         </div>
         </body></html>`;
         const w = window.open('', '_blank');
@@ -148,6 +215,7 @@ export class DispatchListComponent implements OnInit {
     private openInvoiceWindow(d: any) {
         const items: any[] = d.Items || [];
         const grandTotal = items.reduce((s: number, i: any) => s + (i.LineTotal || 0), 0);
+        const orderDateStr = d.OrderDate ? new Date(d.OrderDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
 
         // Group by customer
         const customerMap = new Map<string, any[]>();
@@ -157,60 +225,71 @@ export class DispatchListComponent implements OnInit {
             customerMap.get(key)!.push(item);
         }
 
-        let customerRows = '';
+        let customerSections = '';
         customerMap.forEach((citems, cname) => {
             const cTotal = citems.reduce((s: number, i: any) => s + (i.LineTotal || 0), 0);
-            customerRows += `
-              <tr style="background:#f0f4ff">
-                <td colspan="4" style="font-weight:600;padding:6px 10px">${cname}
-                  <span style="font-size:11px;color:#666;margin-left:8px">Invoice: ${citems[0]?.InvoiceNo || '—'}</span>
-                </td>
-                <td style="text-align:right;font-weight:600;padding:6px 10px">PKR ${cTotal.toLocaleString()}</td>
-              </tr>`;
-            citems.forEach((item: any) => {
-                customerRows += `<tr>
-                  <td style="padding:6px 10px 6px 20px;color:#555">${item.ProductName}</td>
-                  <td style="text-align:right;padding:6px 10px">${item.Carton}</td>
-                  <td style="text-align:right;padding:6px 10px">PKR ${item.CartonPrice?.toLocaleString() || 0}</td>
-                  <td colspan="2" style="text-align:right;padding:6px 10px">PKR ${(item.LineTotal || 0).toLocaleString()}</td>
-                </tr>`;
-            });
+            const itemRows = citems.map((item: any) => `
+              <tr>
+                <td style="padding:8px 12px 8px 24px;color:#374151">${item.ProductName}</td>
+                <td style="padding:8px 12px;text-align:right;font-weight:600">${item.Carton}</td>
+                <td style="padding:8px 12px;text-align:right;color:#6b7280">PKR ${(item.CartonPrice || 0).toLocaleString()}</td>
+                <td style="padding:8px 12px;text-align:right;font-weight:600">PKR ${(item.LineTotal || 0).toLocaleString()}</td>
+              </tr>`).join('');
+            customerSections += `
+              <div style="margin-bottom:16px">
+                <div style="background:#f0fdf4;border-left:3px solid #16a34a;padding:8px 12px;font-weight:600;font-size:13px;color:#15803d;display:flex;justify-content:space-between">
+                  <span>${cname} <span style="font-size:11px;color:#6b7280;font-weight:400;margin-left:8px">Invoice: ${citems[0]?.InvoiceNo || '—'}</span></span>
+                  <span>PKR ${cTotal.toLocaleString()}</span>
+                </div>
+                <table style="width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-top:none">
+                  <thead><tr style="background:#f8fafc">
+                    <th style="text-align:left;padding:7px 12px 7px 24px;font-size:11px;font-weight:600;text-transform:uppercase;color:#9ca3af;border-bottom:1px solid #e2e8f0">Product</th>
+                    <th style="text-align:right;padding:7px 12px;font-size:11px;font-weight:600;text-transform:uppercase;color:#9ca3af;border-bottom:1px solid #e2e8f0">Cartons</th>
+                    <th style="text-align:right;padding:7px 12px;font-size:11px;font-weight:600;text-transform:uppercase;color:#9ca3af;border-bottom:1px solid #e2e8f0">Price/Carton</th>
+                    <th style="text-align:right;padding:7px 12px;font-size:11px;font-weight:600;text-transform:uppercase;color:#9ca3af;border-bottom:1px solid #e2e8f0">Amount</th>
+                  </tr></thead>
+                  <tbody>${itemRows}</tbody>
+                </table>
+              </div>`;
         });
 
         const html = `<!DOCTYPE html><html><head><title>Invoice — ${d.OrderInvoiceNo}</title>
         <style>
-          body{font-family:Arial,sans-serif;padding:30px;font-size:13px}
-          h2{text-align:center;margin-bottom:4px}
-          .sub{text-align:center;color:#666;margin-bottom:20px;font-size:12px}
-          table{width:100%;border-collapse:collapse;margin-top:16px}
-          th,td{border:1px solid #ddd;padding:8px 10px}
-          th{background:#f0f0f0;font-weight:600;text-align:left}
-          .total{background:#e8f5e9;font-weight:700;font-size:14px}
-          .sig{display:flex;justify-content:space-between;margin-top:60px}
-          .sig div{text-align:center;width:180px}
-          .sig .line{border-top:1px solid #333;padding-top:6px;margin-top:30px}
+          *{margin:0;padding:0;box-sizing:border-box}
+          body{font-family:'Segoe UI',Arial,sans-serif;padding:32px;font-size:13px;color:#1a1a1a}
+          @media print{body{padding:16px}}
         </style></head><body>
-        <h2>INVOICE — ${d.OrderInvoiceNo}</h2>
-        <p class="sub">Order Date: ${new Date(d.OrderDate).toLocaleDateString()} | Submitted By: ${d.SubmittedBy || '—'}</p>
-        <table>
-          <thead><tr>
-            <th>Product</th>
-            <th style="text-align:right">Cartons</th>
-            <th style="text-align:right">Price/Carton</th>
-            <th colspan="2" style="text-align:right">Amount</th>
-          </tr></thead>
-          <tbody>${customerRows}</tbody>
-          <tfoot>
-            <tr class="total">
-              <td colspan="4" style="text-align:right;padding:10px">Grand Total</td>
-              <td style="text-align:right;padding:10px">PKR ${grandTotal.toLocaleString()}</td>
-            </tr>
-          </tfoot>
-        </table>
-        <div class="sig">
-          <div><div class="line">Prepared By</div></div>
-          <div><div class="line">Authorized By</div></div>
-          <div><div class="line">Received By</div></div>
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:3px solid #16a34a">
+          <div>
+            <div style="font-size:26px;font-weight:800;color:#15803d;letter-spacing:-0.5px">Kids<span style="color:#f59e0b">Wish</span></div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:2px">Quality Products · Trusted Delivery</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#111827">INVOICE</div>
+            <div style="font-size:16px;font-weight:600;color:#15803d;margin-top:2px">${d.OrderInvoiceNo}</div>
+          </div>
+        </div>
+        <!-- Meta Info -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 24px;background:#f8fafc;border-radius:8px;padding:12px 16px;border:1px solid #e2e8f0;margin-bottom:20px">
+          <div><div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#94a3b8;margin-bottom:2px">Order Date</div><div style="font-size:13px;font-weight:500">${orderDateStr}</div></div>
+          <div><div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#94a3b8;margin-bottom:2px">Submitted By</div><div style="font-size:13px;font-weight:500">${d.SubmittedBy || '—'}</div></div>
+          <div><div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#94a3b8;margin-bottom:2px">Total Customers</div><div style="font-size:13px;font-weight:500">${customerMap.size}</div></div>
+        </div>
+        <!-- Items by Customer -->
+        ${customerSections}
+        <!-- Grand Total -->
+        <div style="display:flex;justify-content:flex-end;margin-top:8px">
+          <div style="background:#15803d;color:#fff;padding:12px 24px;border-radius:8px;text-align:right;min-width:220px">
+            <div style="font-size:11px;text-transform:uppercase;opacity:0.8;margin-bottom:2px">Grand Total</div>
+            <div style="font-size:22px;font-weight:800">PKR ${grandTotal.toLocaleString()}</div>
+          </div>
+        </div>
+        <!-- Signatures -->
+        <div style="display:flex;justify-content:space-between;margin-top:56px">
+          <div style="text-align:center;width:160px"><div style="border-top:1px solid #94a3b8;padding-top:6px;margin-top:36px;font-size:12px;color:#64748b">Prepared By</div></div>
+          <div style="text-align:center;width:160px"><div style="border-top:1px solid #94a3b8;padding-top:6px;margin-top:36px;font-size:12px;color:#64748b">Authorized By</div></div>
+          <div style="text-align:center;width:160px"><div style="border-top:1px solid #94a3b8;padding-top:6px;margin-top:36px;font-size:12px;color:#64748b">Received By</div></div>
         </div>
         </body></html>`;
         const w = window.open('', '_blank');
@@ -218,6 +297,8 @@ export class DispatchListComponent implements OnInit {
         w?.document.close();
         w?.print();
     }
+
+    hasConfirmed(items: any[]): boolean { return items.some(i => i.Status === 'Confirmed'); }
 
     get totalPlanned(): number { return this.groups.flatMap(g => g.items).filter(i => i.Status === 'Planned').length; }
     get totalConfirmed(): number { return this.groups.flatMap(g => g.items).filter(i => i.Status === 'Confirmed').length; }

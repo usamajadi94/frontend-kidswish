@@ -47,5 +47,8 @@ static readonly navigation = `${apiUrls.server}api/GetNavigation`;
     static readonly stockMasterController = `api/stock-master`;
     static readonly dispatchController = `api/dispatch`;
     static readonly clientManagementController = `api/client-management`;
+    static readonly receivableController = `api/receivable`;
+    static readonly notificationController = `api/notification`;
+    static readonly customerPricingController = `api/customer-pricing`;
 
 }

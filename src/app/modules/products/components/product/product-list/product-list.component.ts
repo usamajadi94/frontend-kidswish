@@ -23,6 +23,7 @@ export class ProductListComponent extends BaseRoutedComponent implements OnInit 
     columns = [
         { header: 'Name', name: 'Name', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Code', name: 'Code', isSort: true, isFilterList: true, type: 'text' },
+        { header: 'Carton Price', name: 'CartonPrice', isSort: true, isFilterList: false, type: 'text' },
         { header: 'Legal Entity', name: 'LegalEntityName', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Description', name: 'Description', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Modified By', name: 'ModifiedBy', isSort: true, isFilterList: true, type: 'text' },

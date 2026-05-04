@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BaseComponent } from 'app/core/Base/base/base.component';
 import { GenericService } from 'app/core/Base/services/generic.service';
 import { ToastService } from 'app/core/toaster/toast.service';
@@ -11,6 +12,7 @@ import { BftTextareaComponent } from 'app/modules/shared/components/fields/bft-t
 import { MessageModalService } from 'app/modules/shared/services/message.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { DrpService } from 'app/modules/shared/services/drp.service';
+import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { PaymentTransaction } from '../../models/payment-transaction';
@@ -24,6 +26,8 @@ import { PaymentTransaction } from '../../models/payment-transaction';
 })
 export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, MakePaymentFormComponent> {
     private _drpService = inject(DrpService);
+    private _http = inject(HttpClient);
+    private _localStorage = inject(LocalStorageService);
 
     paymentTypes = [
         { ID: 'Cash', Name: 'Cash' },
@@ -34,6 +38,12 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
 
     bankAccounts: any[] = [];
     vendors: any[] = [];
+    pettyCashList: any[] = [];
+    expenseCategories: any[] = [];
+
+    isDailyExpense = false;
+    dailyExpensePettyCashID: number | null = null;
+    dailyExpenseCategoryID: number | null = null;
 
     constructor(
         private genSer: GenericService,
@@ -51,6 +61,8 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         super.ngOnInit();
         this._drpService.getBankAccountDrp().subscribe({ next: (res: any) => { this.bankAccounts = res; } });
         this._drpService.getVendorDrp().subscribe({ next: (res: any) => { this.vendors = res; } });
+        this._drpService.getPettyCashDrp().subscribe({ next: (res: any) => { this.pettyCashList = res; } });
+        this._drpService.getExpenseCategoryDrp().subscribe({ next: (res: any) => { this.expenseCategories = res; } });
     }
 
     public override InitializeObject(): void {
@@ -62,10 +74,47 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
     }
 
     override BeforeUpSert(): void {
-        this.formData.TransactionType = 'payment';
-        this.formData.FromPartyType = 'bank_account';
-        this.formData.ToPartyType = 'vendor';
-        this.formData.SCode = 'pay_02';
+        if (this.isDailyExpense) {
+            // Entry 1: topup — bank → petty cash (vendor is tracked on expense entry, not here)
+            this.formData.TransactionType = 'topup';
+            this.formData.FromPartyType = 'bank_account';
+            this.formData.ToPartyType = 'petty_cash';
+            this._vendorIdForExpense = this.formData.ToPartyID; // save before overwrite
+            this.formData.ToPartyID = this.dailyExpensePettyCashID;
+            this.formData.SCode = 'pay_03';
+        } else {
+            this.formData.TransactionType = 'payment';
+            this.formData.FromPartyType = 'bank_account';
+            this.formData.ToPartyType = 'vendor';
+            this.formData.SCode = 'pay_02';
+        }
+    }
+
+    private _vendorIdForExpense: number | null = null;
+
+    override AfterUpsert(data: PaymentTransaction): void {
+        if (!this.isDailyExpense) return;
+
+        // Entry 2: expense from petty cash account
+        const headers = new HttpHeaders({
+            uid: this._localStorage.uid,
+            cid: this._localStorage.cid,
+            eid: this._localStorage.eid,
+        });
+
+        const expense = {
+            Date: this.formData.Date,
+            Amount: this.formData.Amount,
+            PettyCashID: this.dailyExpensePettyCashID,
+            ExpenseCategoryID: this.dailyExpenseCategoryID,
+            VendorID: this._vendorIdForExpense || null,
+            Notes: this.formData.Notes || null,
+            SCode: componentRegister.expense?.SCode || 'set_05',
+        };
+
+        this._http.post(`${apiUrls.server}${apiUrls.expenseController}`, expense, { headers }).subscribe({
+            error: (e) => console.error('Failed to create expense entry:', e),
+        });
     }
 
     override ValidateBeforeSave(formData: PaymentTransaction): boolean {
@@ -74,7 +123,12 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         if (!formData.Amount || formData.Amount <= 0) this.validation.push('Amount must be greater than 0.');
         if (!formData.PaymentType) this.validation.push('Payment Type is required.');
         if (!formData.FromPartyID) this.validation.push('Bank Account is required.');
-        if (!formData.ToPartyID) this.validation.push('Vendor is required.');
+        if (this.isDailyExpense) {
+            if (!this.dailyExpensePettyCashID) this.validation.push('Daily Expense Account is required.');
+            if (!this.dailyExpenseCategoryID) this.validation.push('Expense Category is required.');
+        } else {
+            if (!formData.ToPartyID) this.validation.push('Vendor is required.');
+        }
         return this.validation.length > 0;
     }
 }

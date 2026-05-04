@@ -30,7 +30,6 @@ export class ModalService {
       nzClassName: 'bft-form',
       nzWidth: width,
       nzMaskClosable: false,
-      nzOnCancel: () => this.confirmBeforeClose(modalRef)  // 👈 handle cancel here
     });
     return modalRef;
   }

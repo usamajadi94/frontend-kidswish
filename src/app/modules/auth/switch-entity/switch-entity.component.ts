@@ -66,7 +66,8 @@ export class SwitchEntityComponent implements OnInit {
                     this.__userService.clearUserCache();
                     this.__userService.getUser().subscribe((res) => {
                         this.__userService.setUserProfile(res.Data);
-                        this._router.navigate(['/dashboard']);
+                        const dest = this._localStorageService.isDistributor === 'true' ? '/orders/my-orders' : '/dashboard';
+                        this._router.navigate([dest]);
                     })
                 }
             })

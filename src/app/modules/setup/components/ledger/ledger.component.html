@@ -72,7 +72,9 @@
                 } @else {
                     @for (row of rows; track row.ID) {
                         <tr class="transition-colors hover:bg-gray-50">
-                            <td class="px-4 py-2 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-gray-700 text-xs">
+                                {{ row.TransactionType === 'opening' ? '—' : (row.Date | date:'dd/MM/yyyy') }}
+                            </td>
                             <td class="px-4 py-2 whitespace-nowrap text-xs">
                                 <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {{ txBadgeClass(row.TransactionType) }}">
                                     {{ txLabel(row.TransactionType) }}
