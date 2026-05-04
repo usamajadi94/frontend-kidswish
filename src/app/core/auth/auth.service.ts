@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { UserService } from 'app/core/user/user.service';
+import { NavigationService } from 'app/core/navigation/navigation.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { BehaviorSubject, catchError, filter, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
 import { ApiResponse } from '../Base/interface/IResponses';
@@ -14,6 +15,7 @@ export class AuthService {
     private _authenticated: boolean = false;
     private _httpClient = inject(HttpClient);
     private _userService = inject(UserService);
+    private _navService = inject(NavigationService);
     private _localStorage = inject(LocalStorageService);
     private _router = inject(Router);
     private _activatedRoute = inject(ActivatedRoute);
@@ -135,8 +137,9 @@ export class AuthService {
         // Set the authenticated flag to false
         this._authenticated = false;
 
-        // Clear cached user so next login fetches fresh data
+        // Clear cached user and navigation so next login fetches fresh data
         this._userService.clearUserCache();
+        this._navService.clearCache();
 
         // Return the observable
         return of(true);

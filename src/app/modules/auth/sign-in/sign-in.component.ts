@@ -87,6 +87,7 @@ export class AuthSignInComponent implements OnInit {
                             if (manualRedirect) {
                                 this._router.navigateByUrl(manualRedirect);
                             } else {
+                                this._navService.clearCache();
                                 this._navService.get().subscribe(() => {
                                     const dest = this._ls.isDistributor === 'true' ? '/orders/my-orders' : '/dashboard';
                                     this._router.navigateByUrl(dest);
