@@ -6,6 +6,7 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { BftInputTextComponent } from '../../shared/components/fields/bft-input-text/bft-input-text.component';
 import { UserService } from 'app/core/user/user.service';
 import { LocalStorageService } from 'app/core/auth/localStorage.service';
+import { NavigationService } from 'app/core/navigation/navigation.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -22,6 +23,7 @@ export class SwitchEntityComponent implements OnInit {
         private _fuseConfirmationService: FuseConfirmationService,
         private __userService: UserService,
         private _localStorageService: LocalStorageService,
+        private _navService: NavigationService,
         private _router: Router
     ) {}
 
@@ -66,8 +68,11 @@ export class SwitchEntityComponent implements OnInit {
                     this.__userService.clearUserCache();
                     this.__userService.getUser().subscribe((res) => {
                         this.__userService.setUserProfile(res.Data);
-                        const dest = this._localStorageService.isDistributor === 'true' ? '/orders/my-orders' : '/dashboard';
-                        this._router.navigate([dest]);
+                        this._navService.clearCache();
+                        this._navService.get().subscribe(() => {
+                            const dest = this._localStorageService.isDistributor === 'true' ? '/orders/my-orders' : '/dashboard';
+                            this._router.navigate([dest]);
+                        });
                     })
                 }
             })
