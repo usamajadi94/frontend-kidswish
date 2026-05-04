@@ -16,6 +16,7 @@ import { ApiResponse } from 'app/core/Base/interface/IResponses';
 import { AuthService } from 'app/core/auth/auth.service';
 import { UserService } from 'app/core/user/user.service';
 import { LocalStorageService } from 'app/core/auth/localStorage.service';
+import { NavigationService } from 'app/core/navigation/navigation.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -52,6 +53,7 @@ export class AuthSignInComponent implements OnInit {
         private _router: Router,
         private _userService: UserService,
         private _ls: LocalStorageService,
+        private _navService: NavigationService,
     ) {}
 
     ngOnInit(): void {
@@ -81,10 +83,15 @@ export class AuthSignInComponent implements OnInit {
                         if (res.Data?.value[0].IsPasswordChange) {
                             this._router.navigateByUrl('/change-password');
                         } else {
-                            const redirectURL =
-                                this._activatedRoute.snapshot.queryParamMap.get('redirectURL') ||
-                                (this._ls.isDistributor === 'true' ? '/orders/my-orders' : '/dashboard');
-                            this._router.navigateByUrl(redirectURL);
+                            const manualRedirect = this._activatedRoute.snapshot.queryParamMap.get('redirectURL');
+                            if (manualRedirect) {
+                                this._router.navigateByUrl(manualRedirect);
+                            } else {
+                                this._navService.get().subscribe(() => {
+                                    const dest = this._ls.isDistributor === 'true' ? '/orders/my-orders' : '/dashboard';
+                                    this._router.navigateByUrl(dest);
+                                });
+                            }
                         }
                     });
                 }
