@@ -184,6 +184,7 @@
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 border-b">
                         <tr>
+                            <th class="w-8 px-2 py-2"></th>
                             <th class="text-center px-3 py-2 font-medium text-gray-600 w-10"></th>
                             <th class="text-left px-4 py-2 font-medium text-gray-600">Product</th>
                             <th class="text-right px-4 py-2 font-medium text-gray-600">Total</th>
@@ -195,7 +196,14 @@
                     </thead>
                     <tbody>
                         @for (row of stockList; track row.ID) {
-                        <tr class="border-b hover:bg-gray-50">
+                        <!-- Product Row -->
+                        <tr class="border-b hover:bg-gray-50 cursor-pointer" (click)="toggleExpand(row)">
+                            <td class="px-2 py-2 text-center">
+                                <mat-icon class="text-base text-gray-400 leading-none transition-transform duration-200"
+                                    [class.rotate-180]="expandedRows.has(row.ProductID)">
+                                    expand_more
+                                </mat-icon>
+                            </td>
                             <td class="px-3 py-2 text-center">
                                 <mat-icon [class]="stockColor(row.StockStatus)" [title]="stockLabel(row.StockStatus)" class="text-xl leading-none">
                                     {{ row.StockStatus === 'low' ? 'warning' : 'check_circle' }}
@@ -208,11 +216,57 @@
                             </td>
                             <td class="px-4 py-2 text-right text-gray-400 font-mono">{{ row.LowStockThreshold | number:'1.0-0' }}</td>
                             <td class="px-4 py-2 text-right text-gray-400 text-xs">{{ row.ModifiedDate | date:'dd MMM yy' }}</td>
-                            <td class="px-4 py-2 text-right">
-                                <button class="text-blue-500 hover:underline text-xs mr-3" (click)="openTxn(row)">History</button>
+                            <td class="px-4 py-2 text-right" (click)="$event.stopPropagation()">
                                 <button class="text-blue-500 hover:underline text-xs" (click)="openForm(row)">Settings</button>
                             </td>
                         </tr>
+                        <!-- Expanded History Row -->
+                        @if (expandedRows.has(row.ProductID)) {
+                        <tr class="border-b bg-gray-50">
+                            <td colspan="8" class="px-6 py-3">
+                                @if (loadingTxnRows.has(row.ProductID)) {
+                                    <p class="text-gray-400 text-xs py-2">Loading history...</p>
+                                } @else if ((productTxns.get(row.ProductID) || []).length === 0) {
+                                    <p class="text-gray-400 text-xs py-2">No transactions found for this product.</p>
+                                } @else {
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-xs">
+                                        <thead>
+                                            <tr class="text-gray-500 border-b border-gray-200">
+                                                <th class="text-left py-1.5 pr-4 font-medium">Date</th>
+                                                <th class="text-center py-1.5 pr-4 font-medium">Type</th>
+                                                <th class="text-right py-1.5 pr-4 font-medium">Qty</th>
+                                                <th class="text-right py-1.5 pr-4 font-medium">Before</th>
+                                                <th class="text-right py-1.5 pr-4 font-medium">After</th>
+                                                <th class="text-left py-1.5 pr-4 font-medium">Ref</th>
+                                                <th class="text-left py-1.5 font-medium">Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (t of productTxns.get(row.ProductID) || []; track t.ID) {
+                                            <tr class="border-b border-gray-100 hover:bg-white">
+                                                <td class="py-1.5 pr-4 text-gray-500">{{ t.Date | date:'dd MMM yy, HH:mm' }}</td>
+                                                <td class="py-1.5 pr-4 text-center">
+                                                    <span [class]="t.Type === 'IN'
+                                                        ? 'bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium'
+                                                        : 'bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-medium'">
+                                                        {{ t.Type }}
+                                                    </span>
+                                                </td>
+                                                <td class="py-1.5 pr-4 text-right font-mono">{{ t.Qty }}</td>
+                                                <td class="py-1.5 pr-4 text-right font-mono text-gray-400">{{ t.Before }}</td>
+                                                <td class="py-1.5 pr-4 text-right font-mono">{{ t.After }}</td>
+                                                <td class="py-1.5 pr-4 text-gray-500">{{ t.RefType }}</td>
+                                                <td class="py-1.5 text-gray-500">{{ t.Notes }}</td>
+                                            </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                }
+                            </td>
+                        </tr>
+                        }
                         }
                     </tbody>
                 </table>

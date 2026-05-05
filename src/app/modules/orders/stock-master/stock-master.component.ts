@@ -31,6 +31,10 @@ export class StockMasterComponent implements OnInit {
     editingId: number | null = null;
     errorMsg = '';
 
+    expandedRows = new Set<number>();
+    productTxns = new Map<number, any[]>();
+    loadingTxnRows = new Set<number>();
+
     // Daily add form
     addForm = { ProductID: null as any, Qty: null as any, Notes: '' };
 
@@ -48,6 +52,8 @@ export class StockMasterComponent implements OnInit {
 
     loadAll() {
         this.isLoading = true;
+        this.productTxns = new Map();
+        this.expandedRows = new Set();
         Promise.all([
             this._http.get<any[]>(`${apiUrls.server}${apiUrls.stockMasterController}`, { headers: this.authHeaders }).toPromise(),
             this._http.get<any[]>(`${apiUrls.server}${apiUrls.stockMasterController}/product-cards`, { headers: this.authHeaders }).toPromise(),
@@ -105,6 +111,35 @@ export class StockMasterComponent implements OnInit {
             `${apiUrls.server}${apiUrls.stockMasterController}/transactions${productId ? '?productId=' + productId : ''}`,
             { headers: this.authHeaders }
         ).subscribe({ next: (res) => { this.transactions = res || []; this.showTxn = true; } });
+    }
+
+    toggleExpand(row: any) {
+        const pid = row.ProductID;
+        if (this.expandedRows.has(pid)) {
+            this.expandedRows = new Set([...this.expandedRows].filter(p => p !== pid));
+            return;
+        }
+        this.expandedRows = new Set([...this.expandedRows, pid]);
+        if (!this.productTxns.has(pid)) {
+            this.loadingTxnRows = new Set([...this.loadingTxnRows, pid]);
+            this._http.get<any[]>(
+                `${apiUrls.server}${apiUrls.stockMasterController}/transactions?productId=${pid}`,
+                { headers: this.authHeaders }
+            ).subscribe({
+                next: (res) => {
+                    const m = new Map(this.productTxns);
+                    m.set(pid, res || []);
+                    this.productTxns = m;
+                    this.loadingTxnRows = new Set([...this.loadingTxnRows].filter(p => p !== pid));
+                },
+                error: () => {
+                    const m = new Map(this.productTxns);
+                    m.set(pid, []);
+                    this.productTxns = m;
+                    this.loadingTxnRows = new Set([...this.loadingTxnRows].filter(p => p !== pid));
+                },
+            });
+        }
     }
 
     stockColor(status: string) { return status === 'low' ? 'text-orange-500' : 'text-green-500'; }
