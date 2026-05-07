@@ -46,8 +46,25 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     }
 
     // ── Summary ──────────────────────────────────────────────────────────────
-    get totalInvoiced(): number  { return this.financialRows.reduce((s, r) => s + (+r.Debit   || 0), 0); }
-    get totalReceived(): number  { return this.financialRows.reduce((s, r) => s + (+r.Credit  || 0), 0); }
+    get filteredFinancialRows(): any[] {
+        if (!this.selectedStatuses.length) return this.financialRows;
+        const matchingIds = new Set(
+            this.orderItems
+                .filter(i => this.selectedStatuses.includes(i.Status))
+                .map(i => i.OrderID)
+        );
+        const filtered = this.financialRows.filter(r =>
+            r.Type === 'Payment' || matchingIds.has(r.OrderID)
+        );
+        let balance = 0;
+        return filtered.map(r => {
+            balance += (+r.Debit || 0) - (+r.Credit || 0);
+            return { ...r, Balance: balance };
+        });
+    }
+
+    get totalInvoiced(): number  { return this.filteredFinancialRows.reduce((s, r) => s + (+r.Debit   || 0), 0); }
+    get totalReceived(): number  { return this.filteredFinancialRows.reduce((s, r) => s + (+r.Credit  || 0), 0); }
     get closingBalance(): number { return this.totalInvoiced - this.totalReceived; }
 
     // ── Order ledger helpers ──────────────────────────────────────────────────
@@ -115,6 +132,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     onDateChange(dates: Date[]) {
         this.dateRange = dates || [];
         this.loadFinancial();
+        this.loadOrders();
     }
 
     loadAll() {
@@ -146,10 +164,12 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
         if (!this.selectedCustomer) return;
         this.isLoadingOrders = true;
         this.orderError = '';
-        this._http.get<any>(
-            `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomer}/orders`,
-            { headers: this.headers }
-        ).subscribe({
+        const from = this.dateRange?.[0]?.toISOString() || '';
+        const to   = this.dateRange?.[1]?.toISOString() || '';
+        let url = `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomer}/orders?`;
+        if (from) url += `from=${encodeURIComponent(from)}&`;
+        if (to)   url += `to=${encodeURIComponent(to)}&`;
+        this._http.get<any>(url, { headers: this.headers }).subscribe({
             next: (res: any) => {
                 if (res?.__error) {
                     this.orderError = res.__error;

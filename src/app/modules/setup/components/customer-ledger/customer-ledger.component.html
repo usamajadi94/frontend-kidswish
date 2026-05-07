@@ -100,12 +100,12 @@
                                 <tr>
                                     <td colspan="6" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
                                 </tr>
-                            } @else if (financialRows.length === 0) {
+                            } @else if (filteredFinancialRows.length === 0) {
                                 <tr>
                                     <td colspan="6" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found</td>
                                 </tr>
                             } @else {
-                                @for (row of financialRows; track row.ID) {
+                                @for (row of filteredFinancialRows; track row.ID) {
                                     <tr class="hover:bg-gray-50 transition-colors">
                                         <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
                                         <td class="px-3 py-1.5 text-xs">
@@ -135,7 +135,7 @@
                                 }
                             }
                         </tbody>
-                        @if (!isLoadingFinancial && financialRows.length > 0) {
+                        @if (!isLoadingFinancial && filteredFinancialRows.length > 0) {
                             <tfoot class="border-t-2 border-gray-300 bg-gray-50">
                                 <tr class="font-semibold text-gray-800">
                                     <td colspan="3" class="px-3 py-2 text-right text-xs">Total</td>
