@@ -127,16 +127,20 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     }
 
     ngOnInit() {
+        const now = new Date();
+        this.dateRange = [new Date(now.getFullYear(), now.getMonth(), 1), now];
         this._drpService.getCustomerInformationDrp().subscribe({ next: (res: any) => { this.customers = res || []; } });
         this.loadBalances();
     }
 
     loadBalances() {
         this.isLoadingBalances = true;
-        this._http.get<any[]>(
-            `${apiUrls.server}${apiUrls.customerLedgerController}`,
-            { headers: this.headers }
-        ).subscribe({
+        const from = this.dateRange?.[0]?.toISOString() || '';
+        const to   = this.dateRange?.[1]?.toISOString() || '';
+        let url = `${apiUrls.server}${apiUrls.customerLedgerController}?`;
+        if (from) url += `from=${encodeURIComponent(from)}&`;
+        if (to)   url += `to=${encodeURIComponent(to)}&`;
+        this._http.get<any[]>(url, { headers: this.headers }).subscribe({
             next: (res) => { this.customerBalances = res || []; this.isLoadingBalances = false; },
             error: () => { this.isLoadingBalances = false; },
         });
@@ -156,8 +160,12 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
 
     onDateChange(dates: Date[]) {
         this.dateRange = dates || [];
-        this.loadFinancial();
-        this.loadOrders();
+        if (this.selectedCustomer) {
+            this.loadFinancial();
+            this.loadOrders();
+        } else {
+            this.loadBalances();
+        }
     }
 
     loadAll() {
