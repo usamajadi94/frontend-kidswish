@@ -10,4 +10,5 @@ export class PaymentTransaction {
     TransactionType: string = '';
     Notes: string = '';
     SCode: string = '';
+    OrderID: number = null;
 }

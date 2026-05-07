@@ -13,8 +13,14 @@
             [(ngModel)]="formData.FromPartyType" [clearable]="true" [skeleton]="isDataLoading"
             (ngModelChange)="onFromTypeChange()" [disabled]="isView" />
         <bft-select name="FromPartyID" label="From" [displayList]="fromList" valueField="ID" displayField="Name"
-            [(ngModel)]="formData.FromPartyID" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+            [(ngModel)]="formData.FromPartyID" [clearable]="true" [skeleton]="isDataLoading"
+            (ngModelChange)="onFromPartyChange()" [disabled]="isView" />
     </div>
+
+    @if (formData.FromPartyType === 'customer' && formData.FromPartyID) {
+        <bft-select name="OrderID" label="Order" [displayList]="customerOrders" valueField="ID" displayField="Name"
+            [(ngModel)]="formData.OrderID" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+    }
 
     <div class="grid grid-cols-2 gap-4">
         <bft-select name="ToPartyType" label="To Type" [displayList]="toPartyTypes" valueField="ID" displayField="Name"

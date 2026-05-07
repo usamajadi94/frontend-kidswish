@@ -47,6 +47,7 @@ export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransacti
 
     fromList: any[] = [];
     toList: any[] = [];
+    customerOrders: any[] = [];
 
     constructor(
         private genSer: GenericService,
@@ -78,11 +79,28 @@ export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransacti
     override AfterGetData(): void {
         this.refreshFromList();
         this.refreshToList();
+        if (this.formData.FromPartyType === 'customer' && this.formData.FromPartyID) {
+            this._drpService.getOrdersByCustomerDrp(this.formData.FromPartyID).subscribe({
+                next: (res: any) => { this.customerOrders = res; },
+            });
+        }
     }
 
     onFromTypeChange(): void {
         this.formData.FromPartyID = null;
+        this.formData.OrderID = null;
+        this.customerOrders = [];
         this.refreshFromList();
+    }
+
+    onFromPartyChange(): void {
+        this.formData.OrderID = null;
+        this.customerOrders = [];
+        if (this.formData.FromPartyType === 'customer' && this.formData.FromPartyID) {
+            this._drpService.getOrdersByCustomerDrp(this.formData.FromPartyID).subscribe({
+                next: (res: any) => { this.customerOrders = res; },
+            });
+        }
     }
 
     onToTypeChange(): void {
