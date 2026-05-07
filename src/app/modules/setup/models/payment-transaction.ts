@@ -1,7 +1,7 @@
 export class PaymentTransaction {
     ID: number = 0;
     Date: string = '';
-    Amount: number = 0;
+    Amount: any = null;
     PaymentType: string = '';
     FromPartyType: string = null;
     FromPartyID: number = null;

@@ -2,32 +2,33 @@
 
     <div class="grid grid-cols-2 gap-4">
         <bft-input-date name="Date" label="Date" [(ngModel)]="formData.Date" [required]="true" [skeleton]="isDataLoading" [disabled]="isView" />
-        <bft-input-currency name="Amount" label="Amount" symbol="PKR" [(ngModel)]="formData.Amount" [skeleton]="isDataLoading" [disabled]="isView" />
+        <bft-input-currency name="Amount" label="Amount" symbol="PKR" [(ngModel)]="formData.Amount" [required]="true" [skeleton]="isDataLoading" [disabled]="isView" />
     </div>
 
-    <bft-select name="PaymentType" label="Payment Type" [displayList]="paymentTypes" valueField="ID" displayField="Name"
-        [(ngModel)]="formData.PaymentType" [skeleton]="isDataLoading" [disabled]="isView" />
+    <div class="grid grid-cols-2 gap-4">
+        <bft-select name="PaymentType" label="Payment Type" [displayList]="paymentTypes" valueField="ID" displayField="Name"
+            [(ngModel)]="formData.PaymentType" [required]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+        @if (formData.FromPartyType === 'customer' && formData.FromPartyID) {
+            <bft-select name="OrderID" label="Order" [displayList]="customerOrders" valueField="ID" displayField="Name"
+                [(ngModel)]="formData.OrderID" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+        }
+    </div>
 
     <div class="grid grid-cols-2 gap-4">
         <bft-select name="FromPartyType" label="From Type" [displayList]="fromPartyTypes" valueField="ID" displayField="Name"
-            [(ngModel)]="formData.FromPartyType" [clearable]="true" [skeleton]="isDataLoading"
+            [(ngModel)]="formData.FromPartyType" [required]="true" [clearable]="true" [skeleton]="isDataLoading"
             (ngModelChange)="onFromTypeChange()" [disabled]="isView" />
         <bft-select name="FromPartyID" label="From" [displayList]="fromList" valueField="ID" displayField="Name"
-            [(ngModel)]="formData.FromPartyID" [clearable]="true" [skeleton]="isDataLoading"
+            [(ngModel)]="formData.FromPartyID" [required]="true" [clearable]="true" [skeleton]="isDataLoading"
             (ngModelChange)="onFromPartyChange()" [disabled]="isView" />
     </div>
 
-    @if (formData.FromPartyType === 'customer' && formData.FromPartyID) {
-        <bft-select name="OrderID" label="Order" [displayList]="customerOrders" valueField="ID" displayField="Name"
-            [(ngModel)]="formData.OrderID" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
-    }
-
     <div class="grid grid-cols-2 gap-4">
         <bft-select name="ToPartyType" label="To Type" [displayList]="toPartyTypes" valueField="ID" displayField="Name"
-            [(ngModel)]="formData.ToPartyType" [clearable]="true" [skeleton]="isDataLoading"
+            [(ngModel)]="formData.ToPartyType" [required]="true" [clearable]="true" [skeleton]="isDataLoading"
             (ngModelChange)="onToTypeChange()" [disabled]="isView" />
         <bft-select name="ToPartyID" label="To" [displayList]="toList" valueField="ID" displayField="Name"
-            [(ngModel)]="formData.ToPartyID" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+            [(ngModel)]="formData.ToPartyID" [required]="true" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
     </div>
 
     <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes" [skeleton]="isDataLoading" [disabled]="isView" />

@@ -134,6 +134,10 @@ export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransacti
         if (!formData.Date) this.validation.push('Date is required.');
         if (!formData.Amount || formData.Amount <= 0) this.validation.push('Amount must be greater than 0.');
         if (!formData.PaymentType) this.validation.push('Payment Type is required.');
+        if (!formData.FromPartyType) this.validation.push('From Type is required.');
+        if (!formData.FromPartyID) this.validation.push('From is required.');
+        if (!formData.ToPartyType) this.validation.push('To Type is required.');
+        if (!formData.ToPartyID) this.validation.push('To is required.');
         return this.validation.length > 0;
     }
 }

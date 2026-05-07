@@ -4,6 +4,6 @@ export class BankAccount {
     Type: string = '';
     Owner: string = '';
     Description: string = '';
-    OpeningBalance: number = 0;
+    OpeningBalance: any = null;
     SCode: string = 'set_06';
 }
