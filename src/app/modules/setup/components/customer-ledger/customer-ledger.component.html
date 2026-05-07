@@ -30,16 +30,6 @@
     </div>
 
     @if (!selectedCustomer) {
-        <!-- Date filter for balances -->
-        <div class="mb-3 flex items-center justify-between shrink-0">
-            <h2 class="text-sm font-semibold text-gray-700">Customer Balances</h2>
-            <nz-range-picker
-                [(ngModel)]="dateRange"
-                (ngModelChange)="onDateChange($event)"
-                nzFormat="dd/MM/yyyy"
-                [nzPlaceHolder]="['From Date', 'To Date']">
-            </nz-range-picker>
-        </div>
         <!-- All Customers Balances -->
         <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm">
             <table class="min-w-full divide-y divide-gray-200 text-sm">

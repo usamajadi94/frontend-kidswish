@@ -135,12 +135,10 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
 
     loadBalances() {
         this.isLoadingBalances = true;
-        const from = this.dateRange?.[0]?.toISOString() || '';
-        const to   = this.dateRange?.[1]?.toISOString() || '';
-        let url = `${apiUrls.server}${apiUrls.customerLedgerController}?`;
-        if (from) url += `from=${encodeURIComponent(from)}&`;
-        if (to)   url += `to=${encodeURIComponent(to)}&`;
-        this._http.get<any[]>(url, { headers: this.headers }).subscribe({
+        this._http.get<any[]>(
+            `${apiUrls.server}${apiUrls.customerLedgerController}`,
+            { headers: this.headers }
+        ).subscribe({
             next: (res) => { this.customerBalances = res || []; this.isLoadingBalances = false; },
             error: () => { this.isLoadingBalances = false; },
         });
@@ -160,12 +158,8 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
 
     onDateChange(dates: Date[]) {
         this.dateRange = dates || [];
-        if (this.selectedCustomer) {
-            this.loadFinancial();
-            this.loadOrders();
-        } else {
-            this.loadBalances();
-        }
+        this.loadFinancial();
+        this.loadOrders();
     }
 
     loadAll() {
