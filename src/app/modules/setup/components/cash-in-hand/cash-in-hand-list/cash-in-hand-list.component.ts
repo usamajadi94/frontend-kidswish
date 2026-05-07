@@ -5,22 +5,26 @@ import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-bu
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { ListService } from 'app/modules/shared/services/list.service';
+import { DrpService } from 'app/modules/shared/services/drp.service';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { FormsModule } from '@angular/forms';
 import { CashInHandFormComponent } from '../cash-in-hand-form.component';
 
 @Component({
     selector: 'app-cash-in-hand-list',
     standalone: true,
-    imports: [BftTableComponent, WrapperAddComponent, BftButtonComponent, NzDatePickerModule, FormsModule],
+    imports: [BftTableComponent, WrapperAddComponent, BftButtonComponent, NzDatePickerModule, NzDropDownModule, FormsModule],
     templateUrl: './cash-in-hand-list.component.html',
 })
 export class CashInHandListComponent extends BaseRoutedComponent {
     private modalService = inject(ModalService);
     private _listService = inject(ListService);
+    private _drp = inject(DrpService);
     title: string = componentRegister.cashInHand.Title;
     isVisible: boolean = false;
+    paymentCategories: any[] = [];
     columns = [
         { header: 'Date', name: 'Date', isSort: true, isFilterList: true, type: 'date' },
         { header: 'Category', name: 'Category', isSort: true, isFilterList: true, type: 'text' },
@@ -39,6 +43,7 @@ export class CashInHandListComponent extends BaseRoutedComponent {
         const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
         const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
         this.date = [firstDay, lastDay];
+        this._drp.getPaymentCategoryDrp().subscribe({ next: (res: any) => { this.paymentCategories = res; } });
         this.getData();
     }
 
@@ -65,11 +70,12 @@ export class CashInHandListComponent extends BaseRoutedComponent {
         });
     }
 
-    addNew() {
+    addNew(categoryID: number) {
         this.modalService.openModal({
             component: CashInHandFormComponent,
             title: this.title,
             ID: null,
+            Data: { PaymentCategoryID: categoryID },
         }).afterClose.subscribe((res: boolean) => {
             if (res) this.getData();
         });

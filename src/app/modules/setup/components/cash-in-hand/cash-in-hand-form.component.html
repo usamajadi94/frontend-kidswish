@@ -2,7 +2,7 @@
     <div class="grid grid-cols-2 gap-4">
         <bft-select name="PaymentCategoryID" label="Category" [displayList]="paymentCategories"
             valueField="ID" displayField="Description" [(ngModel)]="formData.PaymentCategoryID"
-            [required]="true" [skeleton]="isDataLoading" [disabled]="isView"
+            [required]="true" [skeleton]="isDataLoading" [disabled]="isView || isCategoryLocked"
             (ngModelChange)="onCategoryChange()" />
         @if (isDailyExpense) {
             <bft-select name="ExpenseCategoryID" label="Sub Category" [displayList]="expenseCategories"

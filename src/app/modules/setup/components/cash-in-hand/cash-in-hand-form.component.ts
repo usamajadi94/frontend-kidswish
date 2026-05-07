@@ -31,6 +31,7 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
     expenseCategories: any[] = [];
     vendors: any[] = [];
 
+    isCategoryLocked = false;
     selectedFile: File | null = null;
     isUploading = false;
     uploadError = '';
@@ -57,6 +58,14 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
     public override InitializeObject(): void {
         this.formData = new CashInHand();
         this.formData.Date = new Date() as any;
+    }
+
+    public override async AfterDisplay(): Promise<void> {
+        const preSelected = this.nzModalData?.Data?.PaymentCategoryID;
+        if (preSelected) {
+            this.formData.PaymentCategoryID = preSelected;
+            this.isCategoryLocked = true;
+        }
     }
 
     get isDailyExpense(): boolean {

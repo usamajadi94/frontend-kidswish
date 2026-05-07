@@ -10,7 +10,17 @@
         </div>
         <bft-table [dataSource]="data" [(isVisible)]="isVisible" [columns]="columns" (view)="onView($event)" currency="PKR">
             <wrapper-add [SCode]="SCode">
-                <bft-button name="New" accessKey="n" svgIcon="mat_solid:add" (onClick)="addNew()" />
+                <button nz-button nz-dropdown [nzDropdownMenu]="categoryMenu" nzType="primary" class="flex items-center gap-1">
+                    <span>+ New</span>
+                    <span nz-icon nzType="down"></span>
+                </button>
+                <nz-dropdown-menu #categoryMenu="nzDropdownMenu">
+                    <ul nz-menu>
+                        @for (cat of paymentCategories; track cat.ID) {
+                            <li nz-menu-item (click)="addNew(cat.ID)">{{ cat.Description }}</li>
+                        }
+                    </ul>
+                </nz-dropdown-menu>
             </wrapper-add>
             <bft-button class="ml-3" name="Setting" svgIcon="mat_solid:settings" (onClick)="isVisible = true" />
             <bft-button class="ml-3" name="Export" svgIcon="feather:file" />
