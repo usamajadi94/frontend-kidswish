@@ -135,41 +135,71 @@
                 <h3 class="font-medium">Stock Transactions</h3>
                 <button mat-icon-button (click)="showTxn = false"><mat-icon>close</mat-icon></button>
             </div>
-            @if (transactions.length === 0) {
+            <!-- Filters -->
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+                <label class="text-xs font-medium text-gray-600">From</label>
+                <input type="date" [(ngModel)]="txnFrom" (change)="applyTxnFilter()"
+                    class="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                <label class="text-xs font-medium text-gray-600">To</label>
+                <input type="date" [(ngModel)]="txnTo" (change)="applyTxnFilter()"
+                    class="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                <select [(ngModel)]="txnProduct" (change)="applyTxnFilter()"
+                    class="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <option value="">All Products</option>
+                    @for (p of productsDrp; track p.ID) {
+                        <option [value]="p.Name">{{ p.Name }}</option>
+                    }
+                </select>
+                @if (txnFrom || txnTo || txnProduct) {
+                    <button class="text-xs text-gray-500 hover:text-red-500 underline" (click)="clearTxnFilter()">Clear</button>
+                }
+                <span class="text-xs text-gray-400 ml-1">{{ filteredTransactions.length }} record(s)</span>
+            </div>
+            @if (filteredTransactions.length === 0) {
                 <p class="text-gray-400 text-sm text-center py-4">No transactions found.</p>
             } @else {
+            <div class="overflow-y-auto max-h-[480px]">
             <table class="w-full text-sm">
-                <thead class="bg-gray-50 border-b">
+                <thead class="bg-gray-50 border-b sticky top-0">
                     <tr>
-                        <th class="text-left px-3 py-2 text-xs font-medium text-gray-600">Date</th>
-                        <th class="text-left px-3 py-2 text-xs font-medium text-gray-600">Product</th>
-                        <th class="text-center px-3 py-2 text-xs font-medium text-gray-600">Type</th>
-                        <th class="text-right px-3 py-2 text-xs font-medium text-gray-600">Qty</th>
-                        <th class="text-right px-3 py-2 text-xs font-medium text-gray-600">Before</th>
-                        <th class="text-right px-3 py-2 text-xs font-medium text-gray-600">After</th>
-                        <th class="text-left px-3 py-2 text-xs font-medium text-gray-600">Ref</th>
-                        <th class="text-left px-3 py-2 text-xs font-medium text-gray-600">Notes</th>
+                        <th class="text-left px-4 py-2.5 text-sm font-semibold text-gray-700">Date</th>
+                        <th class="text-left px-4 py-2.5 text-sm font-semibold text-gray-700">Product</th>
+                        <th class="text-center px-4 py-2.5 text-sm font-semibold text-gray-700">Type</th>
+                        <th class="text-right px-4 py-2.5 text-sm font-semibold text-gray-700">Qty</th>
+                        <th class="text-right px-4 py-2.5 text-sm font-semibold text-gray-700">Before</th>
+                        <th class="text-right px-4 py-2.5 text-sm font-semibold text-gray-700">After</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @for (t of transactions; track t.ID) {
+                    @for (t of filteredTransactions; track t.ID) {
                     <tr class="border-b hover:bg-gray-50">
-                        <td class="px-3 py-1.5 text-xs text-gray-500">{{ t.Date | date:'dd MMM HH:mm' }}</td>
-                        <td class="px-3 py-1.5 font-medium">{{ t.ProductName }}</td>
-                        <td class="px-3 py-1.5 text-center">
-                            <span [class]="t.Type === 'IN' ? 'bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium' : 'bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-medium'">
+                        <td class="px-4 py-2.5 text-sm text-gray-500">{{ t.Date | date:'dd MMM yyyy, HH:mm' }}</td>
+                        <td class="px-4 py-2.5 text-sm font-medium text-gray-800">{{ t.ProductName }}</td>
+                        <td class="px-4 py-2.5 text-center">
+                            <span [class]="t.Type === 'IN' ? 'bg-green-100 text-green-700 px-2.5 py-1 rounded text-xs font-semibold' : 'bg-red-100 text-red-700 px-2.5 py-1 rounded text-xs font-semibold'">
                                 {{ t.Type }}
                             </span>
                         </td>
-                        <td class="px-3 py-1.5 text-right font-mono">{{ t.Qty }}</td>
-                        <td class="px-3 py-1.5 text-right text-gray-500 font-mono">{{ t.Before }}</td>
-                        <td class="px-3 py-1.5 text-right font-mono">{{ t.After }}</td>
-                        <td class="px-3 py-1.5 text-xs text-gray-500">{{ t.RefType }}</td>
-                        <td class="px-3 py-1.5 text-xs text-gray-500">{{ t.Notes }}</td>
+                        <td class="px-4 py-2.5 text-right text-sm font-mono font-semibold">{{ t.Qty }}</td>
+                        <td class="px-4 py-2.5 text-right text-sm text-gray-500 font-mono">{{ t.Before }}</td>
+                        <td class="px-4 py-2.5 text-right text-sm font-mono">{{ t.After }}</td>
                     </tr>
                     }
                 </tbody>
+                <tfoot class="bg-gray-50 border-t-2 border-gray-300 sticky bottom-0">
+                    <tr>
+                        <td colspan="3" class="px-4 py-2.5 text-sm font-semibold text-gray-600 text-right">Total IN</td>
+                        <td class="px-4 py-2.5 text-right font-mono font-bold text-green-700 text-sm">{{ txnTotalIn | number:'1.0-0' }}</td>
+                        <td colspan="2"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="px-4 py-2.5 text-sm font-semibold text-gray-600 text-right">Total OUT</td>
+                        <td class="px-4 py-2.5 text-right font-mono font-bold text-red-600 text-sm">{{ txnTotalOut | number:'1.0-0' }}</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
             </table>
+            </div>
             }
         </div>
         }
@@ -229,17 +259,15 @@
                                 } @else if ((productTxns.get(row.ProductID) || []).length === 0) {
                                     <p class="text-gray-400 text-xs py-2">No transactions found for this product.</p>
                                 } @else {
-                                <div class="overflow-x-auto">
+                                <div class="overflow-x-auto overflow-y-auto max-h-[420px]">
                                     <table class="w-full text-xs">
-                                        <thead>
+                                        <thead class="sticky top-0 bg-gray-50 z-10">
                                             <tr class="text-gray-500 border-b border-gray-200">
                                                 <th class="text-left py-1.5 pr-4 font-medium">Date</th>
                                                 <th class="text-center py-1.5 pr-4 font-medium">Type</th>
                                                 <th class="text-right py-1.5 pr-4 font-medium">Qty</th>
                                                 <th class="text-right py-1.5 pr-4 font-medium">Before</th>
-                                                <th class="text-right py-1.5 pr-4 font-medium">After</th>
-                                                <th class="text-left py-1.5 pr-4 font-medium">Ref</th>
-                                                <th class="text-left py-1.5 font-medium">Notes</th>
+                                                <th class="text-right py-1.5 font-medium">After</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -255,12 +283,22 @@
                                                 </td>
                                                 <td class="py-1.5 pr-4 text-right font-mono">{{ t.Qty }}</td>
                                                 <td class="py-1.5 pr-4 text-right font-mono text-gray-400">{{ t.Before }}</td>
-                                                <td class="py-1.5 pr-4 text-right font-mono">{{ t.After }}</td>
-                                                <td class="py-1.5 pr-4 text-gray-500">{{ t.RefType }}</td>
-                                                <td class="py-1.5 text-gray-500">{{ t.Notes }}</td>
+                                                <td class="py-1.5 text-right font-mono">{{ t.After }}</td>
                                             </tr>
                                             }
                                         </tbody>
+                                        <tfoot class="border-t-2 border-gray-300 bg-gray-100 sticky bottom-0">
+                                            <tr>
+                                                <td colspan="2" class="py-1.5 pr-4 text-right font-semibold text-gray-600">Total IN</td>
+                                                <td class="py-1.5 pr-4 text-right font-mono font-bold text-green-700">{{ productTxnTotals(row.ProductID).in | number:'1.0-0' }}</td>
+                                                <td colspan="2"></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="py-1.5 pr-4 text-right font-semibold text-gray-600">Total OUT</td>
+                                                <td class="py-1.5 pr-4 text-right font-mono font-bold text-red-600">{{ productTxnTotals(row.ProductID).out | number:'1.0-0' }}</td>
+                                                <td colspan="2"></td>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                                 }

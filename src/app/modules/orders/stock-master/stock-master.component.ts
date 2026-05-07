@@ -34,6 +34,25 @@ export class StockMasterComponent implements OnInit {
     expandedRows = new Set<number>();
     productTxns = new Map<number, any[]>();
     loadingTxnRows = new Set<number>();
+    txnFrom = '';
+    txnTo = '';
+    txnProduct = '';
+    filteredTransactions: any[] = [];
+
+    get txnTotalIn(): number { return this.filteredTransactions.filter(t => t.Type === 'IN').reduce((s, t) => s + (+t.Qty || 0), 0); }
+    get txnTotalOut(): number { return this.filteredTransactions.filter(t => t.Type !== 'IN').reduce((s, t) => s + (+t.Qty || 0), 0); }
+
+    applyTxnFilter() {
+        this.filteredTransactions = this.transactions.filter(t => {
+            const d = t.Date ? t.Date.substring(0, 10) : '';
+            if (this.txnFrom && d < this.txnFrom) return false;
+            if (this.txnTo && d > this.txnTo) return false;
+            if (this.txnProduct && t.ProductName !== this.txnProduct) return false;
+            return true;
+        });
+    }
+
+    clearTxnFilter() { this.txnFrom = ''; this.txnTo = ''; this.txnProduct = ''; this.applyTxnFilter(); }
 
     // Daily add form
     addForm = { ProductID: null as any, Qty: null as any, Notes: '' };
@@ -55,11 +74,11 @@ export class StockMasterComponent implements OnInit {
         this.productTxns = new Map();
         this.expandedRows = new Set();
         Promise.all([
-            this._http.get<any[]>(`${apiUrls.server}${apiUrls.stockMasterController}`, { headers: this.authHeaders }).toPromise(),
-            this._http.get<any[]>(`${apiUrls.server}${apiUrls.stockMasterController}/product-cards`, { headers: this.authHeaders }).toPromise(),
+            this._http.get<any[]>(`${apiUrls.server}${apiUrls.stockMasterController}`, { headers: this.authHeaders }).toPromise().then(r => r ?? []),
+            this._http.get<any[]>(`${apiUrls.server}${apiUrls.stockMasterController}/product-cards`, { headers: this.authHeaders }).toPromise().then(r => r ?? []),
         ]).then(([list, cards]) => {
-            this.stockList = list || [];
-            this.productCards = cards || [];
+            this.stockList = list;
+            this.productCards = cards;
             this.isLoading = false;
         }).catch(() => { this.isLoading = false; });
     }
@@ -110,7 +129,13 @@ export class StockMasterComponent implements OnInit {
         this._http.get<any[]>(
             `${apiUrls.server}${apiUrls.stockMasterController}/transactions${productId ? '?productId=' + productId : ''}`,
             { headers: this.authHeaders }
-        ).subscribe({ next: (res) => { this.transactions = res || []; this.showTxn = true; } });
+        ).subscribe({ next: (res) => {
+            this.transactions = res || [];
+            this.txnFrom = '';
+            this.txnTo = '';
+            this.filteredTransactions = this.transactions;
+            this.showTxn = true;
+        } });
     }
 
     toggleExpand(row: any) {
@@ -140,6 +165,14 @@ export class StockMasterComponent implements OnInit {
                 },
             });
         }
+    }
+
+    productTxnTotals(pid: number): { in: number; out: number } {
+        const txns = this.productTxns.get(pid) || [];
+        return {
+            in:  txns.filter(t => t.Type === 'IN').reduce((s, t) => s + (+t.Qty || 0), 0),
+            out: txns.filter(t => t.Type !== 'IN').reduce((s, t) => s + (+t.Qty || 0), 0),
+        };
     }
 
     stockColor(status: string) { return status === 'low' ? 'text-orange-500' : 'text-green-500'; }
