@@ -149,6 +149,29 @@
                     <h2 class="text-sm font-semibold text-gray-700">Order Ledger</h2>
                 </div>
 
+                <!-- Status Filter Chips -->
+                @if (!isLoadingOrders && uniqueStatuses.length > 0) {
+                    <div class="mb-2 flex flex-wrap gap-1.5 shrink-0">
+                        @for (s of uniqueStatuses; track s) {
+                            <button
+                                class="rounded-full px-3 py-0.5 text-xs font-medium border transition-all"
+                                [ngClass]="selectedStatuses.includes(s)
+                                    ? statusClass(s)
+                                    : 'bg-white text-gray-500 border-gray-300 hover:border-gray-400'"
+                                (click)="toggleStatus(s)">
+                                {{ s }}
+                            </button>
+                        }
+                        @if (selectedStatuses.length > 0) {
+                            <button
+                                class="rounded-full px-3 py-0.5 text-xs font-medium text-gray-400 hover:text-gray-600 border border-dashed border-gray-300"
+                                (click)="selectedStatuses = []">
+                                All
+                            </button>
+                        }
+                    </div>
+                }
+
                 <!-- Product Filter Chips -->
                 @if (!isLoadingOrders && uniqueProducts.length > 0) {
                     <div class="mb-3 flex flex-wrap gap-1.5 shrink-0">

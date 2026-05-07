@@ -34,6 +34,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     financialRows: any[] = [];
     orderItems: any[]    = [];
     selectedProducts: number[] = [];
+    selectedStatuses: string[] = [];
 
     get headers() {
         return new HttpHeaders({
@@ -53,6 +54,10 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
         const map = new Map<number, string>();
         this.orderItems.forEach(i => map.set(i.ProductID, i.ProductName));
         return [...map.entries()].map(([id, name]) => ({ id, name }));
+    }
+
+    get uniqueStatuses(): string[] {
+        return [...new Set(this.orderItems.map(i => i.Status).filter(Boolean))];
     }
 
     get groupedOrders(): any[] {
@@ -75,7 +80,11 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
             order.items.push(item);
             order.total += +item.Cartons || 0;
         }
-        return [...map.values()];
+        let orders = [...map.values()];
+        if (this.selectedStatuses.length) {
+            orders = orders.filter(o => this.selectedStatuses.includes(o.Status));
+        }
+        return orders;
     }
 
     ngOnInit() {
@@ -84,6 +93,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
 
     onCustomerChange() {
         this.selectedProducts = [];
+        this.selectedStatuses = [];
         this.loadAll();
     }
 
@@ -140,6 +150,12 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
         this.selectedProducts = this.selectedProducts.includes(id)
             ? this.selectedProducts.filter(p => p !== id)
             : [...this.selectedProducts, id];
+    }
+
+    toggleStatus(status: string) {
+        this.selectedStatuses = this.selectedStatuses.includes(status)
+            ? this.selectedStatuses.filter(s => s !== status)
+            : [...this.selectedStatuses, status];
     }
 
     statusClass(status: string): string {
