@@ -55,7 +55,7 @@ export class StockMasterComponent implements OnInit {
     clearTxnFilter() { this.txnFrom = ''; this.txnTo = ''; this.txnProduct = ''; this.applyTxnFilter(); }
 
     // Daily add form
-    addForm = { ProductID: null as any, Qty: null as any, Notes: '' };
+    addForm = { ProductID: null as any, Qty: null as any, Notes: '', Date: '' };
 
     // Edit threshold form
     form = { ProductID: null as any, TotalStock: null as any, AvailableStock: null as any, LowStockThreshold: null as any, Notes: '' };
@@ -84,7 +84,7 @@ export class StockMasterComponent implements OnInit {
     }
 
     openAdd() {
-        this.addForm = { ProductID: null, Qty: 0, Notes: '' };
+        this.addForm = { ProductID: null, Qty: 0, Notes: '', Date: new Date().toISOString().split('T')[0] };
         this.errorMsg = '';
         this.showAddForm = true;
         this.showEditForm = false;
