@@ -289,13 +289,22 @@
                                         </tbody>
                                         <tfoot class="border-t-2 border-gray-300 bg-gray-100 sticky bottom-0">
                                             <tr>
-                                                <td colspan="2" class="py-1.5 pr-4 text-right font-semibold text-gray-600">Total IN</td>
+                                                <td colspan="2" class="py-1.5 pr-4 text-right font-semibold text-gray-500 text-xs">Total IN</td>
                                                 <td class="py-1.5 pr-4 text-right font-mono font-bold text-green-700">{{ productTxnTotals(row.ProductID).in | number:'1.0-0' }}</td>
                                                 <td colspan="2"></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="2" class="py-1.5 pr-4 text-right font-semibold text-gray-600">Total OUT</td>
+                                                <td colspan="2" class="py-1.5 pr-4 text-right font-semibold text-gray-500 text-xs">Total OUT</td>
                                                 <td class="py-1.5 pr-4 text-right font-mono font-bold text-red-600">{{ productTxnTotals(row.ProductID).out | number:'1.0-0' }}</td>
+                                                <td colspan="2"></td>
+                                            </tr>
+                                            <tr class="border-t border-gray-300">
+                                                <td colspan="2" class="py-1.5 pr-4 text-right font-semibold text-gray-700 text-xs">Net</td>
+                                                <td class="py-1.5 pr-4 text-right font-mono font-bold"
+                                                    [class.text-green-700]="productTxnTotals(row.ProductID).net >= 0"
+                                                    [class.text-red-600]="productTxnTotals(row.ProductID).net < 0">
+                                                    {{ productTxnTotals(row.ProductID).net | number:'1.0-0' }}
+                                                </td>
                                                 <td colspan="2"></td>
                                             </tr>
                                         </tfoot>

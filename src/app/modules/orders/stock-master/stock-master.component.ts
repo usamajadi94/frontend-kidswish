@@ -167,12 +167,11 @@ export class StockMasterComponent implements OnInit {
         }
     }
 
-    productTxnTotals(pid: number): { in: number; out: number } {
+    productTxnTotals(pid: number): { in: number; out: number; net: number } {
         const txns = this.productTxns.get(pid) || [];
-        return {
-            in:  txns.filter(t => t.Type === 'IN').reduce((s, t) => s + (+t.Qty || 0), 0),
-            out: txns.filter(t => t.Type !== 'IN').reduce((s, t) => s + (+t.Qty || 0), 0),
-        };
+        const totalIn  = txns.filter(t => t.Type === 'IN').reduce((s, t) => s + (+t.Qty || 0), 0);
+        const totalOut = txns.filter(t => t.Type !== 'IN').reduce((s, t) => s + (+t.Qty || 0), 0);
+        return { in: totalIn, out: totalOut, net: totalIn - totalOut };
     }
 
     stockColor(status: string) { return status === 'low' ? 'text-orange-500' : 'text-green-500'; }
