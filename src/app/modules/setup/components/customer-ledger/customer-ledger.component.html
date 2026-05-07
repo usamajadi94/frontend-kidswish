@@ -178,8 +178,8 @@
                         Loading orders...
                     </div>
                 } @else if (orderError) {
-                    <div class="flex flex-1 items-center justify-center py-12 text-red-400 text-sm">
-                        Failed to load orders
+                    <div class="py-4 px-3 text-red-500 text-xs break-all rounded bg-red-50 border border-red-200">
+                        {{ orderError }}
                     </div>
                 } @else if (groupedOrders.length === 0) {
                     <div class="flex flex-1 items-center justify-center text-gray-400 text-sm py-12">
