@@ -35,6 +35,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     orderItems: any[]    = [];
     selectedProducts: number[] = [];
     selectedStatuses: string[] = [];
+    selectedOrderID: number | null = null;
 
     get headers() {
         return new HttpHeaders({
@@ -60,10 +61,21 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
         return [...new Set(this.orderItems.map(i => i.Status).filter(Boolean))];
     }
 
+    get allOrdersForDrp(): { id: number; label: string }[] {
+        const map = new Map<number, string>();
+        this.orderItems.forEach(i => {
+            if (!map.has(i.OrderID)) map.set(i.OrderID, i.InvoiceNo || ('#' + i.OrderID));
+        });
+        return [...map.entries()].map(([id, label]) => ({ id, label }));
+    }
+
     get groupedOrders(): any[] {
-        const filtered = this.selectedProducts.length
-            ? this.orderItems.filter(i => this.selectedProducts.includes(i.ProductID))
+        const preFiltered = this.selectedOrderID
+            ? this.orderItems.filter(i => i.OrderID === this.selectedOrderID)
             : this.orderItems;
+        const filtered = this.selectedProducts.length
+            ? preFiltered.filter(i => this.selectedProducts.includes(i.ProductID))
+            : preFiltered;
         const map = new Map<number, any>();
         for (const item of filtered) {
             if (!map.has(item.OrderID)) {
@@ -94,6 +106,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     onCustomerChange() {
         this.selectedProducts = [];
         this.selectedStatuses = [];
+        this.selectedOrderID = null;
         this.loadAll();
     }
 
