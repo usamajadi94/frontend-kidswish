@@ -61,6 +61,10 @@ export class OrderDetailComponent implements OnInit {
         });
     }
 
+    editOrder() {
+        this._router.navigate(['/orders/order-edit', this.order.ID]);
+    }
+
     markInProcess() {
         this.isUpdatingStatus = true;
         this.statusError = '';
@@ -193,6 +197,7 @@ export class OrderDetailComponent implements OnInit {
     }
 
     goBack() {
-        this._router.navigate([window.history.length > 1 ? '..' : '/orders/order-list'], { relativeTo: this._route });
+        const dest = this._localStorage.isDistributor === 'true' ? '/orders/my-orders' : '/orders/order-list';
+        this._router.navigate([dest]);
     }
 }

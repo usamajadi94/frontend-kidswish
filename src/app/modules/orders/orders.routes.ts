@@ -10,6 +10,10 @@ export default [
         loadComponent: () => import('./order-submit/order-submit.component').then(m => m.OrderSubmitComponent),
     },
     {
+        path: 'order-edit/:id',
+        loadComponent: () => import('./order-submit/order-submit.component').then(m => m.OrderSubmitComponent),
+    },
+    {
         path: 'my-orders',
         loadComponent: () => import('./order-list/order-list.component').then(m => m.OrderListComponent),
         data: { title: 'My Orders', showSubmitBtn: true },
@@ -33,5 +37,9 @@ export default [
     {
         path: 'dispatch-list',
         loadComponent: () => import('./dispatch-list/dispatch-list.component').then(m => m.DispatchListComponent),
+    },
+    {
+        path: 'customer-ledger',
+        loadComponent: () => import('./customer-ledger/customer-ledger.component').then(m => m.CustomerLedgerComponent),
     },
 ] as Routes;

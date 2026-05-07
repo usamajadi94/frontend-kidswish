@@ -27,8 +27,9 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     customers: any[] = [];
     selectedCustomer: any = null;
     dateRange: Date[] = [];
-    rows: any[] = [];
+    rawRows: any[] = [];
     isLoading = false;
+    filterOrder = '';
 
     get authHeaders() {
         return new HttpHeaders({
@@ -38,8 +39,30 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
         });
     }
 
-    get totalInvoiced(): number  { return this.rows.reduce((s, r) => s + (+r.Invoiced  || 0), 0); }
-    get totalReceived(): number  { return this.rows.reduce((s, r) => s + (+r.Received  || 0), 0); }
+    get orderOptions(): string[] {
+        return [...new Set(
+            this.rawRows
+                .filter(r => r.Type === 'Receivable' && r.Notes)
+                .map(r => r.Notes as string)
+        )];
+    }
+
+    get rows(): any[] {
+        const source = this.filterOrder
+            ? this.rawRows.filter(r => r.Type !== 'Receivable' || r.Notes === this.filterOrder)
+            : this.rawRows;
+
+        let balance = 0;
+        return source.map(r => {
+            const inv = r.Type === 'Receivable' ? (+r.Amount || 0) : 0;
+            const pay = r.Type === 'Payment'    ? (+r.Amount || 0) : 0;
+            balance += inv - pay;
+            return { ...r, Invoiced: inv, Received: pay, Balance: balance };
+        });
+    }
+
+    get totalInvoiced(): number  { return this.rows.reduce((s, r) => s + (r.Invoiced  || 0), 0); }
+    get totalReceived(): number  { return this.rows.reduce((s, r) => s + (r.Received  || 0), 0); }
     get closingBalance(): number { return this.totalInvoiced - this.totalReceived; }
 
     ngOnInit() {
@@ -49,6 +72,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
 
     load() {
         this.isLoading = true;
+        this.filterOrder = '';
         const from = this.dateRange?.[0]?.toISOString() || '';
         const to   = this.dateRange?.[1]?.toISOString() || '';
 
@@ -58,16 +82,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
         if (to)   url += `to=${encodeURIComponent(to)}&`;
 
         this._http.get<any[]>(url, { headers: this.authHeaders }).subscribe({
-            next: (res) => {
-                let balance = 0;
-                this.rows = (res || []).map(r => {
-                    const inv = r.Type === 'Receivable' ? (+r.Amount || 0) : 0;
-                    const pay = r.Type === 'Payment'    ? (+r.Amount || 0) : 0;
-                    balance += inv - pay;
-                    return { ...r, Invoiced: inv, Received: pay, Balance: balance };
-                });
-                this.isLoading = false;
-            },
+            next: (res) => { this.rawRows = res || []; this.isLoading = false; },
             error: () => { this.isLoading = false; },
         });
     }
@@ -78,6 +93,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     clearFilters() {
         this.selectedCustomer = null;
         this.dateRange = [];
+        this.filterOrder = '';
         this.load();
     }
 

@@ -95,16 +95,21 @@ export class CompactLayoutComponent implements OnInit, OnDestroy {
 
         const cleanUrl = url.split('?')[0];
 
+        const urlBaseSegment = cleanUrl.split('/').slice(0, 2).join('/');
+
         for (const group of this.navigation.default) {
             const children: FuseNavigationItem[] = (group.children || []).filter(
                 (c: FuseNavigationItem) => c.link && c.type === 'basic',
             );
-            // Match by exact link — avoids false positives when multiple groups share the same URL prefix (e.g. /setup/)
-            const belongs = children.some(c =>
-                cleanUrl === c.link ||
-                cleanUrl.startsWith(c.link + '/') ||
-                cleanUrl.startsWith(c.link + '?'),
-            );
+            const belongs = children.some(c => {
+                if (!c.link) return false;
+                if (cleanUrl === c.link) return true;
+                if (cleanUrl.startsWith(c.link + '/')) return true;
+                if (cleanUrl.startsWith(c.link + '?')) return true;
+                // Also match detail/sub-pages that share the same top-level segment (e.g. /orders/order-detail/:id → /orders)
+                const linkBaseSegment = c.link.split('/').slice(0, 2).join('/');
+                return urlBaseSegment.length > 1 && urlBaseSegment === linkBaseSegment;
+            });
             if (belongs && children.length > 1) {
                 this.subNavItems = children;
                 this.subNavTitle = group.title as string;
