@@ -17,6 +17,7 @@
         @if (selectedCustomer && allOrdersForDrp.length > 0) {
             <nz-select
                 [(ngModel)]="selectedOrderID"
+                (ngModelChange)="onOrderChange()"
                 nzPlaceHolder="All Orders"
                 [nzAllowClear]="true"
                 [nzShowSearch]="true"

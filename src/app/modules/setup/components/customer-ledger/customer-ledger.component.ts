@@ -121,6 +121,10 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
         this.loadOrders();
     }
 
+    onOrderChange() {
+        this.loadFinancial();
+    }
+
     loadFinancial() {
         if (!this.selectedCustomer) return;
         this.isLoadingFinancial = true;
@@ -129,6 +133,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
         let url = `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomer}/financial?`;
         if (from) url += `from=${encodeURIComponent(from)}&`;
         if (to)   url += `to=${encodeURIComponent(to)}&`;
+        if (this.selectedOrderID) url += `orderId=${this.selectedOrderID}&`;
         this._http.get<any[]>(url, { headers: this.headers }).subscribe({
             next: (res) => { this.financialRows = res || []; this.isLoadingFinancial = false; },
             error: () => { this.isLoadingFinancial = false; },
