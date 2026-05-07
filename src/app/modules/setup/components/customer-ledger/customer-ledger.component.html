@@ -147,13 +147,10 @@
                 <!-- Panel Header -->
                 <div class="mb-3 flex items-center justify-between shrink-0">
                     <h2 class="text-sm font-semibold text-gray-700">Order Ledger</h2>
-                    @if (isLoadingOrders) {
-                        <span class="text-xs text-gray-400">Loading...</span>
-                    }
                 </div>
 
                 <!-- Product Filter Chips -->
-                @if (uniqueProducts.length > 0) {
+                @if (!isLoadingOrders && uniqueProducts.length > 0) {
                     <div class="mb-3 flex flex-wrap gap-1.5 shrink-0">
                         @for (p of uniqueProducts; track p.id) {
                             <button
@@ -176,9 +173,17 @@
                 }
 
                 <!-- Order Cards -->
-                @if (!isLoadingOrders && groupedOrders.length === 0) {
+                @if (isLoadingOrders) {
+                    <div class="flex flex-1 items-center justify-center py-12 text-gray-400 text-sm">
+                        Loading orders...
+                    </div>
+                } @else if (orderError) {
+                    <div class="flex flex-1 items-center justify-center py-12 text-red-400 text-sm">
+                        Failed to load orders
+                    </div>
+                } @else if (groupedOrders.length === 0) {
                     <div class="flex flex-1 items-center justify-center text-gray-400 text-sm py-12">
-                        No orders found
+                        No orders found for this customer
                     </div>
                 } @else {
                     <div class="flex flex-col gap-3">

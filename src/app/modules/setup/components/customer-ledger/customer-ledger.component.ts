@@ -29,6 +29,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     dateRange: Date[] = [];
     isLoadingFinancial = false;
     isLoadingOrders    = false;
+    orderError         = false;
 
     financialRows: any[] = [];
     orderItems: any[]    = [];
@@ -114,12 +115,13 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     loadOrders() {
         if (!this.selectedCustomer) return;
         this.isLoadingOrders = true;
+        this.orderError = false;
         this._http.get<any[]>(
             `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomer}/orders`,
             { headers: this.headers }
         ).subscribe({
             next: (res) => { this.orderItems = res || []; this.isLoadingOrders = false; },
-            error: () => { this.isLoadingOrders = false; },
+            error: () => { this.orderError = true; this.isLoadingOrders = false; },
         });
     }
 
