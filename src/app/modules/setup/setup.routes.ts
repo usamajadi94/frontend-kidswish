@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { ExpenseListComponent } from './components/expense/expense-list/expense-list.component';
 import { ExpenseCategoryListComponent } from './components/expense-category/expense-category-list/expense-category-list.component';
+import { PaymentCategoryListComponent } from './components/payment-category/payment-category-list/payment-category-list.component';
 import { DepartmentListComponent } from './components/department/department-list/department-list.component';
 import { DistributorListComponent } from './components/distributor/distributor-list/distributor-list.component';
 import { CustomerListComponent } from './components/customer/customer-list/customer-list.component';
@@ -41,6 +42,12 @@ export default [
         path: 'expense-category-list',
         component: ExpenseCategoryListComponent,
         data: { SCode: componentRegister.expenseCategory.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'payment-category-list',
+        component: PaymentCategoryListComponent,
+        data: { SCode: componentRegister.paymentCategory.SCode },
         canActivate: [permissionGuard],
     },
     {

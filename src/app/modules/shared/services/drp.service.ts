@@ -22,6 +22,10 @@ export class DrpService {
         return this._QueryService.getQuery('getExpenseCategoryDrp');
     }
 
+    getPaymentCategoryDrp() {
+        return this._QueryService.getQuery('getPaymentCategoryDrp');
+    }
+
     getDistributorDrp() {
         return this._QueryService.getQuery('getDistributorDrp');
     }

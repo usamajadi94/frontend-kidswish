@@ -19,6 +19,7 @@ export class componentRegister {
     // Expense
     static readonly expense: IComponentRegister = { Title: 'Expense', SCode: 'exp_02' };
     static readonly expenseCategory: IComponentRegister = { Title: 'Expense Category', SCode: 'exp_03' };
+    static readonly paymentCategory: IComponentRegister = { Title: 'Payment Category', SCode: 'set_09' };
 
     // Security
     static readonly user: IComponentRegister = { Title: 'Users', SCode: 'sec_01' };
