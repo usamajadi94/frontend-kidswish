@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { CashInHandListComponent } from './components/cash-in-hand/cash-in-hand-list/cash-in-hand-list.component';
 import { ExpenseListComponent } from './components/expense/expense-list/expense-list.component';
 import { ExpenseCategoryListComponent } from './components/expense-category/expense-category-list/expense-category-list.component';
 import { PaymentCategoryListComponent } from './components/payment-category/payment-category-list/payment-category-list.component';
@@ -120,6 +121,12 @@ export default [
         path: 'petty-cash-detail/:id',
         component: PettyCashDetailComponent,
         data: { SCode: componentRegister.pettyCash.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'cash-in-hand-list',
+        component: CashInHandListComponent,
+        data: { SCode: componentRegister.cashInHand.SCode },
         canActivate: [permissionGuard],
     },
 ] as Routes;

@@ -1,0 +1,75 @@
+<div class="flex flex-col gap-4">
+    <div class="grid grid-cols-2 gap-4">
+        <bft-select name="PaymentCategoryID" label="Category" [displayList]="paymentCategories"
+            valueField="ID" displayField="Description" [(ngModel)]="formData.PaymentCategoryID"
+            [required]="true" [skeleton]="isDataLoading" [disabled]="isView"
+            (ngModelChange)="onCategoryChange()" />
+        @if (isDailyExpense) {
+            <bft-select name="ExpenseCategoryID" label="Sub Category" [displayList]="expenseCategories"
+                valueField="ID" displayField="Description" [(ngModel)]="formData.ExpenseCategoryID"
+                [required]="true" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+        }
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+        <bft-select name="ToPartyID" label="To (Vendor)" [displayList]="vendors"
+            valueField="ID" displayField="Name" [(ngModel)]="formData.ToPartyID"
+            [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+        <bft-input-date name="Date" label="Date" [(ngModel)]="formData.Date"
+            [required]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+        <bft-input-currency name="Amount" label="Amount" symbol="PKR" [(ngModel)]="formData.Amount"
+            [skeleton]="isDataLoading" [disabled]="isView" />
+        <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes"
+            [skeleton]="isDataLoading" [disabled]="isView" />
+    </div>
+
+    <!-- Attachment -->
+    <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-gray-600">Attachment <span class="text-xs text-gray-400">(PDF, JPG, PNG — max 10MB)</span></label>
+
+        @if (!formData.AttachmentPath) {
+            <label class="flex items-center gap-3 cursor-pointer border-2 border-dashed border-gray-300 rounded-lg px-4 py-3 hover:border-blue-400 transition-colors"
+                   [class.opacity-50]="isUploading">
+                <input type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp"
+                       (change)="onFileSelected($event)" [disabled]="isUploading" />
+                @if (isUploading) {
+                    <svg class="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                    </svg>
+                    <span class="text-sm text-blue-500">Uploading...</span>
+                } @else {
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    <span class="text-sm text-gray-500">Click to attach a file</span>
+                }
+            </label>
+            @if (uploadError) {
+                <span class="text-xs text-red-500">{{ uploadError }}</span>
+            }
+        } @else {
+            <div class="flex items-center gap-3 border border-gray-200 rounded-lg px-4 py-3 bg-gray-50">
+                @if (isImage) {
+                    <img [src]="attachmentUrl" class="h-10 w-10 object-cover rounded" alt="attachment" />
+                } @else {
+                    <svg class="h-8 w-8 text-red-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/>
+                    </svg>
+                }
+                <a [href]="attachmentUrl" target="_blank" class="text-sm text-blue-600 hover:underline truncate flex-1">
+                    {{ attachmentFileName }}
+                </a>
+                @if (!isView) {
+                    <button type="button" class="text-gray-400 hover:text-red-500 transition-colors ml-auto flex-shrink-0"
+                            (click)="removeAttachment()" title="Remove">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                }
+            </div>
+        }
+    </div>
+</div>

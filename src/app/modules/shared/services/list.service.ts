@@ -155,4 +155,11 @@ export class ListService {
         });
     }
 
+    getCashInHand(fromdate: any, todate: any) {
+        return this._QueryService.getQuery('getCashInHand', {
+            fromdate: fromdate || '',
+            todate: todate || '',
+        });
+    }
+
 }
