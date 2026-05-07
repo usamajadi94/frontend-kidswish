@@ -14,6 +14,18 @@
                 <nz-option [nzValue]="c.ID" [nzLabel]="c.Name"></nz-option>
             }
         </nz-select>
+        @if (selectedCustomer && allOrdersForDrp.length > 0) {
+            <nz-select
+                [(ngModel)]="selectedOrderID"
+                nzPlaceHolder="All Orders"
+                [nzAllowClear]="true"
+                [nzShowSearch]="true"
+                style="min-width: 200px">
+                @for (o of allOrdersForDrp; track o.id) {
+                    <nz-option [nzValue]="o.id" [nzLabel]="o.label"></nz-option>
+                }
+            </nz-select>
+        }
     </div>
 
     @if (!selectedCustomer) {
@@ -145,18 +157,8 @@
             <div class="flex flex-col overflow-y-auto" style="flex: 3; min-width: 0;">
 
                 <!-- Panel Header -->
-                <div class="mb-3 flex items-center justify-between gap-2 shrink-0">
-                    <h2 class="text-sm font-semibold text-gray-700 shrink-0">Order Ledger</h2>
-                    <nz-select
-                        [(ngModel)]="selectedOrderID"
-                        nzPlaceHolder="All Orders"
-                        [nzAllowClear]="true"
-                        [nzShowSearch]="true"
-                        style="min-width: 0; flex: 1;">
-                        @for (o of allOrdersForDrp; track o.id) {
-                            <nz-option [nzValue]="o.id" [nzLabel]="o.label"></nz-option>
-                        }
-                    </nz-select>
+                <div class="mb-3 shrink-0">
+                    <h2 class="text-sm font-semibold text-gray-700">Order Ledger</h2>
                 </div>
 
                 <!-- Status Filter Chips -->
