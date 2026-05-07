@@ -131,6 +131,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
         this.dateRange = [new Date(now.getFullYear(), now.getMonth(), 1), now];
         this._drpService.getCustomerInformationDrp().subscribe({ next: (res: any) => { this.customers = res || []; } });
         this.loadBalances();
+        this.loadAll();
     }
 
     loadBalances() {
@@ -163,7 +164,6 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     }
 
     loadAll() {
-        if (!this.selectedCustomer) { this.financialRows = []; this.orderItems = []; return; }
         this.loadFinancial();
         this.loadOrders();
     }
@@ -173,14 +173,16 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     }
 
     loadFinancial() {
-        if (!this.selectedCustomer) return;
         this.isLoadingFinancial = true;
         const from = this.dateRange?.[0]?.toISOString() || '';
         const to   = this.dateRange?.[1]?.toISOString() || '';
-        let url = `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomer}/financial?`;
+        const base = this.selectedCustomer
+            ? `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomer}/financial?`
+            : `${apiUrls.server}${apiUrls.customerLedgerController}/all/financial?`;
+        let url = base;
         if (from) url += `from=${encodeURIComponent(from)}&`;
         if (to)   url += `to=${encodeURIComponent(to)}&`;
-        if (this.selectedOrderID) url += `orderId=${this.selectedOrderID}&`;
+        if (this.selectedCustomer && this.selectedOrderID) url += `orderId=${this.selectedOrderID}&`;
         this._http.get<any[]>(url, { headers: this.headers }).subscribe({
             next: (res) => { this.financialRows = res || []; this.isLoadingFinancial = false; },
             error: () => { this.isLoadingFinancial = false; },
@@ -188,12 +190,14 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     }
 
     loadOrders() {
-        if (!this.selectedCustomer) return;
         this.isLoadingOrders = true;
         this.orderError = '';
         const from = this.dateRange?.[0]?.toISOString() || '';
         const to   = this.dateRange?.[1]?.toISOString() || '';
-        let url = `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomer}/orders?`;
+        const base = this.selectedCustomer
+            ? `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomer}/orders?`
+            : `${apiUrls.server}${apiUrls.customerLedgerController}/all/orders?`;
+        let url = base;
         if (from) url += `from=${encodeURIComponent(from)}&`;
         if (to)   url += `to=${encodeURIComponent(to)}&`;
         this._http.get<any>(url, { headers: this.headers }).subscribe({
