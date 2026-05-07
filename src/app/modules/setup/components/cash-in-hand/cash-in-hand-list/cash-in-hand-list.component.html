@@ -14,51 +14,72 @@
 
     <!-- Summary Cards -->
     <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div class="text-xs font-medium text-gray-500 mb-1">Opening Balance</div>
             <div class="text-xl font-bold text-gray-800">
                 {{ (summary?.OpeningBalance || 0) | currency:'PKR ':'symbol':'1.0-0' }}
             </div>
         </div>
-
         <div class="rounded-xl border border-green-200 bg-green-50 p-5">
             <div class="text-xs font-medium text-green-600 mb-1">Total Cash In</div>
             <div class="text-xl font-bold text-green-800">
                 {{ totalCashIn | currency:'PKR ':'symbol':'1.0-0' }}
             </div>
         </div>
-
         <div class="rounded-xl border border-red-200 bg-red-50 p-5">
             <div class="text-xs font-medium text-red-600 mb-1">Total Cash Out</div>
             <div class="text-xl font-bold text-red-800">
                 {{ totalCashOut | currency:'PKR ':'symbol':'1.0-0' }}
             </div>
         </div>
-
         <div class="rounded-xl border p-5"
              [class.border-green-200]="currentBalance >= 0" [class.bg-green-50]="currentBalance >= 0"
              [class.border-red-300]="currentBalance < 0"   [class.bg-red-100]="currentBalance < 0">
             <div class="text-xs font-medium mb-1"
-                 [class.text-green-600]="currentBalance >= 0"
-                 [class.text-red-600]="currentBalance < 0">Current Balance</div>
+                 [class.text-green-600]="currentBalance >= 0" [class.text-red-600]="currentBalance < 0">
+                Current Balance
+            </div>
             <div class="text-xl font-bold"
-                 [class.text-green-800]="currentBalance >= 0"
-                 [class.text-red-800]="currentBalance < 0">
+                 [class.text-green-800]="currentBalance >= 0" [class.text-red-800]="currentBalance < 0">
                 {{ currentBalance | currency:'PKR ':'symbol':'1.0-0' }}
             </div>
         </div>
-
     </div>
 
-    <!-- Ledger Table -->
+    <!-- Ledger Header + Filters -->
     <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h2 class="text-lg font-semibold text-gray-800">Transaction Ledger</h2>
+        <div class="flex flex-wrap items-center gap-3">
+            <h2 class="text-lg font-semibold text-gray-800">Transaction Ledger</h2>
+            <!-- Category filter chips -->
+            @if (uniqueCategories.length > 0) {
+                <div class="flex flex-wrap gap-1.5">
+                    @for (cat of uniqueCategories; track cat) {
+                        <button
+                            class="rounded-full px-3 py-0.5 text-xs font-medium border transition-all"
+                            [ngClass]="selectedCategories.includes(cat)
+                                ? [getCategoryColor(cat).bg, getCategoryColor(cat).text, 'border-transparent', 'ring-2', 'ring-offset-1']
+                                : ['bg-white', 'text-gray-500', 'border-gray-300', 'hover:border-gray-400']"
+                            (click)="selectedCategories.includes(cat)
+                                ? selectedCategories = selectedCategories.filter(c => c !== cat)
+                                : selectedCategories = [...selectedCategories, cat]">
+                            {{ cat }}
+                        </button>
+                    }
+                    @if (selectedCategories.length > 0) {
+                        <button class="rounded-full px-3 py-0.5 text-xs font-medium text-gray-400 hover:text-gray-600 border border-dashed border-gray-300"
+                                (click)="selectedCategories = []">
+                            Clear
+                        </button>
+                    }
+                </div>
+            }
+        </div>
         <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onDateChange($event)"
             nzFormat="dd/MM/yyyy" [nzPlaceHolder]="['From Date', 'To Date']">
         </nz-range-picker>
     </div>
 
+    <!-- Table -->
     <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm">
         <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50">
@@ -78,19 +99,26 @@
                     <tr>
                         <td colspan="8" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
                     </tr>
-                } @else if (ledger.length === 0) {
+                } @else if (filteredLedger.length === 0) {
                     <tr>
                         <td colspan="8" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found for selected period</td>
                     </tr>
                 } @else {
-                    @for (row of ledger; track row.ID) {
+                    @for (row of filteredLedger; track row.ID) {
                         <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
                             [class.bg-green-50]="row.CashIn > 0"
                             [class.bg-red-50]="row.CashOut > 0"
                             (click)="onView(row)">
                             <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
                             <td class="px-3 py-1.5 text-xs text-gray-700">{{ row.Vendor || '—' }}</td>
-                            <td class="px-3 py-1.5 text-xs text-gray-700">{{ row.Category || '—' }}</td>
+                            <td class="px-3 py-1.5 text-xs">
+                                @if (row.Category) {
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                                          [ngClass]="[getCategoryColor(row.Category).bg, getCategoryColor(row.Category).text]">
+                                        {{ row.Category }}
+                                    </span>
+                                } @else { — }
+                            </td>
                             <td class="px-3 py-1.5 text-xs text-gray-500">{{ row.SubCategory || '—' }}</td>
                             <td class="px-3 py-1.5 text-xs text-gray-500">{{ row.Notes || '—' }}</td>
                             <td class="px-3 py-1.5 text-right font-semibold text-green-700 text-xs">
@@ -108,7 +136,7 @@
                     }
                 }
             </tbody>
-            @if (ledger.length > 0) {
+            @if (filteredLedger.length > 0) {
                 <tfoot class="border-t-2 border-gray-300 bg-gray-50">
                     <tr class="font-semibold text-gray-800">
                         <td colspan="5" class="px-3 py-2 text-right text-xs">Total</td>

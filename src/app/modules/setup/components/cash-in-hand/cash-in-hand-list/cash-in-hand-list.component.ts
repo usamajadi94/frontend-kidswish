@@ -5,6 +5,7 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { ListService } from 'app/modules/shared/services/list.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { DrpService } from 'app/modules/shared/services/drp.service';
@@ -14,11 +15,22 @@ import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.compo
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { CashInHandFormComponent } from '../cash-in-hand-form.component';
 
+const CATEGORY_COLORS = [
+    { bg: 'bg-blue-100',   text: 'text-blue-700'   },
+    { bg: 'bg-purple-100', text: 'text-purple-700' },
+    { bg: 'bg-orange-100', text: 'text-orange-700' },
+    { bg: 'bg-teal-100',   text: 'text-teal-700'   },
+    { bg: 'bg-pink-100',   text: 'text-pink-700'   },
+    { bg: 'bg-indigo-100', text: 'text-indigo-700' },
+    { bg: 'bg-yellow-100', text: 'text-yellow-700' },
+    { bg: 'bg-cyan-100',   text: 'text-cyan-700'   },
+];
+
 @Component({
     selector: 'app-cash-in-hand-list',
     standalone: true,
     imports: [CommonModule, FormsModule, CurrencyPipe, DatePipe,
-              NzDatePickerModule, NzDropDownModule, NzButtonModule, NzIconModule,
+              NzDatePickerModule, NzDropDownModule, NzButtonModule, NzIconModule, NzSelectModule,
               BftButtonComponent, WrapperAddComponent],
     templateUrl: './cash-in-hand-list.component.html',
 })
@@ -33,9 +45,31 @@ export class CashInHandListComponent extends BaseRoutedComponent {
     ledger: any[] = [];
     isLoading = false;
     dateRange: Date[] = [];
+    selectedCategories: string[] = [];
 
-    get totalCashIn(): number  { return this.ledger.reduce((s, r) => s + (+r.CashIn  || 0), 0); }
-    get totalCashOut(): number { return this.ledger.reduce((s, r) => s + (+r.CashOut || 0), 0); }
+    private _colorMap = new Map<string, (typeof CATEGORY_COLORS)[0]>();
+    private _colorIndex = 0;
+
+    getCategoryColor(cat: string): (typeof CATEGORY_COLORS)[0] {
+        if (!cat) return CATEGORY_COLORS[0];
+        if (!this._colorMap.has(cat)) {
+            this._colorMap.set(cat, CATEGORY_COLORS[this._colorIndex % CATEGORY_COLORS.length]);
+            this._colorIndex++;
+        }
+        return this._colorMap.get(cat);
+    }
+
+    get uniqueCategories(): string[] {
+        return [...new Set(this.ledger.map(r => r.Category).filter(Boolean))];
+    }
+
+    get filteredLedger(): any[] {
+        if (!this.selectedCategories?.length) return this.ledger;
+        return this.ledger.filter(r => this.selectedCategories.includes(r.Category));
+    }
+
+    get totalCashIn(): number  { return this.filteredLedger.reduce((s, r) => s + (+r.CashIn  || 0), 0); }
+    get totalCashOut(): number { return this.filteredLedger.reduce((s, r) => s + (+r.CashOut || 0), 0); }
     get currentBalance(): number {
         return (+this.summary?.OpeningBalance || 0) + this.totalCashIn - this.totalCashOut;
     }
