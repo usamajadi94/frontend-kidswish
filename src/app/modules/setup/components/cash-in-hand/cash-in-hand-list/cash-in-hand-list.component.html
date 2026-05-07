@@ -59,9 +59,7 @@
                             [ngClass]="selectedCategories.includes(cat)
                                 ? [getCategoryColor(cat).bg, getCategoryColor(cat).text, 'border-transparent', 'ring-2', 'ring-offset-1']
                                 : ['bg-white', 'text-gray-500', 'border-gray-300', 'hover:border-gray-400']"
-                            (click)="selectedCategories.includes(cat)
-                                ? selectedCategories = selectedCategories.filter(c => c !== cat)
-                                : selectedCategories = [...selectedCategories, cat]">
+                            (click)="toggleCategory(cat)">
                             {{ cat }}
                         </button>
                     }

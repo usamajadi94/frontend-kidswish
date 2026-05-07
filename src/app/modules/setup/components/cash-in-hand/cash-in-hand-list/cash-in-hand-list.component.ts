@@ -117,6 +117,14 @@ export class CashInHandListComponent extends BaseRoutedComponent {
         }).afterClose.subscribe((res: boolean) => { if (res) this.loadAll(); });
     }
 
+    toggleCategory(cat: string) {
+        if (this.selectedCategories.includes(cat)) {
+            this.selectedCategories = this.selectedCategories.filter(c => c !== cat);
+        } else {
+            this.selectedCategories = [...this.selectedCategories, cat];
+        }
+    }
+
     private fmt(d: Date): string {
         if (!d) return '';
         return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
