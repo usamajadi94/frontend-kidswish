@@ -30,6 +30,10 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
     paymentCategories: any[] = [];
     expenseCategories: any[] = [];
     vendors: any[] = [];
+    transactionTypes = [
+        { ID: 'in',  Name: 'Cash In' },
+        { ID: 'out', Name: 'Cash Out' },
+    ];
 
     isCategoryLocked = false;
     selectedFile: File | null = null;
@@ -82,6 +86,7 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
 
     override ValidateBeforeSave(formData: CashInHand): boolean {
         this.validation = [];
+        if (!formData.Type) this.validation.push('Type is required.');
         if (!formData.PaymentCategoryID) this.validation.push('Category is required.');
         if (!formData.Date) this.validation.push('Date is required.');
         if (!formData.Amount || formData.Amount <= 0) this.validation.push('Amount must be greater than 0.');

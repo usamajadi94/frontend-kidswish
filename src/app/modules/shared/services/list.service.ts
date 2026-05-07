@@ -162,4 +162,18 @@ export class ListService {
         });
     }
 
+    getCashInHandSummary(fromdate: any, todate: any) {
+        return this._QueryService.getQuery('getCashInHandSummary', {
+            fromdate: fromdate || '',
+            todate: todate || '',
+        });
+    }
+
+    getCashInHandLedger(fromdate: any, todate: any) {
+        return this._QueryService.getQuery('getCashInHandLedger', {
+            fromdate: fromdate || '',
+            todate: todate || '',
+        });
+    }
+
 }

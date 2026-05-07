@@ -3,6 +3,7 @@ import { componentRegister } from "app/modules/shared/services/component-registe
 export class CashInHand {
     ID: number = 0;
     Date: any = null;
+    Type: string = 'out';
     PaymentCategoryID: number = null;
     ExpenseCategoryID: number = null;
     ToPartyID: number = null;

@@ -1,23 +1,134 @@
-<div class="absolute inset-0 flex min-w-0 flex-col overflow-y-auto p-6 md:p-8" cdkScrollable>
-    <div class="flex-0">
-        <div class="mb-4">
-            <div class="flex justify-between">
-                <div class="text-3xl font-semibold leading-8 tracking-tight">{{ title }} List</div>
-                <div class="range-picker">
-                    <nz-range-picker [(ngModel)]="date" (ngModelChange)="onChange($event)"></nz-range-picker>
-                </div>
-            </div>
-        </div>
-        <bft-table [dataSource]="data" [(isVisible)]="isVisible" [columns]="columns" (view)="onView($event)" currency="PKR">
+<div class="absolute inset-0 flex min-w-0 flex-col overflow-y-auto p-6 md:p-8">
+
+    <!-- Top Bar -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div class="text-3xl font-semibold leading-8 tracking-tight">{{ title }}</div>
+        <div class="flex items-center gap-2">
             <wrapper-add [SCode]="SCode">
                 <button nz-button nz-dropdown [nzDropdownMenu]="categoryMenu" nzType="primary">
                     + New &nbsp;<span nz-icon nzType="down"></span>
                 </button>
             </wrapper-add>
-            <bft-button class="ml-3" name="Setting" svgIcon="mat_solid:settings" (onClick)="isVisible = true" />
-            <bft-button class="ml-3" name="Export" svgIcon="feather:file" />
-        </bft-table>
+        </div>
     </div>
+
+    <!-- Summary Cards -->
+    <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div class="text-xs font-medium text-gray-500 mb-1">Opening Balance</div>
+            <div class="text-xl font-bold text-gray-800">
+                {{ (summary?.OpeningBalance || 0) | currency:'PKR ':'symbol':'1.0-0' }}
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-green-200 bg-green-50 p-5">
+            <div class="text-xs font-medium text-green-600 mb-1">Total Cash In</div>
+            <div class="text-xl font-bold text-green-800">
+                {{ totalCashIn | currency:'PKR ':'symbol':'1.0-0' }}
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-red-200 bg-red-50 p-5">
+            <div class="text-xs font-medium text-red-600 mb-1">Total Cash Out</div>
+            <div class="text-xl font-bold text-red-800">
+                {{ totalCashOut | currency:'PKR ':'symbol':'1.0-0' }}
+            </div>
+        </div>
+
+        <div class="rounded-xl border p-5"
+             [class.border-green-200]="currentBalance >= 0" [class.bg-green-50]="currentBalance >= 0"
+             [class.border-red-300]="currentBalance < 0"   [class.bg-red-100]="currentBalance < 0">
+            <div class="text-xs font-medium mb-1"
+                 [class.text-green-600]="currentBalance >= 0"
+                 [class.text-red-600]="currentBalance < 0">Current Balance</div>
+            <div class="text-xl font-bold"
+                 [class.text-green-800]="currentBalance >= 0"
+                 [class.text-red-800]="currentBalance < 0">
+                {{ currentBalance | currency:'PKR ':'symbol':'1.0-0' }}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Ledger Table -->
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold text-gray-800">Transaction Ledger</h2>
+        <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onDateChange($event)"
+            nzFormat="dd/MM/yyyy" [nzPlaceHolder]="['From Date', 'To Date']">
+        </nz-range-picker>
+    </div>
+
+    <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Date</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Vendor</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Category</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Sub Category</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Notes</th>
+                    <th class="px-3 py-2 text-right font-semibold text-green-700 text-xs">Cash In (+)</th>
+                    <th class="px-3 py-2 text-right font-semibold text-red-700 text-xs">Cash Out (−)</th>
+                    <th class="px-3 py-2 text-right font-semibold text-gray-600 text-xs">Balance</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @if (isLoading) {
+                    <tr>
+                        <td colspan="8" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
+                    </tr>
+                } @else if (ledger.length === 0) {
+                    <tr>
+                        <td colspan="8" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found for selected period</td>
+                    </tr>
+                } @else {
+                    @for (row of ledger; track row.ID) {
+                        <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                            [class.bg-green-50]="row.CashIn > 0"
+                            [class.bg-red-50]="row.CashOut > 0"
+                            (click)="onView(row)">
+                            <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
+                            <td class="px-3 py-1.5 text-xs text-gray-700">{{ row.Vendor || '—' }}</td>
+                            <td class="px-3 py-1.5 text-xs text-gray-700">{{ row.Category || '—' }}</td>
+                            <td class="px-3 py-1.5 text-xs text-gray-500">{{ row.SubCategory || '—' }}</td>
+                            <td class="px-3 py-1.5 text-xs text-gray-500">{{ row.Notes || '—' }}</td>
+                            <td class="px-3 py-1.5 text-right font-semibold text-green-700 text-xs">
+                                @if (row.CashIn > 0) { {{ row.CashIn | currency:'PKR ':'symbol':'1.0-0' }} }
+                            </td>
+                            <td class="px-3 py-1.5 text-right font-semibold text-red-700 text-xs">
+                                @if (row.CashOut > 0) { {{ row.CashOut | currency:'PKR ':'symbol':'1.0-0' }} }
+                            </td>
+                            <td class="px-3 py-1.5 text-right font-semibold text-xs"
+                                [class.text-green-700]="row.Balance >= 0"
+                                [class.text-red-700]="row.Balance < 0">
+                                {{ row.Balance | currency:'PKR ':'symbol':'1.0-0' }}
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+            @if (ledger.length > 0) {
+                <tfoot class="border-t-2 border-gray-300 bg-gray-50">
+                    <tr class="font-semibold text-gray-800">
+                        <td colspan="5" class="px-3 py-2 text-right text-xs">Total</td>
+                        <td class="px-3 py-2 text-right text-green-700 text-xs">
+                            {{ totalCashIn | currency:'PKR ':'symbol':'1.0-0' }}
+                        </td>
+                        <td class="px-3 py-2 text-right text-red-700 text-xs">
+                            {{ totalCashOut | currency:'PKR ':'symbol':'1.0-0' }}
+                        </td>
+                        <td class="px-3 py-2 text-right text-xs"
+                            [class.text-green-700]="currentBalance >= 0"
+                            [class.text-red-700]="currentBalance < 0">
+                            {{ currentBalance | currency:'PKR ':'symbol':'1.0-0' }}
+                        </td>
+                    </tr>
+                </tfoot>
+            }
+        </table>
+    </div>
+
 </div>
 
 <nz-dropdown-menu #categoryMenu="nzDropdownMenu">
