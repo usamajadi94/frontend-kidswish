@@ -94,9 +94,9 @@ export class CompactLayoutComponent implements OnInit, OnDestroy {
         if (!this.navigation?.default) { this.subNavItems = []; return; }
 
         const cleanUrl = url.split('?')[0];
-
         const urlBaseSegment = cleanUrl.split('/').slice(0, 2).join('/');
 
+        // First pass: exact or prefix match (e.g. /setup/customer-ledger matches Customers group exactly)
         for (const group of this.navigation.default) {
             const children: FuseNavigationItem[] = (group.children || []).filter(
                 (c: FuseNavigationItem) => c.link && c.type === 'basic',
@@ -106,7 +106,22 @@ export class CompactLayoutComponent implements OnInit, OnDestroy {
                 if (cleanUrl === c.link) return true;
                 if (cleanUrl.startsWith(c.link + '/')) return true;
                 if (cleanUrl.startsWith(c.link + '?')) return true;
-                // Also match detail/sub-pages that share the same top-level segment (e.g. /orders/order-detail/:id → /orders)
+                return false;
+            });
+            if (belongs && children.length > 1) {
+                this.subNavItems = children;
+                this.subNavTitle = group.title as string;
+                return;
+            }
+        }
+
+        // Second pass: base-segment fallback for detail sub-pages (e.g. /orders/order-detail/123)
+        for (const group of this.navigation.default) {
+            const children: FuseNavigationItem[] = (group.children || []).filter(
+                (c: FuseNavigationItem) => c.link && c.type === 'basic',
+            );
+            const belongs = children.some(c => {
+                if (!c.link) return false;
                 const linkBaseSegment = c.link.split('/').slice(0, 2).join('/');
                 return urlBaseSegment.length > 1 && urlBaseSegment === linkBaseSegment;
             });
@@ -116,6 +131,7 @@ export class CompactLayoutComponent implements OnInit, OnDestroy {
                 return;
             }
         }
+
         this.subNavItems = [];
         this.subNavTitle = '';
     }
