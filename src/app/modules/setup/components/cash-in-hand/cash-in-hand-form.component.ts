@@ -62,6 +62,7 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
     public override InitializeObject(): void {
         this.formData = new CashInHand();
         this.formData.Date = new Date() as any;
+        this.formData.Type = 'out';
     }
 
     public override async AfterDisplay(): Promise<void> {
@@ -86,8 +87,7 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
 
     override ValidateBeforeSave(formData: CashInHand): boolean {
         this.validation = [];
-        if (!formData.Type) this.validation.push('Type is required.');
-        if (!formData.PaymentCategoryID) this.validation.push('Category is required.');
+if (!formData.PaymentCategoryID) this.validation.push('Category is required.');
         if (!formData.Date) this.validation.push('Date is required.');
         if (!formData.Amount || formData.Amount <= 0) this.validation.push('Amount must be greater than 0.');
         if (this.isDailyExpense && !formData.ExpenseCategoryID) this.validation.push('Sub Category is required for Daily Expense.');
