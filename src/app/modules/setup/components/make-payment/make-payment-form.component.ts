@@ -67,6 +67,7 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
 
     public override InitializeObject(): void {
         this.formData = new PaymentTransaction();
+        this.formData.Date = new Date() as any;
         this.formData.TransactionType = 'payment';
         this.formData.FromPartyType = 'bank_account';
         this.formData.ToPartyType = 'vendor';

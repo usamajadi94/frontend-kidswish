@@ -11,7 +11,7 @@ export class CurrencyFormatterDirective {
   constructor(private elementRef: ElementRef) {
     this.el = this.elementRef.nativeElement;
     setTimeout(() => {
-      if (this.el.value) this.formatCurrency(this.el.value);
+      if (this.el.value && parseFloat(this.el.value.replace(/,/g, '')) !== 0) this.formatCurrency(this.el.value);
     });
   }
   

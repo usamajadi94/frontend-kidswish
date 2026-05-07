@@ -64,6 +64,7 @@ export class ExpenseFormComponent extends BaseComponent<Expense, ExpenseFormComp
 
   public override InitializeObject(): void {
     this.formData = new Expense();
+    this.formData.Date = new Date() as any;
     if (this.nzModalData?.Data?.PettyCashID) {
       this.formData.PettyCashID = this.nzModalData.Data.PettyCashID;
     }

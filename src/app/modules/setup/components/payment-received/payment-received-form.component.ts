@@ -70,6 +70,7 @@ export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransacti
 
     public override InitializeObject(): void {
         this.formData = new PaymentTransaction();
+        this.formData.Date = new Date() as any;
         this.formData.TransactionType = 'received';
         this.formData.SCode = 'pay_01';
     }

@@ -1,21 +1,21 @@
 <div class="flex flex-col gap-4">
     <div class="grid grid-cols-2 gap-4">
-        <bft-input-date name="Date" label="Date" [(ngModel)]="formData.Date" [skeleton]="isDataLoading" [required]="true" />
+        <bft-input-date name="Date" label="Date" [(ngModel)]="formData.Date" [skeleton]="isDataLoading" [required]="true" [disabled]="isView" />
         <bft-select name="VendorID" label="Vendor" [displayList]="vendorList"
             valueField="ID" displayField="DisplayName" [(ngModel)]="formData.VendorID"
-            [clearable]="true" [skeleton]="isDataLoading" />
+            [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
     </div>
     <div class="grid grid-cols-2 gap-4">
         <bft-select name="ExpenseCategoryID" label="Category" [displayList]="expenseCategory"
             valueField="ID" displayField="Description" [(ngModel)]="formData.ExpenseCategoryID"
-            [skeleton]="isDataLoading" [required]="true" />
+            [skeleton]="isDataLoading" [required]="true" [disabled]="isView" />
         <bft-select name="PettyCashID" label="Petty Cash Account" [displayList]="pettyCashList"
             valueField="ID" displayField="Name" [(ngModel)]="formData.PettyCashID"
-            [clearable]="true" [skeleton]="isDataLoading" />
+            [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
     </div>
     <div class="grid grid-cols-2 gap-4">
-        <bft-input-currency name="Amount" label="Amount" symbol="PKR" [(ngModel)]="formData.Amount" [skeleton]="isDataLoading" />
-        <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes" [skeleton]="isDataLoading" />
+        <bft-input-currency name="Amount" label="Amount" symbol="PKR" [(ngModel)]="formData.Amount" [skeleton]="isDataLoading" [disabled]="isView" />
+        <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes" [skeleton]="isDataLoading" [disabled]="isView" />
     </div>
 
     <!-- Attachment -->
