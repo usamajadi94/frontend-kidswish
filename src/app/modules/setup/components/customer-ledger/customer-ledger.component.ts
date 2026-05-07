@@ -29,7 +29,9 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     dateRange: Date[] = [];
     isLoadingFinancial = false;
     isLoadingOrders    = false;
+    isLoadingBalances  = false;
     orderError         = '';
+    customerBalances: any[] = [];
 
     financialRows: any[] = [];
     orderItems: any[]    = [];
@@ -44,6 +46,12 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
             eid: this._localStorage.eid,
         });
     }
+
+    // ── Balances totals ───────────────────────────────────────────────────────
+    get balanceTotalCartons(): number  { return this.customerBalances.reduce((s, c) => s + (+c.TotalCartons || 0), 0); }
+    get balanceTotalOrders(): number   { return this.customerBalances.reduce((s, c) => s + (+c.TotalOrders  || 0), 0); }
+    get balanceTotalPaid(): number     { return this.customerBalances.reduce((s, c) => s + (+c.TotalPaid    || 0), 0); }
+    get balanceTotalOutstanding(): number { return this.customerBalances.reduce((s, c) => s + (+c.Outstanding || 0), 0); }
 
     // ── Summary ──────────────────────────────────────────────────────────────
     get filteredFinancialRows(): any[] {
@@ -120,6 +128,23 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
 
     ngOnInit() {
         this._drpService.getCustomerInformationDrp().subscribe({ next: (res: any) => { this.customers = res || []; } });
+        this.loadBalances();
+    }
+
+    loadBalances() {
+        this.isLoadingBalances = true;
+        this._http.get<any[]>(
+            `${apiUrls.server}${apiUrls.customerLedgerController}`,
+            { headers: this.headers }
+        ).subscribe({
+            next: (res) => { this.customerBalances = res || []; this.isLoadingBalances = false; },
+            error: () => { this.isLoadingBalances = false; },
+        });
+    }
+
+    selectCustomerFromBalances(customerId: number) {
+        this.selectedCustomer = customerId;
+        this.onCustomerChange();
     }
 
     onCustomerChange() {
