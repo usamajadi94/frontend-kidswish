@@ -6,21 +6,21 @@
     </div>
 
     <div class="grid grid-cols-2 gap-4">
-        <bft-select name="PaymentType" label="Payment Type" [displayList]="paymentTypes" valueField="ID" displayField="Name"
-            [(ngModel)]="formData.PaymentType" [required]="true" [skeleton]="isDataLoading" [disabled]="isView" />
-        @if (formData.FromPartyType === 'customer' && formData.FromPartyID) {
-            <bft-select name="OrderID" label="Order" [displayList]="customerOrders" valueField="ID" displayField="Name"
-                [(ngModel)]="formData.OrderID" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
-        }
-    </div>
-
-    <div class="grid grid-cols-2 gap-4">
         <bft-select name="FromPartyType" label="From Type" [displayList]="fromPartyTypes" valueField="ID" displayField="Name"
             [(ngModel)]="formData.FromPartyType" [required]="true" [clearable]="true" [skeleton]="isDataLoading"
             (ngModelChange)="onFromTypeChange()" [disabled]="isView" />
         <bft-select name="FromPartyID" label="From" [displayList]="fromList" valueField="ID" displayField="Name"
             [(ngModel)]="formData.FromPartyID" [required]="true" [clearable]="true" [skeleton]="isDataLoading"
             (ngModelChange)="onFromPartyChange()" [disabled]="isView" />
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <bft-select name="PaymentType" label="Payment Type" [displayList]="paymentTypes" valueField="ID" displayField="Name"
+            [(ngModel)]="formData.PaymentType" [required]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+        @if (formData.FromPartyType === 'customer' && formData.FromPartyID) {
+            <bft-select name="OrderID" label="Order" [displayList]="customerOrders" valueField="ID" displayField="Name"
+                [(ngModel)]="formData.OrderID" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+        }
     </div>
 
     <div class="grid grid-cols-2 gap-4">
