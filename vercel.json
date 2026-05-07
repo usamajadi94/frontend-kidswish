@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm ci && npx ng build --configuration=production",
+  "buildCommand": "npx ng build --configuration=production",
   "outputDirectory": "dist/fuse/browser",
   "framework": null,
   "rewrites": [
