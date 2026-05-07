@@ -80,17 +80,19 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
         for (const item of filtered) {
             if (!map.has(item.OrderID)) {
                 map.set(item.OrderID, {
-                    OrderID:   item.OrderID,
-                    InvoiceNo: item.InvoiceNo,
-                    OrderDate: item.OrderDate,
-                    Status:    item.Status,
-                    items:     [],
-                    total:     0,
+                    OrderID:    item.OrderID,
+                    InvoiceNo:  item.InvoiceNo,
+                    OrderDate:  item.OrderDate,
+                    Status:     item.Status,
+                    items:      [],
+                    total:      0,
+                    dispatched: 0,
                 });
             }
             const order = map.get(item.OrderID);
             order.items.push(item);
-            order.total += +item.Cartons || 0;
+            order.total      += +item.Cartons    || 0;
+            order.dispatched += +item.Dispatched || 0;
         }
         let orders = [...map.values()];
         if (this.selectedStatuses.length) {
