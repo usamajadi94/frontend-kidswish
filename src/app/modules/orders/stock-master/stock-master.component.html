@@ -246,9 +246,7 @@
                             </td>
                             <td class="px-4 py-2 text-right text-gray-400 font-mono">{{ row.LowStockThreshold | number:'1.0-0' }}</td>
                             <td class="px-4 py-2 text-right text-gray-400 text-xs">{{ row.ModifiedDate | date:'dd MMM yy' }}</td>
-                            <td class="px-4 py-2 text-right" (click)="$event.stopPropagation()">
-                                <button class="text-blue-500 hover:underline text-xs" (click)="openForm(row)">Settings</button>
-                            </td>
+                            <td class="px-4 py-2"></td>
                         </tr>
                         <!-- Expanded History Row -->
                         @if (expandedRows.has(row.ProductID)) {
@@ -287,28 +285,16 @@
                                             </tr>
                                             }
                                         </tbody>
-                                        <tfoot class="border-t-2 border-gray-300 bg-gray-100 sticky bottom-0">
-                                            <tr>
-                                                <td colspan="2" class="py-1.5 pr-4 text-right font-semibold text-gray-500 text-xs">Total IN</td>
-                                                <td class="py-1.5 pr-4 text-right font-mono font-bold text-green-700">{{ productTxnTotals(row.ProductID).in | number:'1.0-0' }}</td>
-                                                <td colspan="2"></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2" class="py-1.5 pr-4 text-right font-semibold text-gray-500 text-xs">Total OUT</td>
-                                                <td class="py-1.5 pr-4 text-right font-mono font-bold text-red-600">{{ productTxnTotals(row.ProductID).out | number:'1.0-0' }}</td>
-                                                <td colspan="2"></td>
-                                            </tr>
-                                            <tr class="border-t border-gray-300">
-                                                <td colspan="2" class="py-1.5 pr-4 text-right font-semibold text-gray-700 text-xs">Net</td>
-                                                <td class="py-1.5 pr-4 text-right font-mono font-bold"
-                                                    [class.text-green-700]="productTxnTotals(row.ProductID).net >= 0"
-                                                    [class.text-red-600]="productTxnTotals(row.ProductID).net < 0">
-                                                    {{ productTxnTotals(row.ProductID).net | number:'1.0-0' }}
-                                                </td>
-                                                <td colspan="2"></td>
-                                            </tr>
-                                        </tfoot>
                                     </table>
+                                </div>
+                                <div class="flex items-center gap-6 border-t-2 border-gray-300 bg-gray-100 px-3 py-2 mt-0 text-xs font-semibold">
+                                    <span class="text-gray-500">Total IN: <span class="text-green-700 font-mono font-bold ml-1">{{ productTxnTotals(row.ProductID).in | number:'1.0-0' }}</span></span>
+                                    <span class="text-gray-500">Total OUT: <span class="text-red-600 font-mono font-bold ml-1">{{ productTxnTotals(row.ProductID).out | number:'1.0-0' }}</span></span>
+                                    <span class="text-gray-600">Net: <span class="font-mono font-bold ml-1"
+                                        [class.text-green-700]="productTxnTotals(row.ProductID).net >= 0"
+                                        [class.text-red-600]="productTxnTotals(row.ProductID).net < 0">
+                                        {{ productTxnTotals(row.ProductID).net | number:'1.0-0' }}
+                                    </span></span>
                                 </div>
                                 }
                             </td>
