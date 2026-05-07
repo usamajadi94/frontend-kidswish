@@ -9,13 +9,15 @@ import { DrpService } from 'app/modules/shared/services/drp.service';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 import { FormsModule } from '@angular/forms';
 import { CashInHandFormComponent } from '../cash-in-hand-form.component';
 
 @Component({
     selector: 'app-cash-in-hand-list',
     standalone: true,
-    imports: [BftTableComponent, WrapperAddComponent, BftButtonComponent, NzDatePickerModule, NzDropDownModule, FormsModule],
+    imports: [BftTableComponent, WrapperAddComponent, BftButtonComponent, NzDatePickerModule, NzDropDownModule, NzButtonModule, NzIconModule, FormsModule],
     templateUrl: './cash-in-hand-list.component.html',
 })
 export class CashInHandListComponent extends BaseRoutedComponent {
