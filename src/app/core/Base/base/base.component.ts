@@ -161,6 +161,9 @@ export class BaseComponent<T, Component> implements OnDestroy {
 
         try {
             const res = await firstValueFrom(operation$);
+            if (res.Success === false) {
+                throw { error: { Message: res.Message || 'Operation failed', Errors: res.Errors || [res.Message || 'Operation failed'] } };
+            }
             this.formData = res.Data as T;
             if (this.primaryKey === 0) {
                 this.message.success('Created Successfully!');
