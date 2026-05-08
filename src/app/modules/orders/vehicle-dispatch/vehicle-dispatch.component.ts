@@ -23,10 +23,21 @@ export class VehicleDispatchComponent implements OnInit {
 
     // ── List ──────────────────────────────────────────────────────────────────
     list: any[] = [];
+    listTab = 'All';
     selected: any = null;
     isLoadingList   = false;
     isLoadingDetail = false;
     isConfirming    = false;
+
+    get filteredList(): any[] {
+        if (this.listTab === 'All') return this.list;
+        return this.list.filter(v => v.Status === this.listTab);
+    }
+
+    tabCount(tab: string): number {
+        if (tab === 'All') return this.list.length;
+        return this.list.filter(v => v.Status === tab).length;
+    }
 
     // ── Create form ───────────────────────────────────────────────────────────
     showForm = false;

@@ -13,8 +13,26 @@
     <div class="flex flex-1 gap-4 min-h-0 overflow-hidden">
 
         <!-- ══ LEFT: List ══ -->
-        <div class="flex flex-col overflow-y-auto" style="flex: 4; min-width: 0;">
-            <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div class="flex flex-col" style="flex: 4; min-width: 0;">
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-200 mb-0 shrink-0">
+                @for (tab of ['All','Draft','Confirmed']; track tab) {
+                    <button
+                        class="px-4 py-2 text-xs font-medium border-b-2 transition-colors"
+                        [class.border-blue-600]="listTab === tab"
+                        [class.text-blue-600]="listTab === tab"
+                        [class.border-transparent]="listTab !== tab"
+                        [class.text-gray-500]="listTab !== tab"
+                        [class.hover:text-gray-700]="listTab !== tab"
+                        (click)="listTab = tab">
+                        {{ tab }}
+                        <span class="ml-1 rounded-full bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
+                            {{ tabCount(tab) }}
+                        </span>
+                    </button>
+                }
+            </div>
+            <div class="overflow-auto rounded-b-xl border border-t-0 border-gray-200 bg-white shadow-sm flex-1">
                 <table class="min-w-full divide-y divide-gray-200 text-sm">
                     <thead class="bg-gray-50">
                         <tr>
@@ -22,18 +40,17 @@
                             <th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-600">Driver</th>
                             <th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-600">Vehicle</th>
                             <th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-600">Gatepass</th>
-                            <th class="px-3 py-2.5 text-center text-xs font-semibold text-gray-600">Customers</th>
+                            <th class="px-3 py-2.5 text-center text-xs font-semibold text-gray-600">Cust.</th>
                             <th class="px-3 py-2.5 text-center text-xs font-semibold text-gray-600">Items</th>
-                            <th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-600">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @if (isLoadingList) {
-                            <tr><td colspan="7" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td></tr>
-                        } @else if (list.length === 0) {
-                            <tr><td colspan="7" class="px-3 py-10 text-center text-gray-400 text-sm">No deliveries yet</td></tr>
+                            <tr><td colspan="6" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td></tr>
+                        } @else if (filteredList.length === 0) {
+                            <tr><td colspan="6" class="px-3 py-10 text-center text-gray-400 text-sm">No deliveries</td></tr>
                         } @else {
-                            @for (vd of list; track vd.ID) {
+                            @for (vd of filteredList; track vd.ID) {
                                 <tr class="hover:bg-gray-50 cursor-pointer transition-colors"
                                     [class.bg-blue-50]="selected?.ID === vd.ID"
                                     (click)="select(vd)">
@@ -43,12 +60,6 @@
                                     <td class="px-3 py-2 text-xs text-gray-600">{{ vd.GatpassNo || '—' }}</td>
                                     <td class="px-3 py-2 text-xs text-center text-gray-700">{{ vd.CustomerCount }}</td>
                                     <td class="px-3 py-2 text-xs text-center text-gray-700">{{ vd.ItemCount }}</td>
-                                    <td class="px-3 py-2 text-xs">
-                                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-                                              [ngClass]="statusClass(vd.Status)">
-                                            {{ vd.Status }}
-                                        </span>
-                                    </td>
                                 </tr>
                             }
                         }
