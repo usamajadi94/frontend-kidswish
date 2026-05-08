@@ -279,9 +279,10 @@
                                 🖨 Gate Pass
                             </button>
                             <button
-                                class="rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-100 transition-colors"
-                                (click)="shareWhatsApp()">
-                                WhatsApp
+                                [disabled]="isSharingDO"
+                                class="rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-100 disabled:opacity-50 transition-colors"
+                                (click)="shareDoImage()">
+                                {{ isSharingDO ? 'Preparing...' : '📤 WhatsApp DO' }}
                             </button>
                         }
                         @if (selected.Status === 'Draft') {

@@ -42,7 +42,8 @@ export class VehicleDispatchComponent implements OnInit {
     // ── Create form ───────────────────────────────────────────────────────────
     showForm = false;
     form = { DispatchDate: new Date() as any, DriverID: null as any, VehicleNo: '', BuiltyNo: '', FreightAmount: null as any, Notes: '' };
-    isSaving = false;
+    isSaving    = false;
+    isSharingDO = false;
 
     // ── Available items ───────────────────────────────────────────────────────
     availableItems: any[] = [];
@@ -335,23 +336,85 @@ export class VehicleDispatchComponent implements OnInit {
         this._printHtml(html);
     }
 
-    shareWhatsApp() {
-        const d = this.selected;
-        const date = new Date(d.DispatchDate).toLocaleDateString('en-GB');
-        let text = `*DELIVERY - ${d.DONo || 'N/A'}*\n`;
-        text += `Date: ${date}\n`;
-        text += `Driver: ${d.DriverName || '—'} | Vehicle: ${d.VehicleNo || '—'}\n`;
-        text += `Gatepass: ${d.GatpassNo || '—'}`;
-        if (d.BuiltyNo) text += ` | Builty: ${d.BuiltyNo}`;
-        if (d.FreightAmount) text += `\nFreight: PKR ${(+d.FreightAmount).toLocaleString()}`;
-        text += '\n\n';
-        for (const g of this.groupedByCustomer) {
-            text += `*${g.customer}*\nOrder: ${g.items[0]?.OrderInvoiceNo || '—'}\n`;
-            for (const i of g.items) text += `• ${i.ProductName}: ${i.PlannedQty} ctns\n`;
-            text += `Total: ${g.total} ctns\n\n`;
+    async shareDoImage() {
+        if (this.isSharingDO) return;
+        this.isSharingDO = true;
+        try {
+            const h2c = (await import('html2canvas')).default;
+            const d = this.selected;
+            const date = new Date(d.DispatchDate).toLocaleDateString('en-GB');
+            const files: File[] = [];
+
+            for (const g of this.groupedByCustomer) {
+                const rows = g.items.map((i: any) =>
+                    `<tr>
+                        <td style="padding:5px 8px;border:1px solid #ddd;font-size:11px">${i.ProductName}</td>
+                        <td style="padding:5px 8px;border:1px solid #ddd;font-size:11px;text-align:right">${i.PlannedQty}</td>
+                    </tr>`
+                ).join('');
+
+                const el = document.createElement('div');
+                el.style.cssText = 'position:fixed;left:-9999px;top:0;width:680px;background:#fff;padding:30px;font-family:Arial,sans-serif;color:#111;box-sizing:border-box';
+                el.innerHTML = `
+                    <div style="text-align:center;border-bottom:2px solid #222;padding-bottom:10px;margin-bottom:16px">
+                        <div style="font-size:20px;font-weight:bold;letter-spacing:3px">DELIVERY ORDER</div>
+                        <div style="font-size:11px;color:#555;margin-top:3px">Kids Wish</div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:11px;line-height:1.9">
+                        <div>
+                            <strong>DO No:</strong> ${d.DONo || '—'}<br>
+                            <strong>Gatepass:</strong> ${d.GatpassNo || '—'}
+                            ${d.BuiltyNo ? '<br><strong>Builty No:</strong> ' + d.BuiltyNo : ''}
+                        </div>
+                        <div style="text-align:right"><strong>Date:</strong> ${date}</div>
+                    </div>
+                    <div style="background:#f7f7f7;border:1px solid #ddd;padding:7px 12px;margin-bottom:16px;border-radius:3px;font-size:11px">
+                        <strong>Driver:</strong> ${d.DriverName || '—'} &nbsp;&nbsp;&nbsp;
+                        <strong>Vehicle No:</strong> ${d.VehicleNo || '—'}
+                    </div>
+                    <div style="font-weight:bold;font-size:13px;border-bottom:1px solid #bbb;padding-bottom:3px;margin-bottom:5px">${g.customer}</div>
+                    <div style="font-size:10px;color:#666;margin-bottom:10px">Order: ${g.items[0]?.OrderInvoiceNo || '—'}</div>
+                    <table style="width:100%;border-collapse:collapse">
+                        <thead><tr>
+                            <th style="background:#ececec;text-align:left;padding:5px 8px;border:1px solid #ccc;font-size:11px">Product</th>
+                            <th style="background:#ececec;text-align:right;padding:5px 8px;border:1px solid #ccc;font-size:11px">Qty (Ctns)</th>
+                        </tr></thead>
+                        <tbody>
+                            ${rows}
+                            <tr style="background:#f4f4f4">
+                                <td style="padding:5px 8px;border:1px solid #ddd;font-size:11px;font-weight:bold">Total</td>
+                                <td style="padding:5px 8px;border:1px solid #ddd;font-size:11px;font-weight:bold;text-align:right">${g.total} ctns</td>
+                            </tr>
+                        </tbody>
+                    </table>`;
+
+                document.body.appendChild(el);
+                try {
+                    const canvas = await h2c(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+                    const blob = await new Promise<Blob>(res => canvas.toBlob(b => res(b!), 'image/png'));
+                    files.push(new File([blob], `DO-${d.DONo || 'delivery'}-${g.customer}.png`, { type: 'image/png' }));
+                } finally {
+                    document.body.removeChild(el);
+                }
+            }
+
+            if (!files.length) return;
+
+            if ((navigator as any).share && (navigator as any).canShare?.({ files })) {
+                await (navigator as any).share({ files, title: `Delivery Order ${d.DONo || ''}` });
+            } else {
+                // Desktop fallback: download images
+                for (const file of files) {
+                    const url = URL.createObjectURL(file);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = file.name; a.click();
+                    URL.revokeObjectURL(url);
+                }
+            }
+        } catch (e: any) {
+            if (e?.name !== 'AbortError') console.error(e);
+        } finally {
+            this.isSharingDO = false;
         }
-        const gt = this.groupedByCustomer.reduce((s, g) => s + g.total, 0);
-        text += `*Grand Total: ${gt} ctns*`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     }
 }
