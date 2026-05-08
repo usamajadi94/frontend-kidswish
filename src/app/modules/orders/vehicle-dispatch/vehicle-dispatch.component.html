@@ -103,6 +103,20 @@
                                        placeholder="e.g. ABC-1234">
                             </div>
                         </div>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Builty No.</label>
+                                <input type="text" [(ngModel)]="form.BuiltyNo"
+                                       class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Transport receipt no.">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Freight (PKR)</label>
+                                <input type="number" [(ngModel)]="form.FreightAmount" min="0"
+                                       class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Driver charges">
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Add items section -->
@@ -241,12 +255,12 @@
                             @if (selected.DriverName) { · {{ selected.DriverName }} }
                             @if (selected.VehicleNo) { · {{ selected.VehicleNo }} }
                         </div>
-                        @if (selected.DONo || selected.GatpassNo) {
-                            <div class="text-xs text-gray-500 mt-0.5 flex gap-3">
-                                @if (selected.DONo) { <span>DO: {{ selected.DONo }}</span> }
-                                @if (selected.GatpassNo) { <span>Gatepass: {{ selected.GatpassNo }}</span> }
-                            </div>
-                        }
+                        <div class="text-xs text-gray-500 mt-0.5 flex flex-wrap gap-3">
+                            @if (selected.DONo) { <span>DO: {{ selected.DONo }}</span> }
+                            @if (selected.GatpassNo) { <span>Gatepass: {{ selected.GatpassNo }}</span> }
+                            @if (selected.BuiltyNo) { <span>Builty: {{ selected.BuiltyNo }}</span> }
+                            @if (selected.FreightAmount) { <span>Freight: PKR {{ selected.FreightAmount | number:'1.0-0' }}</span> }
+                        </div>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium"
@@ -297,9 +311,6 @@
                             <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
                                 <div class="flex items-center justify-between px-4 py-2.5 bg-gray-50 border-b border-gray-100">
                                     <div class="text-sm font-semibold text-gray-800">{{ group.customer }}</div>
-                                    @if (group.doNo !== '—') {
-                                        <span class="text-xs font-medium text-blue-700 bg-blue-50 rounded-full px-2 py-0.5">DO: {{ group.doNo }}</span>
-                                    }
                                 </div>
                                 <table class="min-w-full text-xs">
                                     <thead class="bg-white">
@@ -307,8 +318,6 @@
                                             <th class="px-4 py-1.5 text-left font-medium text-gray-500">Order</th>
                                             <th class="px-4 py-1.5 text-left font-medium text-gray-500">Product</th>
                                             <th class="px-4 py-1.5 text-right font-medium text-gray-500">Qty (ctns)</th>
-                                            <th class="px-4 py-1.5 text-right font-medium text-gray-500">Price</th>
-                                            <th class="px-4 py-1.5 text-right font-medium text-gray-500">Amount</th>
                                             @if (selected.Status === 'Draft') { <th class="px-4 py-1.5"></th> }
                                         </tr>
                                     </thead>
@@ -318,10 +327,6 @@
                                                 <td class="px-4 py-1.5 text-gray-600">{{ item.OrderInvoiceNo || ('#' + item.OrderID) }}</td>
                                                 <td class="px-4 py-1.5 text-gray-800 font-medium">{{ item.ProductName }}</td>
                                                 <td class="px-4 py-1.5 text-right text-gray-700">{{ item.PlannedQty }}</td>
-                                                <td class="px-4 py-1.5 text-right text-gray-600">{{ item.CartonPrice | currency:'PKR ':'symbol':'1.0-0' }}</td>
-                                                <td class="px-4 py-1.5 text-right font-semibold text-gray-800">
-                                                    {{ (+item.PlannedQty * +item.CartonPrice) | currency:'PKR ':'symbol':'1.0-0' }}
-                                                </td>
                                                 @if (selected.Status === 'Draft') {
                                                     <td class="px-4 py-1.5 text-right">
                                                         <button class="text-red-400 hover:text-red-600" (click)="removeItem(item.PlanID)">✕</button>
@@ -334,10 +339,6 @@
                                         <tr>
                                             <td colspan="2" class="px-4 py-1.5 text-right text-xs font-semibold text-gray-600">Total</td>
                                             <td class="px-4 py-1.5 text-right text-xs font-semibold text-gray-700">{{ group.total }} ctns</td>
-                                            <td></td>
-                                            <td class="px-4 py-1.5 text-right text-xs font-bold text-gray-800">
-                                                {{ groupAmount(group.items) | currency:'PKR ':'symbol':'1.0-0' }}
-                                            </td>
                                             @if (selected.Status === 'Draft') { <td></td> }
                                         </tr>
                                     </tfoot>

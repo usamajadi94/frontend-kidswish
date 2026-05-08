@@ -41,17 +41,17 @@ export class VehicleDispatchComponent implements OnInit {
 
     // ── Create form ───────────────────────────────────────────────────────────
     showForm = false;
-    form = { DispatchDate: new Date() as any, DriverID: null as any, VehicleNo: '', Notes: '' };
+    form = { DispatchDate: new Date() as any, DriverID: null as any, VehicleNo: '', BuiltyNo: '', FreightAmount: null as any, Notes: '' };
     isSaving = false;
 
-    // ── Available items (all confirmed unassigned dispatch plan items) ─────────
+    // ── Available items ───────────────────────────────────────────────────────
     availableItems: any[] = [];
     isLoadingAvail  = false;
 
     // ── Item selection state ──────────────────────────────────────────────────
     selCustomerId: number | null = null;
     selOrderId: number | null = null;
-    selectionRows: any[] = [];   // items for selected customer+order (mutable, has inputQty)
+    selectionRows: any[] = [];
 
     // ── Items staged for this delivery ────────────────────────────────────────
     stagedItems: {
@@ -59,7 +59,6 @@ export class VehicleDispatchComponent implements OnInit {
         OrderID: number; OrderInvoiceNo: string; ProductName: string; Qty: number;
     }[] = [];
 
-    // ── Dropdowns ─────────────────────────────────────────────────────────────
     drivers: any[] = [];
 
     get headers() {
@@ -92,7 +91,7 @@ export class VehicleDispatchComponent implements OnInit {
     openNewForm() {
         this.selected = null;
         this.showForm = true;
-        this.form = { DispatchDate: new Date(), DriverID: null, VehicleNo: '', Notes: '' };
+        this.form = { DispatchDate: new Date(), DriverID: null, VehicleNo: '', BuiltyNo: '', FreightAmount: null, Notes: '' };
         this.stagedItems = [];
         this.selCustomerId = null;
         this.selOrderId = null;
@@ -103,8 +102,6 @@ export class VehicleDispatchComponent implements OnInit {
             error: () => { this.isLoadingAvail = false; },
         });
     }
-
-    // ── Derived dropdowns from availableItems ─────────────────────────────────
 
     get customersForForm(): { ID: number; Name: string }[] {
         const map = new Map<number, string>();
@@ -127,10 +124,7 @@ export class VehicleDispatchComponent implements OnInit {
         return [...map.entries()].map(([ID, Label]) => ({ ID, Label }));
     }
 
-    onCustomerChange() {
-        this.selOrderId = null;
-        this.selectionRows = [];
-    }
+    onCustomerChange() { this.selOrderId = null; this.selectionRows = []; }
 
     onOrderChange() {
         if (!this.selCustomerId || !this.selOrderId) { this.selectionRows = []; return; }
@@ -145,19 +139,13 @@ export class VehicleDispatchComponent implements OnInit {
         for (const row of this.selectionRows) {
             if (+row.inputQty > 0) {
                 this.stagedItems.push({
-                    PlanID: row.PlanID,
-                    CustomerID: row.CustomerID,
-                    CustomerName: row.CustomerName,
-                    OrderID: row.OrderID,
-                    OrderInvoiceNo: row.OrderInvoiceNo || ('#' + row.OrderID),
-                    ProductName: row.ProductName,
-                    Qty: +row.inputQty,
+                    PlanID: row.PlanID, CustomerID: row.CustomerID, CustomerName: row.CustomerName,
+                    OrderID: row.OrderID, OrderInvoiceNo: row.OrderInvoiceNo || ('#' + row.OrderID),
+                    ProductName: row.ProductName, Qty: +row.inputQty,
                 });
             }
         }
-        this.selCustomerId = null;
-        this.selOrderId = null;
-        this.selectionRows = [];
+        this.selCustomerId = null; this.selOrderId = null; this.selectionRows = [];
     }
 
     removeStagedItem(planId: number) {
@@ -183,12 +171,7 @@ export class VehicleDispatchComponent implements OnInit {
             next: (vd) => {
                 const planIds = this.stagedItems.map(i => i.PlanID);
                 this._http.post<any>(`${this.base}/${vd.ID}/items`, { planIds }, { headers: this.headers }).subscribe({
-                    next: () => {
-                        this.isSaving = false;
-                        this.showForm = false;
-                        this.loadList();
-                        this.select({ ID: vd.ID });
-                    },
+                    next: () => { this.isSaving = false; this.showForm = false; this.loadList(); this.select({ ID: vd.ID }); },
                     error: () => { this.isSaving = false; },
                 });
             },
@@ -196,14 +179,11 @@ export class VehicleDispatchComponent implements OnInit {
         });
     }
 
-    // ── Detail actions ────────────────────────────────────────────────────────
-
     confirm() {
         this._modal.confirm({
             nzTitle: 'Confirm Delivery?',
-            nzContent: `This will generate 1 DO + 1 Gatepass and create invoices for all items.`,
-            nzOkText: 'Confirm',
-            nzOkType: 'primary',
+            nzContent: 'This will generate 1 DO + 1 Gatepass and create invoices for all items.',
+            nzOkText: 'Confirm', nzOkType: 'primary',
             nzOnOk: () => {
                 this.isConfirming = true;
                 this._http.post<any>(`${this.base}/${this.selected.ID}/confirm`, {}, { headers: this.headers }).subscribe({
@@ -216,10 +196,8 @@ export class VehicleDispatchComponent implements OnInit {
 
     deleteVD() {
         this._modal.confirm({
-            nzTitle: 'Delete this delivery?',
-            nzContent: 'Items will be returned to the available pool.',
-            nzOkDanger: true,
-            nzOkText: 'Delete',
+            nzTitle: 'Delete this delivery?', nzContent: 'Items will be returned to the available pool.',
+            nzOkDanger: true, nzOkText: 'Delete',
             nzOnOk: () => {
                 this._http.delete<any>(`${this.base}/${this.selected.ID}`, { headers: this.headers }).subscribe({
                     next: () => { this.selected = null; this.showForm = false; this.loadList(); },
@@ -238,22 +216,18 @@ export class VehicleDispatchComponent implements OnInit {
         return new Set(this.selected.Items.map((i: any) => i.CustomerID)).size;
     }
 
-    get groupedByCustomer(): { customer: string; items: any[]; total: number; doNo: string }[] {
+    get groupedByCustomer(): { customer: string; items: any[]; total: number }[] {
         if (!this.selected?.Items) return [];
         const map = new Map<number, any>();
         for (const item of this.selected.Items) {
             if (!map.has(item.CustomerID)) {
-                map.set(item.CustomerID, { customer: item.CustomerName, doNo: item.DONo || '—', items: [], total: 0 });
+                map.set(item.CustomerID, { customer: item.CustomerName, items: [], total: 0 });
             }
             const g = map.get(item.CustomerID);
             g.items.push(item);
             g.total += +item.PlannedQty || 0;
         }
         return [...map.values()];
-    }
-
-    groupAmount(items: any[]): number {
-        return items.reduce((s, i) => s + (+i.PlannedQty || 0) * (+i.CartonPrice || 0), 0);
     }
 
     statusClass(status: string): string {
@@ -264,9 +238,9 @@ export class VehicleDispatchComponent implements OnInit {
         }
     }
 
-    // ── Print helpers ─────────────────────────────────────────────────────────
+    // ── Print / Share ─────────────────────────────────────────────────────────
 
-    private _printHtml(title: string, html: string) {
+    private _printHtml(html: string) {
         const w = window.open('', '_blank', 'width=750,height=950');
         if (!w) return;
         w.document.write(html);
@@ -275,17 +249,15 @@ export class VehicleDispatchComponent implements OnInit {
         setTimeout(() => w.print(), 400);
     }
 
-    private get _docStyles(): string {
-        return `
-            body{font-family:Arial,sans-serif;margin:25px;font-size:12px;color:#111}
-            .header{text-align:center;margin-bottom:18px;border-bottom:2px solid #222;padding-bottom:10px}
+    private get _css(): string {
+        return `body{font-family:Arial,sans-serif;margin:25px;font-size:12px;color:#111}
+            .header{text-align:center;margin-bottom:16px;border-bottom:2px solid #222;padding-bottom:10px}
             .title{font-size:20px;font-weight:bold;letter-spacing:3px}
             .co{font-size:11px;color:#555;margin-top:3px}
             .meta{display:flex;justify-content:space-between;margin-bottom:12px;font-size:11px;line-height:1.9}
-            .driver-box{background:#f7f7f7;border:1px solid #ddd;padding:7px 12px;margin-bottom:14px;border-radius:3px;font-size:11px}
-            .section{margin-bottom:18px}
-            .cust-hdr{font-weight:bold;font-size:12px;border-bottom:1px solid #ccc;padding-bottom:3px;margin-bottom:7px}
-            .order-ref{font-size:10px;color:#666;margin-bottom:5px}
+            .dbox{background:#f7f7f7;border:1px solid #ddd;padding:7px 12px;margin-bottom:14px;border-radius:3px;font-size:11px}
+            .cust{font-weight:bold;font-size:12px;border-bottom:1px solid #bbb;padding-bottom:3px;margin-bottom:5px}
+            .oref{font-size:10px;color:#666;margin-bottom:8px}
             table{width:100%;border-collapse:collapse}
             th{background:#ececec;text-align:left;padding:5px 8px;border:1px solid #ccc;font-size:11px}
             td{padding:4px 8px;border:1px solid #ddd;font-size:11px}
@@ -293,52 +265,44 @@ export class VehicleDispatchComponent implements OnInit {
             .sigs{display:flex;justify-content:space-between;margin-top:45px}
             .sig{text-align:center;width:140px}
             .sig-line{border-top:1px solid #333;padding-top:4px;font-size:10px;color:#555}
+            .page{page-break-after:always}.page:last-child{page-break-after:avoid}
             @media print{@page{margin:12mm}body{margin:0}}`;
     }
 
     printDO() {
         const d = this.selected;
         const date = new Date(d.DispatchDate).toLocaleDateString('en-GB');
-        let sections = '';
-        for (const g of this.groupedByCustomer) {
+        const dbox = `<strong>Driver:</strong> ${d.DriverName || '—'} &nbsp;&nbsp;&nbsp; <strong>Vehicle No:</strong> ${d.VehicleNo || '—'}`;
+
+        const pages = this.groupedByCustomer.map(g => {
             const rows = g.items.map((i: any) =>
                 `<tr><td>${i.ProductName}</td><td style="text-align:right">${i.PlannedQty}</td></tr>`
             ).join('');
-            sections += `
-                <div class="section">
-                    <div class="cust-hdr">${g.customer}</div>
-                    <div class="order-ref">Order: ${g.items[0]?.OrderInvoiceNo || '—'}</div>
-                    <table>
-                        <thead><tr><th>Product</th><th style="text-align:right">Qty (Ctns)</th></tr></thead>
-                        <tbody>
-                            ${rows}
-                            <tr class="tr"><td><strong>Total</strong></td><td style="text-align:right"><strong>${g.total} ctns</strong></td></tr>
-                        </tbody>
-                    </table>
-                </div>`;
-        }
-        const html = `<!DOCTYPE html><html><head><title>DO-${d.DONo}</title>
-        <style>${this._docStyles}</style></head><body>
-            <div class="header">
-                <div class="title">DELIVERY ORDER</div>
-                <div class="co">Kids Wish</div>
-            </div>
-            <div class="meta">
-                <div><strong>DO No:</strong> ${d.DONo || '—'}<br><strong>Gatepass No:</strong> ${d.GatpassNo || '—'}</div>
-                <div style="text-align:right"><strong>Date:</strong> ${date}</div>
-            </div>
-            <div class="driver-box">
-                <strong>Driver:</strong> ${d.DriverName || '—'} &nbsp;&nbsp;&nbsp;
-                <strong>Vehicle No:</strong> ${d.VehicleNo || '—'}
-            </div>
-            ${sections}
-            <div class="sigs">
-                <div class="sig"><div class="sig-line">Driver Signature</div></div>
-                <div class="sig"><div class="sig-line">Security</div></div>
-                <div class="sig"><div class="sig-line">Authorized By</div></div>
-            </div>
-        </body></html>`;
-        this._printHtml('DO', html);
+            const ml = `<strong>DO No:</strong> ${d.DONo || '—'}<br>
+                        <strong>Gatepass:</strong> ${d.GatpassNo || '—'}
+                        ${d.BuiltyNo ? '<br><strong>Builty No:</strong> ' + d.BuiltyNo : ''}`;
+            return `<div class="page">
+                <div class="header"><div class="title">DELIVERY ORDER</div><div class="co">Kids Wish</div></div>
+                <div class="meta"><div>${ml}</div><div style="text-align:right"><strong>Date:</strong> ${date}</div></div>
+                <div class="dbox">${dbox}</div>
+                <div class="cust">${g.customer}</div>
+                <div class="oref">Order: ${g.items[0]?.OrderInvoiceNo || '—'}</div>
+                <table>
+                    <thead><tr><th>Product</th><th style="text-align:right">Qty (Ctns)</th></tr></thead>
+                    <tbody>
+                        ${rows}
+                        <tr class="tr"><td><strong>Total</strong></td><td style="text-align:right"><strong>${g.total} ctns</strong></td></tr>
+                    </tbody>
+                </table>
+                <div class="sigs">
+                    <div class="sig"><div class="sig-line">Driver Signature</div></div>
+                    <div class="sig"><div class="sig-line">Customer Signature</div></div>
+                    <div class="sig"><div class="sig-line">Authorized By</div></div>
+                </div>
+            </div>`;
+        }).join('');
+
+        this._printHtml(`<!DOCTYPE html><html><head><title>DO-${d.DONo}</title><style>${this._css}</style></head><body>${pages}</body></html>`);
     }
 
     printGatepass() {
@@ -346,29 +310,20 @@ export class VehicleDispatchComponent implements OnInit {
         const date = new Date(d.DispatchDate).toLocaleDateString('en-GB');
         const totalQty = this.groupedByCustomer.reduce((s, g) => s + g.total, 0);
         const rows = this.groupedByCustomer.flatMap(g =>
-            g.items.map((i: any) =>
-                `<tr><td>${g.customer}</td><td>${i.OrderInvoiceNo || '—'}</td><td>${i.ProductName}</td><td style="text-align:right">${i.PlannedQty}</td></tr>`
-            )
+            g.items.map((i: any) => `<tr><td>${i.ProductName}</td><td style="text-align:right">${i.PlannedQty}</td></tr>`)
         ).join('');
-        const html = `<!DOCTYPE html><html><head><title>GP-${d.GatpassNo}</title>
-        <style>${this._docStyles}</style></head><body>
-            <div class="header">
-                <div class="title">GATE PASS</div>
-                <div class="co">Kids Wish</div>
-            </div>
-            <div class="meta">
-                <div><strong>GP No:</strong> ${d.GatpassNo || '—'}<br><strong>DO No:</strong> ${d.DONo || '—'}</div>
-                <div style="text-align:right"><strong>Date:</strong> ${date}</div>
-            </div>
-            <div class="driver-box">
-                <strong>Driver:</strong> ${d.DriverName || '—'} &nbsp;&nbsp;&nbsp;
-                <strong>Vehicle No:</strong> ${d.VehicleNo || '—'}
-            </div>
+        const ml = `<strong>GP No:</strong> ${d.GatpassNo || '—'}<br>
+                    <strong>DO No:</strong> ${d.DONo || '—'}
+                    ${d.BuiltyNo ? '<br><strong>Builty No:</strong> ' + d.BuiltyNo : ''}`;
+        const html = `<!DOCTYPE html><html><head><title>GP-${d.GatpassNo}</title><style>${this._css}</style></head><body>
+            <div class="header"><div class="title">GATE PASS</div><div class="co">Kids Wish</div></div>
+            <div class="meta"><div>${ml}</div><div style="text-align:right"><strong>Date:</strong> ${date}</div></div>
+            <div class="dbox"><strong>Driver:</strong> ${d.DriverName || '—'} &nbsp;&nbsp;&nbsp; <strong>Vehicle No:</strong> ${d.VehicleNo || '—'}</div>
             <table>
-                <thead><tr><th>Customer</th><th>Order</th><th>Product</th><th style="text-align:right">Qty (Ctns)</th></tr></thead>
+                <thead><tr><th>Product</th><th style="text-align:right">Qty (Ctns)</th></tr></thead>
                 <tbody>
                     ${rows}
-                    <tr class="tr"><td colspan="3"><strong>Grand Total</strong></td><td style="text-align:right"><strong>${totalQty} ctns</strong></td></tr>
+                    <tr class="tr"><td><strong>Grand Total</strong></td><td style="text-align:right"><strong>${totalQty} ctns</strong></td></tr>
                 </tbody>
             </table>
             <div class="sigs">
@@ -377,7 +332,7 @@ export class VehicleDispatchComponent implements OnInit {
                 <div class="sig"><div class="sig-line">Authorized By</div></div>
             </div>
         </body></html>`;
-        this._printHtml('GP', html);
+        this._printHtml(html);
     }
 
     shareWhatsApp() {
@@ -386,17 +341,17 @@ export class VehicleDispatchComponent implements OnInit {
         let text = `*DELIVERY - ${d.DONo || 'N/A'}*\n`;
         text += `Date: ${date}\n`;
         text += `Driver: ${d.DriverName || '—'} | Vehicle: ${d.VehicleNo || '—'}\n`;
-        text += `Gatepass: ${d.GatpassNo || '—'}\n\n`;
+        text += `Gatepass: ${d.GatpassNo || '—'}`;
+        if (d.BuiltyNo) text += ` | Builty: ${d.BuiltyNo}`;
+        if (d.FreightAmount) text += `\nFreight: PKR ${(+d.FreightAmount).toLocaleString()}`;
+        text += '\n\n';
         for (const g of this.groupedByCustomer) {
-            text += `*${g.customer}*\n`;
-            text += `Order: ${g.items[0]?.OrderInvoiceNo || '—'}\n`;
-            for (const i of g.items) {
-                text += `• ${i.ProductName}: ${i.PlannedQty} ctns\n`;
-            }
+            text += `*${g.customer}*\nOrder: ${g.items[0]?.OrderInvoiceNo || '—'}\n`;
+            for (const i of g.items) text += `• ${i.ProductName}: ${i.PlannedQty} ctns\n`;
             text += `Total: ${g.total} ctns\n\n`;
         }
-        const grandTotal = this.groupedByCustomer.reduce((s, g) => s + g.total, 0);
-        text += `*Grand Total: ${grandTotal} ctns*`;
+        const gt = this.groupedByCustomer.reduce((s, g) => s + g.total, 0);
+        text += `*Grand Total: ${gt} ctns*`;
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     }
 }
