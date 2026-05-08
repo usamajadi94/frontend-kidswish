@@ -256,15 +256,15 @@ export class VehicleDispatchComponent implements OnInit {
 
     private _header(docTitle: string): string {
         return `<div class="header">
-            <img src="${this._logoUrl}" style="height:54px;object-fit:contain;margin-bottom:6px" crossorigin="anonymous">
+            <img src="${this._logoUrl}" style="height:32px;object-fit:contain" crossorigin="anonymous">
             <div class="title">${docTitle}</div>
         </div>`;
     }
 
     private get _css(): string {
         return `body{font-family:Arial,sans-serif;margin:25px;font-size:12px;color:#111}
-            .header{text-align:center;margin-bottom:16px;border-bottom:2px solid #222;padding-bottom:10px}
-            .title{font-size:18px;font-weight:bold;letter-spacing:3px;margin-top:4px}
+            .header{display:flex;align-items:center;gap:12px;margin-bottom:16px;border-bottom:2px solid #222;padding-bottom:10px}
+            .title{font-size:18px;font-weight:bold;letter-spacing:3px}
             .meta{display:flex;justify-content:space-between;margin-bottom:12px;font-size:11px;line-height:1.9}
             .dbox{background:#f7f7f7;border:1px solid #ddd;padding:7px 12px;margin-bottom:14px;border-radius:3px;font-size:11px}
             .cust{font-weight:bold;font-size:12px;border-bottom:1px solid #bbb;padding-bottom:3px;margin-bottom:5px}
@@ -366,9 +366,9 @@ export class VehicleDispatchComponent implements OnInit {
                 const el = document.createElement('div');
                 el.style.cssText = 'position:fixed;left:-9999px;top:0;width:680px;background:#fff;padding:30px;font-family:Arial,sans-serif;color:#111;box-sizing:border-box';
                 el.innerHTML = `
-                    <div style="text-align:center;border-bottom:2px solid #222;padding-bottom:10px;margin-bottom:16px">
-                        <img src="${this._logoUrl}" style="height:54px;object-fit:contain;margin-bottom:6px" crossorigin="anonymous">
-                        <div style="font-size:18px;font-weight:bold;letter-spacing:3px;margin-top:4px">DELIVERY ORDER</div>
+                    <div style="display:flex;align-items:center;gap:12px;border-bottom:2px solid #222;padding-bottom:10px;margin-bottom:16px">
+                        <img src="${this._logoUrl}" style="height:32px;object-fit:contain" crossorigin="anonymous">
+                        <div style="font-size:18px;font-weight:bold;letter-spacing:3px">DELIVERY ORDER</div>
                     </div>
                     <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:11px;line-height:1.9">
                         <div>
