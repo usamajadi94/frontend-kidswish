@@ -46,6 +46,10 @@ export class DrpService {
         return this._QueryService.getQuery('getVendorDrp');
     }
 
+    getDriverDrp() {
+        return this._QueryService.getQuery('getDriverDrp');
+    }
+
     getDistributorCustomerDrp() {
         return this._QueryService.getQuery('getDistributorCustomerDrp');
     }

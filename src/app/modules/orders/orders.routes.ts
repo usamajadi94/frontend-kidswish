@@ -42,4 +42,8 @@ export default [
         path: 'customer-ledger',
         loadComponent: () => import('./customer-ledger/customer-ledger.component').then(m => m.CustomerLedgerComponent),
     },
+    {
+        path: 'vehicle-dispatch',
+        loadComponent: () => import('./vehicle-dispatch/vehicle-dispatch.component').then(m => m.VehicleDispatchComponent),
+    },
 ] as Routes;
