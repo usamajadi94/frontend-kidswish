@@ -248,11 +248,28 @@
                             </div>
                         }
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium"
                               [ngClass]="statusClass(selected.Status)">
                             {{ selected.Status }}
                         </span>
+                        @if (selected.Status === 'Confirmed') {
+                            <button
+                                class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100 transition-colors"
+                                (click)="printDO()">
+                                🖨 Delivery Order
+                            </button>
+                            <button
+                                class="rounded-lg border border-purple-200 bg-purple-50 px-3 py-1.5 text-xs font-medium text-purple-700 hover:bg-purple-100 transition-colors"
+                                (click)="printGatepass()">
+                                🖨 Gate Pass
+                            </button>
+                            <button
+                                class="rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-100 transition-colors"
+                                (click)="shareWhatsApp()">
+                                WhatsApp
+                            </button>
+                        }
                         @if (selected.Status === 'Draft') {
                             <button
                                 [disabled]="!selected.Items?.length || isConfirming"

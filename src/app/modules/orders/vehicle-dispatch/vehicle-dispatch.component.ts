@@ -263,4 +263,140 @@ export class VehicleDispatchComponent implements OnInit {
             default:          return 'bg-gray-100 text-gray-600';
         }
     }
+
+    // ── Print helpers ─────────────────────────────────────────────────────────
+
+    private _printHtml(title: string, html: string) {
+        const w = window.open('', '_blank', 'width=750,height=950');
+        if (!w) return;
+        w.document.write(html);
+        w.document.close();
+        w.focus();
+        setTimeout(() => w.print(), 400);
+    }
+
+    private get _docStyles(): string {
+        return `
+            body{font-family:Arial,sans-serif;margin:25px;font-size:12px;color:#111}
+            .header{text-align:center;margin-bottom:18px;border-bottom:2px solid #222;padding-bottom:10px}
+            .title{font-size:20px;font-weight:bold;letter-spacing:3px}
+            .co{font-size:11px;color:#555;margin-top:3px}
+            .meta{display:flex;justify-content:space-between;margin-bottom:12px;font-size:11px;line-height:1.9}
+            .driver-box{background:#f7f7f7;border:1px solid #ddd;padding:7px 12px;margin-bottom:14px;border-radius:3px;font-size:11px}
+            .section{margin-bottom:18px}
+            .cust-hdr{font-weight:bold;font-size:12px;border-bottom:1px solid #ccc;padding-bottom:3px;margin-bottom:7px}
+            .order-ref{font-size:10px;color:#666;margin-bottom:5px}
+            table{width:100%;border-collapse:collapse}
+            th{background:#ececec;text-align:left;padding:5px 8px;border:1px solid #ccc;font-size:11px}
+            td{padding:4px 8px;border:1px solid #ddd;font-size:11px}
+            .tr{background:#f4f4f4;font-weight:bold}
+            .sigs{display:flex;justify-content:space-between;margin-top:45px}
+            .sig{text-align:center;width:140px}
+            .sig-line{border-top:1px solid #333;padding-top:4px;font-size:10px;color:#555}
+            @media print{@page{margin:12mm}body{margin:0}}`;
+    }
+
+    printDO() {
+        const d = this.selected;
+        const date = new Date(d.DispatchDate).toLocaleDateString('en-GB');
+        let sections = '';
+        for (const g of this.groupedByCustomer) {
+            const rows = g.items.map((i: any) =>
+                `<tr><td>${i.ProductName}</td><td style="text-align:right">${i.PlannedQty}</td></tr>`
+            ).join('');
+            sections += `
+                <div class="section">
+                    <div class="cust-hdr">${g.customer}</div>
+                    <div class="order-ref">Order: ${g.items[0]?.OrderInvoiceNo || '—'}</div>
+                    <table>
+                        <thead><tr><th>Product</th><th style="text-align:right">Qty (Ctns)</th></tr></thead>
+                        <tbody>
+                            ${rows}
+                            <tr class="tr"><td><strong>Total</strong></td><td style="text-align:right"><strong>${g.total} ctns</strong></td></tr>
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+        const html = `<!DOCTYPE html><html><head><title>DO-${d.DONo}</title>
+        <style>${this._docStyles}</style></head><body>
+            <div class="header">
+                <div class="title">DELIVERY ORDER</div>
+                <div class="co">Kids Wish</div>
+            </div>
+            <div class="meta">
+                <div><strong>DO No:</strong> ${d.DONo || '—'}<br><strong>Gatepass No:</strong> ${d.GatpassNo || '—'}</div>
+                <div style="text-align:right"><strong>Date:</strong> ${date}</div>
+            </div>
+            <div class="driver-box">
+                <strong>Driver:</strong> ${d.DriverName || '—'} &nbsp;&nbsp;&nbsp;
+                <strong>Vehicle No:</strong> ${d.VehicleNo || '—'}
+            </div>
+            ${sections}
+            <div class="sigs">
+                <div class="sig"><div class="sig-line">Driver Signature</div></div>
+                <div class="sig"><div class="sig-line">Security</div></div>
+                <div class="sig"><div class="sig-line">Authorized By</div></div>
+            </div>
+        </body></html>`;
+        this._printHtml('DO', html);
+    }
+
+    printGatepass() {
+        const d = this.selected;
+        const date = new Date(d.DispatchDate).toLocaleDateString('en-GB');
+        const totalQty = this.groupedByCustomer.reduce((s, g) => s + g.total, 0);
+        const rows = this.groupedByCustomer.flatMap(g =>
+            g.items.map((i: any) =>
+                `<tr><td>${g.customer}</td><td>${i.OrderInvoiceNo || '—'}</td><td>${i.ProductName}</td><td style="text-align:right">${i.PlannedQty}</td></tr>`
+            )
+        ).join('');
+        const html = `<!DOCTYPE html><html><head><title>GP-${d.GatpassNo}</title>
+        <style>${this._docStyles}</style></head><body>
+            <div class="header">
+                <div class="title">GATE PASS</div>
+                <div class="co">Kids Wish</div>
+            </div>
+            <div class="meta">
+                <div><strong>GP No:</strong> ${d.GatpassNo || '—'}<br><strong>DO No:</strong> ${d.DONo || '—'}</div>
+                <div style="text-align:right"><strong>Date:</strong> ${date}</div>
+            </div>
+            <div class="driver-box">
+                <strong>Driver:</strong> ${d.DriverName || '—'} &nbsp;&nbsp;&nbsp;
+                <strong>Vehicle No:</strong> ${d.VehicleNo || '—'}
+            </div>
+            <table>
+                <thead><tr><th>Customer</th><th>Order</th><th>Product</th><th style="text-align:right">Qty (Ctns)</th></tr></thead>
+                <tbody>
+                    ${rows}
+                    <tr class="tr"><td colspan="3"><strong>Grand Total</strong></td><td style="text-align:right"><strong>${totalQty} ctns</strong></td></tr>
+                </tbody>
+            </table>
+            <div class="sigs">
+                <div class="sig"><div class="sig-line">Driver Signature</div></div>
+                <div class="sig"><div class="sig-line">Security</div></div>
+                <div class="sig"><div class="sig-line">Authorized By</div></div>
+            </div>
+        </body></html>`;
+        this._printHtml('GP', html);
+    }
+
+    shareWhatsApp() {
+        const d = this.selected;
+        const date = new Date(d.DispatchDate).toLocaleDateString('en-GB');
+        let text = `*DELIVERY - ${d.DONo || 'N/A'}*\n`;
+        text += `Date: ${date}\n`;
+        text += `Driver: ${d.DriverName || '—'} | Vehicle: ${d.VehicleNo || '—'}\n`;
+        text += `Gatepass: ${d.GatpassNo || '—'}\n\n`;
+        for (const g of this.groupedByCustomer) {
+            text += `*${g.customer}*\n`;
+            text += `Order: ${g.items[0]?.OrderInvoiceNo || '—'}\n`;
+            for (const i of g.items) {
+                text += `• ${i.ProductName}: ${i.PlannedQty} ctns\n`;
+            }
+            text += `Total: ${g.total} ctns\n\n`;
+        }
+        const grandTotal = this.groupedByCustomer.reduce((s, g) => s + g.total, 0);
+        text += `*Grand Total: ${grandTotal} ctns*`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
 }
