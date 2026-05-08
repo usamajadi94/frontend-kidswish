@@ -52,23 +52,6 @@
                     }
                 </div>
                 <div class="flex items-center gap-2" (click)="$event.stopPropagation()">
-                    @if (hasConfirmed(grp.items)) {
-                        <button mat-stroked-button class="!text-xs !h-7 !px-3 !rounded-lg !border-blue-300 !text-blue-700 hover:!bg-blue-50"
-                            (click)="printOrderDO(grp)">
-                            <mat-icon class="!text-sm !mr-1">description</mat-icon>Delivery Order
-                        </button>
-                        <button mat-stroked-button class="!text-xs !h-7 !px-3 !rounded-lg !border-purple-300 !text-purple-700 hover:!bg-purple-50"
-                            (click)="printOrderGP(grp)">
-                            <mat-icon class="!text-sm !mr-1">exit_to_app</mat-icon>Gate Pass
-                        </button>
-                    }
-                    @if (grp.OrderStatus === 'Completed') {
-                        <button mat-flat-button color="primary" class="text-xs !min-h-6 !h-7 !px-3"
-                            (click)="printInvoice(grp)" [disabled]="busyInvoiceId === grp.OrderID">
-                            <mat-icon class="text-sm mr-1">receipt</mat-icon>
-                            {{ busyInvoiceId === grp.OrderID ? '...' : 'Invoice' }}
-                        </button>
-                    }
                     <span class="text-xs text-gray-400">{{ grp.items.length }} item(s)</span>
                 </div>
             </div>

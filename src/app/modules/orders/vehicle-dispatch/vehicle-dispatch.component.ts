@@ -16,34 +16,49 @@ import { apiUrls } from 'app/modules/shared/services/api-url';
     templateUrl: './vehicle-dispatch.component.html',
 })
 export class VehicleDispatchComponent implements OnInit {
-    private _http         = inject(HttpClient);
-    private _ls           = inject(LocalStorageService);
-    private _drp          = inject(DrpService);
-    private _modal        = inject(NzModalService);
+    private _http  = inject(HttpClient);
+    private _ls    = inject(LocalStorageService);
+    private _drp   = inject(DrpService);
+    private _modal = inject(NzModalService);
 
+    // ── List ──────────────────────────────────────────────────────────────────
     list: any[] = [];
     selected: any = null;
-    availableItems: any[] = [];
-    drivers: any[] = [];
-    isLoadingList    = false;
-    isLoadingDetail  = false;
-    isLoadingAvail   = false;
-    isConfirming     = false;
-    showCreateModal  = false;
-    showAddItemModal = false;
-    selectedPlanIds: number[] = [];
+    isLoadingList   = false;
+    isLoadingDetail = false;
+    isConfirming    = false;
 
-    createForm = { DispatchDate: new Date() as any, DriverID: null as any, VehicleNo: '', Notes: '' };
+    // ── Create form ───────────────────────────────────────────────────────────
+    showForm = false;
+    form = { DispatchDate: new Date() as any, DriverID: null as any, VehicleNo: '', Notes: '' };
+    isSaving = false;
+
+    // ── Available items (all confirmed unassigned dispatch plan items) ─────────
+    availableItems: any[] = [];
+    isLoadingAvail  = false;
+
+    // ── Item selection state ──────────────────────────────────────────────────
+    selCustomerId: number | null = null;
+    selOrderId: number | null = null;
+    selectionRows: any[] = [];   // items for selected customer+order (mutable, has inputQty)
+
+    // ── Items staged for this delivery ────────────────────────────────────────
+    stagedItems: {
+        PlanID: number; CustomerID: number; CustomerName: string;
+        OrderID: number; OrderInvoiceNo: string; ProductName: string; Qty: number;
+    }[] = [];
+
+    // ── Dropdowns ─────────────────────────────────────────────────────────────
+    drivers: any[] = [];
 
     get headers() {
         return new HttpHeaders({ uid: this._ls.uid, cid: this._ls.cid, eid: this._ls.eid });
     }
-
     get base() { return `${apiUrls.server}${apiUrls.vehicleDispatchController}`; }
 
     ngOnInit() {
         this.loadList();
-        this._drp.getDriverDrp().subscribe({ next: (res: any) => { this.drivers = res || []; } });
+        this._drp.getDriverDrp().subscribe({ next: (res: any) => this.drivers = res || [] });
     }
 
     loadList() {
@@ -55,6 +70,7 @@ export class VehicleDispatchComponent implements OnInit {
     }
 
     select(item: any) {
+        this.showForm = false;
         this.isLoadingDetail = true;
         this._http.get<any>(`${this.base}/${item.ID}`, { headers: this.headers }).subscribe({
             next: (res) => { this.selected = res; this.isLoadingDetail = false; },
@@ -62,54 +78,114 @@ export class VehicleDispatchComponent implements OnInit {
         });
     }
 
-    openCreate() {
-        this.createForm = { DispatchDate: new Date(), DriverID: null, VehicleNo: '', Notes: '' };
-        this.showCreateModal = true;
-    }
-
-    saveCreate() {
-        this._http.post<any>(this.base, this.createForm, { headers: this.headers }).subscribe({
-            next: (res) => {
-                this.showCreateModal = false;
-                this.loadList();
-                this.selected = res;
-            },
-        });
-    }
-
-    openAddItems() {
-        this.selectedPlanIds = [];
+    openNewForm() {
+        this.selected = null;
+        this.showForm = true;
+        this.form = { DispatchDate: new Date(), DriverID: null, VehicleNo: '', Notes: '' };
+        this.stagedItems = [];
+        this.selCustomerId = null;
+        this.selOrderId = null;
+        this.selectionRows = [];
         this.isLoadingAvail = true;
-        this.showAddItemModal = true;
         this._http.get<any[]>(`${this.base}/available-items`, { headers: this.headers }).subscribe({
             next: (res) => { this.availableItems = res || []; this.isLoadingAvail = false; },
             error: () => { this.isLoadingAvail = false; },
         });
     }
 
-    togglePlanItem(planId: number) {
-        this.selectedPlanIds = this.selectedPlanIds.includes(planId)
-            ? this.selectedPlanIds.filter(id => id !== planId)
-            : [...this.selectedPlanIds, planId];
+    // ── Derived dropdowns from availableItems ─────────────────────────────────
+
+    get customersForForm(): { ID: number; Name: string }[] {
+        const map = new Map<number, string>();
+        for (const i of this.availableItems) {
+            if (!this.stagedItems.find(s => s.PlanID === i.PlanID)) {
+                map.set(i.CustomerID, i.CustomerName);
+            }
+        }
+        return [...map.entries()].map(([ID, Name]) => ({ ID, Name }));
     }
 
-    addSelectedItems() {
-        if (!this.selectedPlanIds.length) return;
-        this._http.post<any>(
-            `${this.base}/${this.selected.ID}/items`,
-            { planIds: this.selectedPlanIds },
-            { headers: this.headers }
-        ).subscribe({
-            next: (res) => { this.selected = res; this.showAddItemModal = false; this.loadList(); },
+    get ordersForSelCustomer(): { ID: number; Label: string }[] {
+        if (!this.selCustomerId) return [];
+        const map = new Map<number, string>();
+        for (const i of this.availableItems) {
+            if (i.CustomerID === this.selCustomerId && !this.stagedItems.find(s => s.PlanID === i.PlanID)) {
+                map.set(i.OrderID, i.OrderInvoiceNo || ('#' + i.OrderID));
+            }
+        }
+        return [...map.entries()].map(([ID, Label]) => ({ ID, Label }));
+    }
+
+    onCustomerChange() {
+        this.selOrderId = null;
+        this.selectionRows = [];
+    }
+
+    onOrderChange() {
+        if (!this.selCustomerId || !this.selOrderId) { this.selectionRows = []; return; }
+        this.selectionRows = this.availableItems
+            .filter(i => i.CustomerID === this.selCustomerId
+                      && i.OrderID === this.selOrderId
+                      && !this.stagedItems.find(s => s.PlanID === i.PlanID))
+            .map(i => ({ ...i, inputQty: +i.PlannedQty }));
+    }
+
+    addToDelivery() {
+        for (const row of this.selectionRows) {
+            if (+row.inputQty > 0) {
+                this.stagedItems.push({
+                    PlanID: row.PlanID,
+                    CustomerID: row.CustomerID,
+                    CustomerName: row.CustomerName,
+                    OrderID: row.OrderID,
+                    OrderInvoiceNo: row.OrderInvoiceNo || ('#' + row.OrderID),
+                    ProductName: row.ProductName,
+                    Qty: +row.inputQty,
+                });
+            }
+        }
+        this.selCustomerId = null;
+        this.selOrderId = null;
+        this.selectionRows = [];
+    }
+
+    removeStagedItem(planId: number) {
+        this.stagedItems = this.stagedItems.filter(i => i.PlanID !== planId);
+        this.onOrderChange();
+    }
+
+    get groupedStaged(): { customerName: string; orderLabel: string; items: any[] }[] {
+        const map = new Map<number, any>();
+        for (const item of this.stagedItems) {
+            if (!map.has(item.CustomerID)) {
+                map.set(item.CustomerID, { customerName: item.CustomerName, orderLabel: item.OrderInvoiceNo, items: [] });
+            }
+            map.get(item.CustomerID).items.push(item);
+        }
+        return [...map.values()];
+    }
+
+    saveDelivery() {
+        if (!this.stagedItems.length || this.isSaving) return;
+        this.isSaving = true;
+        this._http.post<any>(this.base, this.form, { headers: this.headers }).subscribe({
+            next: (vd) => {
+                const planIds = this.stagedItems.map(i => i.PlanID);
+                this._http.post<any>(`${this.base}/${vd.ID}/items`, { planIds }, { headers: this.headers }).subscribe({
+                    next: () => {
+                        this.isSaving = false;
+                        this.showForm = false;
+                        this.loadList();
+                        this.select({ ID: vd.ID });
+                    },
+                    error: () => { this.isSaving = false; },
+                });
+            },
+            error: () => { this.isSaving = false; },
         });
     }
 
-    removeItem(planId: number) {
-        this._http.delete<any>(
-            `${this.base}/${this.selected.ID}/items/${planId}`,
-            { headers: this.headers }
-        ).subscribe({ next: (res) => { this.selected = res; this.loadList(); } });
-    }
+    // ── Detail actions ────────────────────────────────────────────────────────
 
     confirm() {
         this._modal.confirm({
@@ -119,11 +195,7 @@ export class VehicleDispatchComponent implements OnInit {
             nzOkType: 'primary',
             nzOnOk: () => {
                 this.isConfirming = true;
-                this._http.post<any>(
-                    `${this.base}/${this.selected.ID}/confirm`,
-                    {},
-                    { headers: this.headers }
-                ).subscribe({
+                this._http.post<any>(`${this.base}/${this.selected.ID}/confirm`, {}, { headers: this.headers }).subscribe({
                     next: (res) => { this.selected = res; this.isConfirming = false; this.loadList(); },
                     error: () => { this.isConfirming = false; },
                 });
@@ -133,16 +205,21 @@ export class VehicleDispatchComponent implements OnInit {
 
     deleteVD() {
         this._modal.confirm({
-            nzTitle: 'Delete this vehicle dispatch?',
+            nzTitle: 'Delete this delivery?',
             nzContent: 'Items will be returned to the available pool.',
             nzOkDanger: true,
             nzOkText: 'Delete',
             nzOnOk: () => {
                 this._http.delete<any>(`${this.base}/${this.selected.ID}`, { headers: this.headers }).subscribe({
-                    next: () => { this.selected = null; this.loadList(); },
+                    next: () => { this.selected = null; this.showForm = false; this.loadList(); },
                 });
             },
         });
+    }
+
+    removeItem(planId: number) {
+        this._http.delete<any>(`${this.base}/${this.selected.ID}/items/${planId}`, { headers: this.headers })
+            .subscribe({ next: (res) => { this.selected = res; this.loadList(); } });
     }
 
     get uniqueCustomerCount(): number {
@@ -155,12 +232,7 @@ export class VehicleDispatchComponent implements OnInit {
         const map = new Map<number, any>();
         for (const item of this.selected.Items) {
             if (!map.has(item.CustomerID)) {
-                map.set(item.CustomerID, {
-                    customer: item.CustomerName,
-                    doNo: item.DONo || '—',
-                    items: [],
-                    total: 0,
-                });
+                map.set(item.CustomerID, { customer: item.CustomerName, doNo: item.DONo || '—', items: [], total: 0 });
             }
             const g = map.get(item.CustomerID);
             g.items.push(item);
