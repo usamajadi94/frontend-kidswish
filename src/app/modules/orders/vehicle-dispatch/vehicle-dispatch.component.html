@@ -2,11 +2,11 @@
 
     <!-- Header -->
     <div class="mb-4 flex items-center justify-between shrink-0">
-        <div class="text-3xl font-semibold leading-8 tracking-tight">Vehicle Dispatch</div>
+        <div class="text-3xl font-semibold leading-8 tracking-tight">Delivery</div>
         <button
             class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
             (click)="openCreate()">
-            + New Vehicle Dispatch
+            + New Delivery
         </button>
     </div>
 
@@ -176,7 +176,7 @@
 <!-- ══ Create Modal ══ -->
 <nz-modal
     [(nzVisible)]="showCreateModal"
-    nzTitle="New Vehicle Dispatch"
+    nzTitle="New Delivery"
     (nzOnCancel)="showCreateModal = false"
     (nzOnOk)="saveCreate()"
     nzOkText="Create">
@@ -212,7 +212,7 @@
 <!-- ══ Add Items Modal ══ -->
 <nz-modal
     [(nzVisible)]="showAddItemModal"
-    nzTitle="Add Items to Vehicle Dispatch"
+    nzTitle="Add Items to Delivery"
     nzWidth="700px"
     (nzOnCancel)="showAddItemModal = false"
     (nzOnOk)="addSelectedItems()"
