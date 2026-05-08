@@ -201,7 +201,7 @@ export class VehicleDispatchComponent implements OnInit {
     confirm() {
         this._modal.confirm({
             nzTitle: 'Confirm Delivery?',
-            nzContent: `This will generate 1 Gatepass + ${this.uniqueCustomerCount} DO(s) and create invoices.`,
+            nzContent: `This will generate 1 DO + 1 Gatepass and create invoices for all items.`,
             nzOkText: 'Confirm',
             nzOkType: 'primary',
             nzOnOk: () => {

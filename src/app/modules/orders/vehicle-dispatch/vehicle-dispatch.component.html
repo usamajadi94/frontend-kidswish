@@ -241,8 +241,11 @@
                             @if (selected.DriverName) { · {{ selected.DriverName }} }
                             @if (selected.VehicleNo) { · {{ selected.VehicleNo }} }
                         </div>
-                        @if (selected.GatpassNo) {
-                            <div class="text-xs text-gray-500 mt-0.5">Gatepass: {{ selected.GatpassNo }}</div>
+                        @if (selected.DONo || selected.GatpassNo) {
+                            <div class="text-xs text-gray-500 mt-0.5 flex gap-3">
+                                @if (selected.DONo) { <span>DO: {{ selected.DONo }}</span> }
+                                @if (selected.GatpassNo) { <span>Gatepass: {{ selected.GatpassNo }}</span> }
+                            </div>
                         }
                     </div>
                     <div class="flex items-center gap-2">
