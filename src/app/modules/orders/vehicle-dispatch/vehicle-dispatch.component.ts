@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -12,7 +12,7 @@ import { apiUrls } from 'app/modules/shared/services/api-url';
 @Component({
     selector: 'app-vehicle-dispatch',
     standalone: true,
-    imports: [CommonModule, FormsModule, NzSelectModule, NzDatePickerModule, NzModalModule, CurrencyPipe, DatePipe],
+    imports: [CommonModule, FormsModule, NzSelectModule, NzDatePickerModule, NzModalModule, DatePipe],
     templateUrl: './vehicle-dispatch.component.html',
 })
 export class VehicleDispatchComponent implements OnInit {
@@ -250,11 +250,21 @@ export class VehicleDispatchComponent implements OnInit {
         setTimeout(() => w.print(), 400);
     }
 
+    private get _logoUrl(): string {
+        return `${window.location.origin}/images/logo/trackcloud/kidswishlogo.png`;
+    }
+
+    private _header(docTitle: string): string {
+        return `<div class="header">
+            <img src="${this._logoUrl}" style="height:54px;object-fit:contain;margin-bottom:6px" crossorigin="anonymous">
+            <div class="title">${docTitle}</div>
+        </div>`;
+    }
+
     private get _css(): string {
         return `body{font-family:Arial,sans-serif;margin:25px;font-size:12px;color:#111}
             .header{text-align:center;margin-bottom:16px;border-bottom:2px solid #222;padding-bottom:10px}
-            .title{font-size:20px;font-weight:bold;letter-spacing:3px}
-            .co{font-size:11px;color:#555;margin-top:3px}
+            .title{font-size:18px;font-weight:bold;letter-spacing:3px;margin-top:4px}
             .meta{display:flex;justify-content:space-between;margin-bottom:12px;font-size:11px;line-height:1.9}
             .dbox{background:#f7f7f7;border:1px solid #ddd;padding:7px 12px;margin-bottom:14px;border-radius:3px;font-size:11px}
             .cust{font-weight:bold;font-size:12px;border-bottom:1px solid #bbb;padding-bottom:3px;margin-bottom:5px}
@@ -283,7 +293,7 @@ export class VehicleDispatchComponent implements OnInit {
                         <strong>Gatepass:</strong> ${d.GatpassNo || '—'}
                         ${d.BuiltyNo ? '<br><strong>Builty No:</strong> ' + d.BuiltyNo : ''}`;
             return `<div class="page">
-                <div class="header"><div class="title">DELIVERY ORDER</div><div class="co">Kids Wish</div></div>
+                ${this._header('DELIVERY ORDER')}
                 <div class="meta"><div>${ml}</div><div style="text-align:right"><strong>Date:</strong> ${date}</div></div>
                 <div class="dbox">${dbox}</div>
                 <div class="cust">${g.customer}</div>
@@ -317,7 +327,7 @@ export class VehicleDispatchComponent implements OnInit {
                     <strong>DO No:</strong> ${d.DONo || '—'}
                     ${d.BuiltyNo ? '<br><strong>Builty No:</strong> ' + d.BuiltyNo : ''}`;
         const html = `<!DOCTYPE html><html><head><title>GP-${d.GatpassNo}</title><style>${this._css}</style></head><body>
-            <div class="header"><div class="title">GATE PASS</div><div class="co">Kids Wish</div></div>
+            ${this._header('GATE PASS')}
             <div class="meta"><div>${ml}</div><div style="text-align:right"><strong>Date:</strong> ${date}</div></div>
             <div class="dbox"><strong>Driver:</strong> ${d.DriverName || '—'} &nbsp;&nbsp;&nbsp; <strong>Vehicle No:</strong> ${d.VehicleNo || '—'}</div>
             <table>
@@ -357,8 +367,8 @@ export class VehicleDispatchComponent implements OnInit {
                 el.style.cssText = 'position:fixed;left:-9999px;top:0;width:680px;background:#fff;padding:30px;font-family:Arial,sans-serif;color:#111;box-sizing:border-box';
                 el.innerHTML = `
                     <div style="text-align:center;border-bottom:2px solid #222;padding-bottom:10px;margin-bottom:16px">
-                        <div style="font-size:20px;font-weight:bold;letter-spacing:3px">DELIVERY ORDER</div>
-                        <div style="font-size:11px;color:#555;margin-top:3px">Kids Wish</div>
+                        <img src="${this._logoUrl}" style="height:54px;object-fit:contain;margin-bottom:6px" crossorigin="anonymous">
+                        <div style="font-size:18px;font-weight:bold;letter-spacing:3px;margin-top:4px">DELIVERY ORDER</div>
                     </div>
                     <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:11px;line-height:1.9">
                         <div>
