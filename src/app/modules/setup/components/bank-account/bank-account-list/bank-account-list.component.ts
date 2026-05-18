@@ -1,5 +1,4 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-button/bft-button.component';
 import { BftTableComponent } from 'app/modules/shared/components/tables/bft-table/bft-table.component';
 import { ListService } from 'app/modules/shared/services/list.service';
@@ -22,7 +21,6 @@ export class BankAccountListComponent extends BaseRoutedComponent implements OnI
     private modalService = inject(ModalService);
     private _listService = inject(ListService);
     private _toastService = inject(ToastService);
-    private _router = inject(Router);
     title = componentRegister.bankAccount.Title;
     isVisible = false;
     columns = [
