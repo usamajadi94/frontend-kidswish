@@ -14,6 +14,8 @@ import { WrapperAddComponent } from 'app/modules/shared/permission-wrapper/wrapp
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { CashInHandFormComponent } from '../cash-in-hand-form.component';
+import { PaymentReceivedFormComponent } from '../../payment-received/payment-received-form.component';
+import { AccountTransferFormComponent } from '../../bank-account/account-transfer-form.component';
 
 const CATEGORY_COLORS = [
     { bg: 'bg-blue-100',   text: 'text-blue-700'   },
@@ -101,11 +103,25 @@ export class CashInHandListComponent extends BaseRoutedComponent {
     }
 
     onView(row: any) {
-        this._modalService.openModal({
-            component: CashInHandFormComponent,
-            title: this.title,
-            ID: row.ID,
-        }).afterClose.subscribe((res: boolean) => { if (res) this.loadAll(); });
+        if (row.Source === 'payment') {
+            this._modalService.openModal({
+                component: PaymentReceivedFormComponent,
+                title: 'Payment Received',
+                ID: row.ID - 3000000000,
+            }).afterClose.subscribe((res: boolean) => { if (res) this.loadAll(); });
+        } else if (row.Source === 'transfer') {
+            this._modalService.openModal({
+                component: AccountTransferFormComponent,
+                title: 'Account Transfer',
+                ID: row.ID - 4000000000,
+            }).afterClose.subscribe((res: boolean) => { if (res) this.loadAll(); });
+        } else {
+            this._modalService.openModal({
+                component: CashInHandFormComponent,
+                title: this.title,
+                ID: row.ID,
+            }).afterClose.subscribe((res: boolean) => { if (res) this.loadAll(); });
+        }
     }
 
     addNew(categoryID: number) {
