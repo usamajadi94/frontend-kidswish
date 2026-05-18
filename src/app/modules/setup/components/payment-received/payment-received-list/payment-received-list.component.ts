@@ -42,6 +42,7 @@ export class PaymentReceivedListComponent extends BaseRoutedComponent implements
     }
 
     onView(row) {
+        if (row.Source === 'cash_in_hand') return;
         this.modalService.openModal({ component: PaymentReceivedFormComponent, title: this.title, ID: row.ID })
             .afterClose.subscribe((res: boolean) => { if (res) this.getData(); });
     }
