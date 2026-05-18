@@ -62,7 +62,7 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
     public override InitializeObject(): void {
         this.formData = new CashInHand();
         this.formData.Date = new Date() as any;
-        this.formData.Type = 'out';
+        this.formData.Type = 'in';
     }
 
     public override async AfterDisplay(): Promise<void> {
