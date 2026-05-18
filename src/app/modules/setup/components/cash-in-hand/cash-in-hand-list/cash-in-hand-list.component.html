@@ -103,14 +103,19 @@
                     </tr>
                 } @else {
                     @for (row of filteredLedger; track row.ID) {
-                        <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                        <tr class="hover:bg-gray-50 transition-colors"
+                            [class.cursor-pointer]="row.Source !== 'payment'"
                             [class.bg-green-50]="row.CashIn > 0"
                             [class.bg-red-50]="row.CashOut > 0"
-                            (click)="onView(row)">
+                            (click)="row.Source !== 'payment' && onView(row)">
                             <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
                             <td class="px-3 py-1.5 text-xs text-gray-700">{{ row.Vendor || '—' }}</td>
                             <td class="px-3 py-1.5 text-xs">
-                                @if (row.Category) {
+                                @if (row.Source === 'payment') {
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-700">
+                                        Payment
+                                    </span>
+                                } @else if (row.Category) {
                                     <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
                                           [ngClass]="[getCategoryColor(row.Category).bg, getCategoryColor(row.Category).text]">
                                         {{ row.Category }}
