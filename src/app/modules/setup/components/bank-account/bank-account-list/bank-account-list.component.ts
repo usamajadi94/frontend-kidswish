@@ -47,9 +47,7 @@ export class BankAccountListComponent extends BaseRoutedComponent implements OnI
         });
     }
 
-    onView(row) {
-        this._router.navigate(['/setup/bank-account-detail', row.ID]);
-    }
+    onView(row) { }
 
     addBankAccount() {
         this.modalService.openModal({ component: BankAccountFormComponent, title: this.title })
