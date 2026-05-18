@@ -39,6 +39,8 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
     selectedFile: File | null = null;
     isUploading = false;
     uploadError = '';
+    private _categoriesLoaded = false;
+    private _afterDisplayRan = false;
 
     constructor(
         private genSer: GenericService,
@@ -54,9 +56,15 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
 
     override ngOnInit(): void {
         super.ngOnInit();
-        this._drp.getPaymentCategoryDrp().subscribe({ next: (res: any) => { this.paymentCategories = res; } });
+        this._drp.getPaymentCategoryDrp().subscribe({ next: (res: any) => { this.paymentCategories = res; this._categoriesLoaded = true; this.applyDailyExpenseType(); } });
         this._drp.getExpenseCategoryDrp().subscribe({ next: (res: any) => { this.expenseCategories = res; } });
         this._drp.getVendorDrp().subscribe({ next: (res: any) => { this.vendors = res; } });
+    }
+
+    private applyDailyExpenseType(): void {
+        if (this._categoriesLoaded && this._afterDisplayRan && this.isDailyExpense) {
+            this.formData.Type = 'out';
+        }
     }
 
     public override InitializeObject(): void {
@@ -70,7 +78,8 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
         if (preSelected) {
             this.formData.PaymentCategoryID = preSelected;
             this.isCategoryLocked = true;
-            if (this.isDailyExpense) this.formData.Type = 'out';
+            this._afterDisplayRan = true;
+            this.applyDailyExpenseType();
         }
     }
 
