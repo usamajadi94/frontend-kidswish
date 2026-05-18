@@ -28,11 +28,12 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     isLoading = false;
 
     txTypes = [
-        { id: '',         label: 'All Types' },
-        { id: 'received', label: 'Payment Received' },
-        { id: 'payment',  label: 'Payment Made' },
-        { id: 'topup',    label: 'Petty Cash Topup' },
-        { id: 'transfer', label: 'Account Transfer' },
+        { id: '',             label: 'All Types' },
+        { id: 'received',     label: 'Payment Received' },
+        { id: 'payment',      label: 'Payment Made' },
+        { id: 'topup',        label: 'Petty Cash Topup' },
+        { id: 'transfer',     label: 'Account Transfer' },
+        { id: 'cash_expense', label: 'Cash Expense' },
     ];
 
     get totalReceived(): number { return this.rows.reduce((s, r) => s + (+r.Received || 0), 0); }
@@ -74,20 +75,24 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
 
     txBadgeClass(type: string): string {
         const m: Record<string, string> = {
-            received: 'bg-green-100 text-green-800',
-            payment:  'bg-red-100 text-red-800',
-            topup:    'bg-blue-100 text-blue-800',
-            transfer: 'bg-purple-100 text-purple-800',
-            opening:  'bg-gray-100 text-gray-600',
+            received:     'bg-green-100 text-green-800',
+            payment:      'bg-red-100 text-red-800',
+            topup:        'bg-blue-100 text-blue-800',
+            transfer:     'bg-purple-100 text-purple-800',
+            opening:      'bg-gray-100 text-gray-600',
+            cash_expense: 'bg-orange-100 text-orange-800',
         };
         return m[type] || 'bg-gray-100 text-gray-700';
     }
 
     txLabel(type: string): string {
         const m: Record<string, string> = {
-            received: 'Received', payment: 'Payment',
-            topup: 'PC Topup', transfer: 'Transfer',
-            opening: 'Opening Bal.',
+            received:     'Received',
+            payment:      'Payment',
+            topup:        'PC Topup',
+            transfer:     'Transfer',
+            opening:      'Opening Bal.',
+            cash_expense: 'Cash Expense',
         };
         return m[type] || type;
     }
