@@ -70,6 +70,7 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
         if (preSelected) {
             this.formData.PaymentCategoryID = preSelected;
             this.isCategoryLocked = true;
+            if (this.isDailyExpense) this.formData.Type = 'out';
         }
     }
 
@@ -80,7 +81,9 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
     }
 
     onCategoryChange(): void {
-        if (!this.isDailyExpense) {
+        if (this.isDailyExpense) {
+            this.formData.Type = 'out';
+        } else {
             this.formData.ExpenseCategoryID = null;
         }
     }
