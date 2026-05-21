@@ -269,12 +269,44 @@
                                                 <th class="text-center py-1.5 pr-4 font-medium">Type</th>
                                                 <th class="text-right py-1.5 pr-4 font-medium">Qty</th>
                                                 <th class="text-right py-1.5 pr-4 font-medium">Before</th>
-                                                <th class="text-right py-1.5 font-medium">After</th>
+                                                <th class="text-right py-1.5 pr-4 font-medium">After</th>
+                                                <th class="w-16"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @for (t of productTxns.get(row.ProductID) || []; track t.ID) {
-                                            <tr class="border-b border-gray-100 hover:bg-white">
+                                            @if (editingTxnId === t.ID) {
+                                            <!-- Inline edit row -->
+                                            <tr class="border-b border-blue-200 bg-blue-50">
+                                                <td class="py-1 pr-2">
+                                                    <input type="date" [(ngModel)]="editTxnForm.Date"
+                                                        class="w-full border rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                                                </td>
+                                                <td class="py-1 pr-2 text-center">
+                                                    <span class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium text-xs">{{ t.Type }}</span>
+                                                </td>
+                                                <td class="py-1 pr-2 text-right">
+                                                    <input type="number" [(ngModel)]="editTxnForm.Qty" min="1"
+                                                        class="w-20 border rounded px-1.5 py-0.5 text-xs text-right font-mono focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                                                </td>
+                                                <td class="py-1 pr-2 text-right text-gray-400 font-mono text-xs">{{ t.Before }}</td>
+                                                <td class="py-1 pr-2 text-right font-mono text-xs">—</td>
+                                                <td class="py-1 text-right">
+                                                    <div class="flex items-center justify-end gap-1">
+                                                        <button (click)="saveEditTxn(t)" [disabled]="savingTxn"
+                                                            class="text-green-600 hover:text-green-800 p-0.5" title="Save">
+                                                            <mat-icon class="!text-base !w-4 !h-4 leading-none">check</mat-icon>
+                                                        </button>
+                                                        <button (click)="cancelEditTxn()"
+                                                            class="text-gray-400 hover:text-gray-600 p-0.5" title="Cancel">
+                                                            <mat-icon class="!text-base !w-4 !h-4 leading-none">close</mat-icon>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            } @else {
+                                            <!-- Normal row -->
+                                            <tr class="border-b border-gray-100 hover:bg-white group">
                                                 <td class="py-1.5 pr-4 text-gray-500">{{ t.Date | date:'dd MMM yy, HH:mm' }}</td>
                                                 <td class="py-1.5 pr-4 text-center">
                                                     <span [class]="t.Type === 'IN'
@@ -285,8 +317,22 @@
                                                 </td>
                                                 <td class="py-1.5 pr-4 text-right font-mono">{{ t.Qty }}</td>
                                                 <td class="py-1.5 pr-4 text-right font-mono text-gray-400">{{ t.Before }}</td>
-                                                <td class="py-1.5 text-right font-mono">{{ t.After }}</td>
+                                                <td class="py-1.5 pr-4 text-right font-mono">{{ t.After }}</td>
+                                                <td class="py-1.5 text-right">
+                                                    <div class="flex items-center justify-end gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <button (click)="startEditTxn(t); $event.stopPropagation()"
+                                                            class="text-blue-400 hover:text-blue-600 p-0.5" title="Edit">
+                                                            <mat-icon class="!text-sm !w-3.5 !h-3.5 leading-none">edit</mat-icon>
+                                                        </button>
+                                                        <button (click)="confirmDeleteTxn(t); $event.stopPropagation()"
+                                                            [disabled]="deletingTxnId === t.ID"
+                                                            class="text-red-400 hover:text-red-600 p-0.5" title="Delete">
+                                                            <mat-icon class="!text-sm !w-3.5 !h-3.5 leading-none">delete</mat-icon>
+                                                        </button>
+                                                    </div>
+                                                </td>
                                             </tr>
+                                            }
                                             }
                                         </tbody>
                                     </table>

@@ -39,6 +39,11 @@ export class StockMasterComponent implements OnInit {
     txnProduct = '';
     filteredTransactions: any[] = [];
 
+    editingTxnId: number | null = null;
+    editTxnForm: { Qty: number; Date: string; Notes: string } = { Qty: 0, Date: '', Notes: '' };
+    savingTxn = false;
+    deletingTxnId: number | null = null;
+
     get txnTotalIn(): number { return this.filteredTransactions.filter(t => t.Type === 'IN').reduce((s, t) => s + (+t.Qty || 0), 0); }
     get txnTotalOut(): number { return this.filteredTransactions.filter(t => t.Type !== 'IN').reduce((s, t) => s + (+t.Qty || 0), 0); }
 
@@ -172,6 +177,71 @@ export class StockMasterComponent implements OnInit {
         const totalIn  = txns.filter(t => t.Type === 'IN').reduce((s, t) => s + (+t.Qty || 0), 0);
         const totalOut = txns.filter(t => t.Type !== 'IN').reduce((s, t) => s + (+t.Qty || 0), 0);
         return { totalIn, totalOut, net: totalIn - totalOut };
+    }
+
+    startEditTxn(t: any) {
+        this.editingTxnId = t.ID;
+        this.editTxnForm = {
+            Qty: +t.Qty,
+            Date: t.Date ? t.Date.substring(0, 10) : '',
+            Notes: t.Notes || '',
+        };
+    }
+
+    cancelEditTxn() { this.editingTxnId = null; }
+
+    saveEditTxn(t: any) {
+        if (!this.editTxnForm.Qty || this.editTxnForm.Qty <= 0) return;
+        this.savingTxn = true;
+        this._http.patch<any>(
+            `${apiUrls.server}${apiUrls.stockMasterController}/transaction/${t.ID}`,
+            this.editTxnForm,
+            { headers: this.authHeaders }
+        ).subscribe({
+            next: () => {
+                this.savingTxn = false;
+                this.editingTxnId = null;
+                this.reloadProductTxns(t.ProductID);
+                this.loadAll();
+            },
+            error: () => { this.savingTxn = false; },
+        });
+    }
+
+    confirmDeleteTxn(t: any) {
+        if (!confirm(`Delete this ${t.Type} entry of ${t.Qty} cartons?`)) return;
+        this.deletingTxnId = t.ID;
+        this._http.delete<any>(
+            `${apiUrls.server}${apiUrls.stockMasterController}/transaction/${t.ID}`,
+            { headers: this.authHeaders }
+        ).subscribe({
+            next: () => {
+                this.deletingTxnId = null;
+                this.reloadProductTxns(t.ProductID);
+                this.loadAll();
+            },
+            error: () => { this.deletingTxnId = null; },
+        });
+    }
+
+    private reloadProductTxns(productId: number) {
+        this.productTxns = new Map(this.productTxns);
+        this.productTxns.delete(productId);
+        if (this.expandedRows.has(productId)) {
+            this.loadingTxnRows = new Set([...this.loadingTxnRows, productId]);
+            this._http.get<any[]>(
+                `${apiUrls.server}${apiUrls.stockMasterController}/transactions?productId=${productId}`,
+                { headers: this.authHeaders }
+            ).subscribe({
+                next: (res) => {
+                    const m = new Map(this.productTxns);
+                    m.set(productId, res || []);
+                    this.productTxns = m;
+                    this.loadingTxnRows = new Set([...this.loadingTxnRows].filter(p => p !== productId));
+                },
+                error: () => { this.loadingTxnRows = new Set([...this.loadingTxnRows].filter(p => p !== productId)); },
+            });
+        }
     }
 
     stockColor(status: string) { return status === 'low' ? 'text-orange-500' : 'text-green-500'; }
