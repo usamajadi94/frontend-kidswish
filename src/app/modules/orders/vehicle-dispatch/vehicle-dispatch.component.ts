@@ -45,6 +45,11 @@ export class VehicleDispatchComponent implements OnInit {
     isSaving    = false;
     isSharingDO = false;
 
+    // ── Builty edit ───────────────────────────────────────────────────────────
+    editingBuilty = false;
+    builtyInput   = '';
+    savingBuilty  = false;
+
     // ── Available items ───────────────────────────────────────────────────────
     availableItems: any[] = [];
     isLoadingAvail  = false;
@@ -82,6 +87,7 @@ export class VehicleDispatchComponent implements OnInit {
 
     select(item: any) {
         this.showForm = false;
+        this.editingBuilty = false;
         this.isLoadingDetail = true;
         this._http.get<any>(`${this.base}/${item.ID}`, { headers: this.headers }).subscribe({
             next: (res) => { this.selected = res; this.isLoadingDetail = false; },
@@ -194,6 +200,27 @@ export class VehicleDispatchComponent implements OnInit {
             },
         });
     }
+
+    openEditBuilty() {
+        this.builtyInput = this.selected?.BuiltyNo || '';
+        this.editingBuilty = true;
+    }
+
+    saveBuilty() {
+        if (this.savingBuilty) return;
+        this.savingBuilty = true;
+        this._http.patch<any>(`${this.base}/${this.selected.ID}/builty`, { BuiltyNo: this.builtyInput }, { headers: this.headers }).subscribe({
+            next: (res) => {
+                this.selected = res;
+                this.savingBuilty = false;
+                this.editingBuilty = false;
+                this.loadList();
+            },
+            error: () => { this.savingBuilty = false; },
+        });
+    }
+
+    cancelEditBuilty() { this.editingBuilty = false; }
 
     deleteVD() {
         this._modal.confirm({

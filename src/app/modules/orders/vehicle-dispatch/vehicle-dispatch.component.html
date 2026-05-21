@@ -255,10 +255,36 @@
                             @if (selected.DriverName) { · {{ selected.DriverName }} }
                             @if (selected.VehicleNo) { · {{ selected.VehicleNo }} }
                         </div>
-                        <div class="text-xs text-gray-500 mt-0.5 flex flex-wrap gap-3">
+                        <div class="text-xs text-gray-500 mt-0.5 flex flex-wrap gap-3 items-center">
                             @if (selected.DONo) { <span>DO: {{ selected.DONo }}</span> }
                             @if (selected.GatpassNo) { <span>Gatepass: {{ selected.GatpassNo }}</span> }
-                            @if (selected.BuiltyNo) { <span>Builty: {{ selected.BuiltyNo }}</span> }
+                            <!-- Builty No inline edit -->
+                            @if (editingBuilty) {
+                                <span class="flex items-center gap-1">
+                                    <input type="text" [(ngModel)]="builtyInput" placeholder="Builty No."
+                                           class="rounded border border-blue-300 px-2 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 w-32">
+                                    <button (click)="saveBuilty()" [disabled]="savingBuilty"
+                                            class="text-green-600 hover:text-green-800 disabled:opacity-40 text-xs font-medium">
+                                        {{ savingBuilty ? '...' : 'Save' }}
+                                    </button>
+                                    <button (click)="cancelEditBuilty()" class="text-gray-400 hover:text-gray-600 text-xs">Cancel</button>
+                                </span>
+                            } @else {
+                                <span class="flex items-center gap-1 group/builty">
+                                    @if (selected.BuiltyNo) {
+                                        <span>Builty: {{ selected.BuiltyNo }}</span>
+                                    } @else {
+                                        <span class="text-gray-400 italic">No builty no.</span>
+                                    }
+                                    <button (click)="openEditBuilty()"
+                                            class="opacity-0 group-hover/builty:opacity-100 transition-opacity text-blue-400 hover:text-blue-600"
+                                            title="Edit Builty No.">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                        </svg>
+                                    </button>
+                                </span>
+                            }
                             @if (selected.FreightAmount) { <span>Freight: PKR {{ selected.FreightAmount | number:'1.0-0' }}</span> }
                         </div>
                     </div>
