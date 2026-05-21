@@ -56,13 +56,13 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
 
     override ngOnInit(): void {
         super.ngOnInit();
-        this._drp.getPaymentCategoryDrp().subscribe({ next: (res: any) => { this.paymentCategories = res; this._categoriesLoaded = true; this.applyDailyExpenseType(); } });
+        this._drp.getPaymentCategoryDrp().subscribe({ next: (res: any) => { this.paymentCategories = res; this._categoriesLoaded = true; this.applyCategoryType(); } });
         this._drp.getExpenseCategoryDrp().subscribe({ next: (res: any) => { this.expenseCategories = res; } });
         this._drp.getVendorDrp().subscribe({ next: (res: any) => { this.vendors = res; } });
     }
 
-    private applyDailyExpenseType(): void {
-        if (this._categoriesLoaded && this._afterDisplayRan && this.isDailyExpense) {
+    private applyCategoryType(): void {
+        if (this._categoriesLoaded && this._afterDisplayRan && this.formData?.PaymentCategoryID) {
             this.formData.Type = 'out';
         }
     }
@@ -79,7 +79,7 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
             this.formData.PaymentCategoryID = preSelected;
             this.isCategoryLocked = true;
             this._afterDisplayRan = true;
-            this.applyDailyExpenseType();
+            this.applyCategoryType();
         }
     }
 
@@ -90,9 +90,10 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
     }
 
     onCategoryChange(): void {
-        if (this.isDailyExpense) {
+        if (this.formData.PaymentCategoryID) {
             this.formData.Type = 'out';
-        } else {
+        }
+        if (!this.isDailyExpense) {
             this.formData.ExpenseCategoryID = null;
         }
     }
