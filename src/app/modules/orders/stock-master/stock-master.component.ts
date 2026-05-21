@@ -202,9 +202,9 @@ export class StockMasterComponent implements OnInit {
                 this.savingTxn = false;
                 this.editingTxnId = null;
                 this.reloadProductTxns(t.ProductID);
-                this.loadAll();
+                this.refreshStockList();
             },
-            error: () => { this.savingTxn = false; },
+            error: (e) => { this.savingTxn = false; this.errorMsg = e?.error?.message || 'Save failed'; },
         });
     }
 
@@ -218,15 +218,16 @@ export class StockMasterComponent implements OnInit {
             next: () => {
                 this.deletingTxnId = null;
                 this.reloadProductTxns(t.ProductID);
-                this.loadAll();
+                this.refreshStockList();
             },
-            error: () => { this.deletingTxnId = null; },
+            error: (e) => { this.deletingTxnId = null; this.errorMsg = e?.error?.message || 'Delete failed'; },
         });
     }
 
     private reloadProductTxns(productId: number) {
-        this.productTxns = new Map(this.productTxns);
-        this.productTxns.delete(productId);
+        const m = new Map(this.productTxns);
+        m.delete(productId);
+        this.productTxns = m;
         if (this.expandedRows.has(productId)) {
             this.loadingTxnRows = new Set([...this.loadingTxnRows, productId]);
             this._http.get<any[]>(
@@ -234,14 +235,21 @@ export class StockMasterComponent implements OnInit {
                 { headers: this.authHeaders }
             ).subscribe({
                 next: (res) => {
-                    const m = new Map(this.productTxns);
-                    m.set(productId, res || []);
-                    this.productTxns = m;
+                    const m2 = new Map(this.productTxns);
+                    m2.set(productId, res || []);
+                    this.productTxns = m2;
                     this.loadingTxnRows = new Set([...this.loadingTxnRows].filter(p => p !== productId));
                 },
                 error: () => { this.loadingTxnRows = new Set([...this.loadingTxnRows].filter(p => p !== productId)); },
             });
         }
+    }
+
+    private refreshStockList() {
+        Promise.all([
+            this._http.get<any[]>(`${apiUrls.server}${apiUrls.stockMasterController}`, { headers: this.authHeaders }).toPromise().then(r => r ?? []),
+            this._http.get<any[]>(`${apiUrls.server}${apiUrls.stockMasterController}/product-cards`, { headers: this.authHeaders }).toPromise().then(r => r ?? []),
+        ]).then(([list, cards]) => { this.stockList = list; this.productCards = cards; });
     }
 
     stockColor(status: string) { return status === 'low' ? 'text-orange-500' : 'text-green-500'; }
