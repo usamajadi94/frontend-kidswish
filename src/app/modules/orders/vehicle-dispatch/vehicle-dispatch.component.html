@@ -40,7 +40,7 @@
                             <th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-600">Driver</th>
                             <th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-600">Vehicle</th>
                             <th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-600">Gatepass</th>
-                            <th class="px-3 py-2.5 text-center text-xs font-semibold text-gray-600">Builty</th>
+                            <th class="px-3 py-2.5 text-center text-xs font-semibold text-gray-600">Status</th>
                             <th class="px-3 py-2.5 text-center text-xs font-semibold text-gray-600">Cust.</th>
                             <th class="px-3 py-2.5 text-center text-xs font-semibold text-gray-600">Items</th>
                         </tr>
@@ -60,15 +60,10 @@
                                     <td class="px-3 py-2 text-xs text-gray-600">{{ vd.VehicleNo || '—' }}</td>
                                     <td class="px-3 py-2 text-xs text-gray-600">{{ vd.GatpassNo || '—' }}</td>
                                     <td class="px-3 py-2 text-center">
-                                        @if (vd.BuiltyNo) {
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
-                                                <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Added
-                                            </span>
-                                        } @else {
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-xs font-medium text-orange-600">
-                                                <span class="h-1.5 w-1.5 rounded-full bg-orange-400"></span> Pending
-                                            </span>
-                                        }
+                                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                                              [ngClass]="statusClass(vd.Status)">
+                                            {{ vd.Status }}
+                                        </span>
                                     </td>
                                     <td class="px-3 py-2 text-xs text-center text-gray-700">{{ vd.CustomerCount }}</td>
                                     <td class="px-3 py-2 text-xs text-center text-gray-700">{{ vd.ItemCount }}</td>
@@ -279,16 +274,6 @@
                               [ngClass]="statusClass(selected.Status)">
                             {{ selected.Status }}
                         </span>
-                        <!-- Builty status badge + button -->
-                        @if (selected.BuiltyNo) {
-                            <span class="inline-flex items-center gap-1 rounded-full bg-green-50 border border-green-200 px-2.5 py-1 text-xs font-medium text-green-700">
-                                <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Builty Added
-                            </span>
-                        } @else {
-                            <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 border border-orange-200 px-2.5 py-1 text-xs font-medium text-orange-600">
-                                <span class="h-1.5 w-1.5 rounded-full bg-orange-400"></span> No Builty
-                            </span>
-                        }
                         <button (click)="openEditBuilty()"
                                 class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors">
                             {{ selected.BuiltyNo ? 'Update Builty' : '+ Add Builty No.' }}
