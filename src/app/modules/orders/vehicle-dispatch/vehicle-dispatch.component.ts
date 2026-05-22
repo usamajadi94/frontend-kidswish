@@ -355,7 +355,7 @@ export class VehicleDispatchComponent implements OnInit {
         const ml = `<strong>GP No:</strong> ${d.GatpassNo || '—'}<br>
                     <strong>DO No:</strong> ${d.DONo || '—'}
                     ${d.BuiltyNo ? '<br><strong>Builty No:</strong> ' + d.BuiltyNo : ''}`;
-        const html = `<!DOCTYPE html><html><head><title>GP-${d.GatpassNo}</title><style>${this._css}</style></head><body>
+        const copy = `
             ${this._header('GATE PASS')}
             <div class="meta"><div>${ml}</div><div style="text-align:right"><strong>Date:</strong> ${date}</div></div>
             <div class="dbox"><strong>Driver:</strong> ${d.DriverName || '—'} &nbsp;&nbsp;&nbsp; <strong>Vehicle No:</strong> ${d.VehicleNo || '—'}</div>
@@ -370,7 +370,12 @@ export class VehicleDispatchComponent implements OnInit {
                 <div class="sig"><div class="sig-line">Driver Signature</div></div>
                 <div class="sig"><div class="sig-line">Security</div></div>
                 <div class="sig"><div class="sig-line">Authorized By</div></div>
-            </div>
+            </div>`;
+        const cutLine = `<div style="border-top:1px dashed #aaa;margin:18px 0;text-align:center;font-size:10px;color:#aaa;letter-spacing:2px">✂ &nbsp; CUT HERE &nbsp; ✂</div>`;
+        const html = `<!DOCTYPE html><html><head><title>GP-${d.GatpassNo}</title><style>${this._css}</style></head><body>
+            ${copy}
+            ${cutLine}
+            ${copy}
         </body></html>`;
         this._printHtml(html);
     }
