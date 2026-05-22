@@ -40,15 +40,16 @@
                             <th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-600">Driver</th>
                             <th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-600">Vehicle</th>
                             <th class="px-3 py-2.5 text-left text-xs font-semibold text-gray-600">Gatepass</th>
+                            <th class="px-3 py-2.5 text-center text-xs font-semibold text-gray-600">Builty</th>
                             <th class="px-3 py-2.5 text-center text-xs font-semibold text-gray-600">Cust.</th>
                             <th class="px-3 py-2.5 text-center text-xs font-semibold text-gray-600">Items</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @if (isLoadingList) {
-                            <tr><td colspan="6" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td></tr>
+                            <tr><td colspan="7" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td></tr>
                         } @else if (filteredList.length === 0) {
-                            <tr><td colspan="6" class="px-3 py-10 text-center text-gray-400 text-sm">No deliveries</td></tr>
+                            <tr><td colspan="7" class="px-3 py-10 text-center text-gray-400 text-sm">No deliveries</td></tr>
                         } @else {
                             @for (vd of filteredList; track vd.ID) {
                                 <tr class="hover:bg-gray-50 cursor-pointer transition-colors"
@@ -58,6 +59,17 @@
                                     <td class="px-3 py-2 text-xs font-medium text-gray-800">{{ vd.DriverName || '—' }}</td>
                                     <td class="px-3 py-2 text-xs text-gray-600">{{ vd.VehicleNo || '—' }}</td>
                                     <td class="px-3 py-2 text-xs text-gray-600">{{ vd.GatpassNo || '—' }}</td>
+                                    <td class="px-3 py-2 text-center">
+                                        @if (vd.BuiltyNo) {
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                                                <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Added
+                                            </span>
+                                        } @else {
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-xs font-medium text-orange-600">
+                                                <span class="h-1.5 w-1.5 rounded-full bg-orange-400"></span> Pending
+                                            </span>
+                                        }
+                                    </td>
                                     <td class="px-3 py-2 text-xs text-center text-gray-700">{{ vd.CustomerCount }}</td>
                                     <td class="px-3 py-2 text-xs text-center text-gray-700">{{ vd.ItemCount }}</td>
                                 </tr>
@@ -258,33 +270,7 @@
                         <div class="text-xs text-gray-500 mt-0.5 flex flex-wrap gap-3 items-center">
                             @if (selected.DONo) { <span>DO: {{ selected.DONo }}</span> }
                             @if (selected.GatpassNo) { <span>Gatepass: {{ selected.GatpassNo }}</span> }
-                            <!-- Builty No inline edit -->
-                            @if (editingBuilty) {
-                                <span class="flex items-center gap-1">
-                                    <input type="text" [(ngModel)]="builtyInput" placeholder="Builty No."
-                                           class="rounded border border-blue-300 px-2 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 w-32">
-                                    <button (click)="saveBuilty()" [disabled]="savingBuilty"
-                                            class="text-green-600 hover:text-green-800 disabled:opacity-40 text-xs font-medium">
-                                        {{ savingBuilty ? '...' : 'Save' }}
-                                    </button>
-                                    <button (click)="cancelEditBuilty()" class="text-gray-400 hover:text-gray-600 text-xs">Cancel</button>
-                                </span>
-                            } @else {
-                                <span class="flex items-center gap-1 group/builty">
-                                    @if (selected.BuiltyNo) {
-                                        <span>Builty: {{ selected.BuiltyNo }}</span>
-                                    } @else {
-                                        <span class="text-gray-400 italic">No builty no.</span>
-                                    }
-                                    <button (click)="openEditBuilty()"
-                                            class="opacity-0 group-hover/builty:opacity-100 transition-opacity text-blue-400 hover:text-blue-600"
-                                            title="Edit Builty No.">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                                        </svg>
-                                    </button>
-                                </span>
-                            }
+                            @if (selected.BuiltyNo) { <span>Builty: {{ selected.BuiltyNo }}</span> }
                             @if (selected.FreightAmount) { <span>Freight: PKR {{ selected.FreightAmount | number:'1.0-0' }}</span> }
                         </div>
                     </div>
@@ -293,6 +279,20 @@
                               [ngClass]="statusClass(selected.Status)">
                             {{ selected.Status }}
                         </span>
+                        <!-- Builty status badge + button -->
+                        @if (selected.BuiltyNo) {
+                            <span class="inline-flex items-center gap-1 rounded-full bg-green-50 border border-green-200 px-2.5 py-1 text-xs font-medium text-green-700">
+                                <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Builty Added
+                            </span>
+                        } @else {
+                            <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 border border-orange-200 px-2.5 py-1 text-xs font-medium text-orange-600">
+                                <span class="h-1.5 w-1.5 rounded-full bg-orange-400"></span> No Builty
+                            </span>
+                        }
+                        <button (click)="openEditBuilty()"
+                                class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors">
+                            {{ selected.BuiltyNo ? 'Update Builty' : '+ Add Builty No.' }}
+                        </button>
                         @if (selected.Status === 'Confirmed') {
                             <button
                                 class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100 transition-colors"
@@ -378,3 +378,36 @@
         </div>
     </div>
 </div>
+
+<!-- ══ Builty No. Modal ══ -->
+@if (editingBuilty) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/30" (click)="cancelEditBuilty()"></div>
+        <!-- Card -->
+        <div class="relative z-10 w-80 rounded-2xl bg-white shadow-xl p-6 flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+                <div class="text-sm font-semibold text-gray-800">
+                    {{ selected?.BuiltyNo ? 'Update Builty No.' : 'Add Builty No.' }}
+                </div>
+                <button (click)="cancelEditBuilty()" class="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1.5">Builty / Transport Receipt No.</label>
+                <input type="text" [(ngModel)]="builtyInput" placeholder="e.g. BLT-2024-001"
+                       class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       (keydown.enter)="saveBuilty()" autofocus>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button (click)="cancelEditBuilty()"
+                        class="rounded-lg border border-gray-200 px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+                <button (click)="saveBuilty()" [disabled]="savingBuilty"
+                        class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-40 transition-colors">
+                    {{ savingBuilty ? 'Saving...' : 'Save' }}
+                </button>
+            </div>
+        </div>
+    </div>
+}
