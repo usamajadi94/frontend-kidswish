@@ -371,7 +371,7 @@ export class VehicleDispatchComponent implements OnInit {
                 <div class="sig"><div class="sig-line">Security</div></div>
                 <div class="sig"><div class="sig-line">Authorized By</div></div>
             </div>`;
-        const cutLine = `<div style="border-top:1px dashed #aaa;margin:18px 0;text-align:center;font-size:10px;color:#aaa;letter-spacing:2px">✂ &nbsp; CUT HERE &nbsp; ✂</div>`;
+        const cutLine = `<div style="border-top:1px dashed #aaa;margin:18px 0"></div>`;
         const html = `<!DOCTYPE html><html><head><title>GP-${d.GatpassNo}</title><style>${this._css}</style></head><body>
             ${copy}
             ${cutLine}
