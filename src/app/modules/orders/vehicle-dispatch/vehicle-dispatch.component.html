@@ -25,7 +25,7 @@
                         [class.text-gray-500]="listTab !== tab"
                         [class.hover:text-gray-700]="listTab !== tab"
                         (click)="listTab = tab">
-                        {{ tab }}
+                        {{ statusLabel(tab) }}
                         <span class="ml-1 rounded-full bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
                             {{ tabCount(tab) }}
                         </span>
@@ -62,7 +62,7 @@
                                     <td class="px-3 py-2 text-center">
                                         <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
                                               [ngClass]="statusClass(vd.Status)">
-                                            {{ vd.Status }}
+                                            {{ statusLabel(vd.Status) }}
                                         </span>
                                     </td>
                                     <td class="px-3 py-2 text-xs text-center text-gray-700">{{ vd.CustomerCount }}</td>
@@ -272,7 +272,7 @@
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium"
                               [ngClass]="statusClass(selected.Status)">
-                            {{ selected.Status }}
+                            {{ statusLabel(selected.Status) }}
                         </span>
                         <button (click)="openEditBuilty()"
                                 class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors">

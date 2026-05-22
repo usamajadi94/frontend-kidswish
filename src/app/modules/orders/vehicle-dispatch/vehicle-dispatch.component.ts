@@ -258,6 +258,8 @@ export class VehicleDispatchComponent implements OnInit {
         return [...map.values()];
     }
 
+    statusLabel(status: string): string { return status === 'Draft' ? 'Pending' : status; }
+
     statusClass(status: string): string {
         switch (status) {
             case 'Confirmed': return 'bg-green-100 text-green-700';
