@@ -83,6 +83,9 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs whitespace-nowrap">Date</th>
+                                @if (!selectedCustomer) {
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Customer</th>
+                                }
                                 <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Type</th>
                                 <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Notes</th>
                                 <th class="px-3 py-2 text-right font-semibold text-red-700 text-xs whitespace-nowrap">Invoice (Dr)</th>
@@ -93,16 +96,19 @@
                         <tbody class="divide-y divide-gray-100">
                             @if (isLoadingFinancial) {
                                 <tr>
-                                    <td colspan="6" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
+                                    <td [colSpan]="selectedCustomer ? 6 : 7" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
                                 </tr>
                             } @else if (filteredFinancialRows.length === 0) {
                                 <tr>
-                                    <td colspan="6" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found</td>
+                                    <td [colSpan]="selectedCustomer ? 6 : 7" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found</td>
                                 </tr>
                             } @else {
                                 @for (row of filteredFinancialRows; track row.ID) {
                                     <tr class="hover:bg-gray-50 transition-colors">
                                         <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
+                                        @if (!selectedCustomer) {
+                                            <td class="px-3 py-1.5 text-xs font-medium text-gray-800">{{ row.CustomerName || '—' }}</td>
+                                        }
                                         <td class="px-3 py-1.5 text-xs">
                                             <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
                                                   [class.bg-red-100]="row.Type === 'Invoice'"
@@ -133,7 +139,7 @@
                         @if (!isLoadingFinancial && filteredFinancialRows.length > 0) {
                             <tfoot class="border-t-2 border-gray-300 bg-gray-50">
                                 <tr class="font-semibold text-gray-800">
-                                    <td colspan="3" class="px-3 py-2 text-right text-xs">Total</td>
+                                    <td [colSpan]="selectedCustomer ? 3 : 4" class="px-3 py-2 text-right text-xs">Total</td>
                                     <td class="px-3 py-2 text-right text-red-700 text-xs">{{ totalInvoiced | currency:'PKR ':'symbol':'1.0-0' }}</td>
                                     <td class="px-3 py-2 text-right text-green-700 text-xs">{{ totalReceived | currency:'PKR ':'symbol':'1.0-0' }}</td>
                                     <td class="px-3 py-2 text-right text-xs"
