@@ -62,7 +62,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
                 .map(i => i.OrderID)
         );
         const filtered = this.financialRows.filter(r =>
-            r.Type === 'Payment' || matchingIds.has(r.OrderID)
+            r.Type === 'Payment' || r.Type === 'Opening Balance' || matchingIds.has(r.OrderID)
         );
         let balance = 0;
         return filtered.map(r => {

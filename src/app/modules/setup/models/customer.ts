@@ -9,5 +9,6 @@ export class Customer {
     Address: string = null;
     DistributorID: number = null;
     IsActive: boolean = true;
+    OpeningBalance: number = null;
     SCode: string = componentRegister.customer.SCode;
 }

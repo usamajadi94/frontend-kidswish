@@ -8,6 +8,7 @@
         [(ngModel)]="formData.DistributorID" [clearable]="true" [skeleton]="isDataLoading" />
     <bft-input-text name="Email" label="Email" [(ngModel)]="formData.Email" [skeleton]="isDataLoading" />
     <bft-textarea name="Address" label="Address" [(ngModel)]="formData.Address" [skeleton]="isDataLoading" />
+    <bft-input-text name="OpeningBalance" label="Opening Balance (PKR)" [(ngModel)]="formData.OpeningBalance" [skeleton]="isDataLoading" type="number" />
     <bft-checkbox name="IsActive" label="Active" [(ngModel)]="formData.IsActive" [skeleton]="isDataLoading" />
 </div>
 
