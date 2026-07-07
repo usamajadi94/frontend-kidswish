@@ -73,6 +73,7 @@ export class DispatchPlanningComponent implements OnInit {
         const entries = this.orderItems
             .filter(i => (this.plannedQtys[i.ItemID] || 0) > 0)
             .map(i => ({
+                ItemID: i.ItemID,
                 CustomerID: i.CustomerID,
                 ProductID: i.ProductID,
                 ProductName: i.ProductName,
