@@ -79,8 +79,9 @@
                             </nz-select>
                         </td>
                         <td class="px-3 py-2">
-                            <input type="number" [(ngModel)]="row.Carton" min="1" placeholder="Qty"
-                                class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                            <input type="number" [(ngModel)]="row.Carton" min="1" step="1" placeholder="Qty"
+                                class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                (input)="row.Carton = row.Carton ? floor(+row.Carton) : row.Carton" />
                         </td>
                         <td class="px-3 py-2">
                             <input type="text" [(ngModel)]="row.Notes" placeholder="Optional"

@@ -46,6 +46,8 @@ export class OrderSubmitComponent implements OnInit {
     isSaving = false;
     orderId: number | null = null;
 
+    floor = Math.floor;
+
     get isEditMode(): boolean { return this.orderId !== null; }
     get isAdmin(): boolean { return this._localStorage.isDistributor !== 'true'; }
 
