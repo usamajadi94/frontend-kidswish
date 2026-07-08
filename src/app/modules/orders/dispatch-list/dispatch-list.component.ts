@@ -21,6 +21,7 @@ export class DispatchListComponent implements OnInit {
 
     groups: any[] = [];
     isLoading = false;
+    isConfirmingAll = false;
     selectedDate: string = new Date().toISOString().split('T')[0];
     busyId: number | null = null;
     busyInvoiceId: number | null = null;
@@ -57,6 +58,34 @@ export class DispatchListComponent implements OnInit {
 
     isExpanded(orderId: number): boolean {
         return this.expandedGroups.has(orderId);
+    }
+
+    confirmAll() {
+        const planned = this.groups.flatMap(g => g.items).filter(i => i.Status === 'Planned');
+        if (!planned.length) return;
+        this._modal.confirmModal({
+            title: 'Confirm All Dispatches',
+            message: `Confirm all <b>${planned.length} planned</b> dispatch entries for ${this.selectedDate}?`,
+            icon: 'heroicons_outline:check-circle',
+        }).afterClosed().subscribe(async (result) => {
+            if (!result) return;
+            this.isConfirmingAll = true;
+            this.errorMsg = '';
+            for (const item of planned) {
+                try {
+                    await this._http.post<any>(
+                        `${apiUrls.server}${apiUrls.dispatchController}/confirm/${item.ID}`, {},
+                        { headers: this.authHeaders }
+                    ).toPromise();
+                    item.Status = 'Confirmed';
+                } catch (e: any) {
+                    this.errorMsg = `Failed on ${item.ProductName}: ${e?.error?.message || 'Unknown error'}`;
+                    break;
+                }
+            }
+            this.isConfirmingAll = false;
+            this.load();
+        });
     }
 
     confirm(item: any) {
