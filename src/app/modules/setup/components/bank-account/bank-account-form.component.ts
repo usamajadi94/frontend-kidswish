@@ -24,7 +24,6 @@ import { BankAccount } from '../../models/bank-account';
 export class BankAccountFormComponent extends BaseComponent<BankAccount, BankAccountFormComponent> {
     accountTypes = [
         { ID: 'Bank', Name: 'Bank' },
-        { ID: 'Cash', Name: 'Cash' },
     ];
 
     constructor(
