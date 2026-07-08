@@ -90,6 +90,15 @@ export class OrderListComponent implements OnInit {
         this._router.navigate(['/orders/order-detail', row.ID]);
     }
 
+    deleteOrder(row: any, event: Event) {
+        event.stopPropagation();
+        if (!confirm(`Delete order ${row.InvoiceNo}? This cannot be undone.`)) return;
+        this._http.delete(`${apiUrls.server}${apiUrls.distributorOrderController}/${row.ID}`, { headers: this.authHeaders }).subscribe({
+            next: () => this.loadOrders(),
+            error: (e) => alert(e?.error?.message || 'Failed to delete order'),
+        });
+    }
+
     printInvoice(row: any, event: Event) {
         event.stopPropagation();
         this._http.get<any>(`${apiUrls.server}${apiUrls.dispatchController}/order-invoice/${row.ID}`, { headers: this.authHeaders }).subscribe({
