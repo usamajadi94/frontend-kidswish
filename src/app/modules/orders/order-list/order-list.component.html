@@ -39,37 +39,37 @@
     </div>
     }
 
-    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-x-auto">
         <table class="min-w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
-                    <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Order No</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Submitted By</th>
-                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Items</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Notes</th>
-                    @if (isAdmin) { <th class="px-4 py-3"></th> }
+                    <th class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Order No</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Submitted By</th>
+                    <th class="px-3 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Items</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Notes</th>
+                    @if (isAdmin) { <th class="px-3 py-2"></th> }
                 </tr>
             </thead>
             <tbody>
                 @if (isLoading) {
-                    <tr><td colspan="7" class="px-5 py-12 text-center text-gray-400">Loading...</td></tr>
+                    <tr><td colspan="7" class="px-4 py-10 text-center text-gray-400">Loading...</td></tr>
                 } @else if (filtered.length === 0) {
-                    <tr><td colspan="7" class="px-5 py-12 text-center text-gray-400">No orders found.</td></tr>
+                    <tr><td colspan="7" class="px-4 py-10 text-center text-gray-400">No orders found.</td></tr>
                 } @else {
                     @for (row of paginatedOrders; track row.ID) {
                     <tr class="border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors" (click)="viewOrder(row)">
-                        <td class="px-5 py-3.5 font-semibold text-blue-700">{{ row.InvoiceNo || '—' }}</td>
-                        <td class="px-4 py-3.5 text-gray-600">{{ row.OrderDate | date:'dd MMM yyyy' }}</td>
-                        <td class="px-4 py-3.5 text-gray-700">{{ row.SubmittedBy || '—' }}</td>
-                        <td class="px-4 py-3.5 text-center">
-                            <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
+                        <td class="px-4 py-2 font-semibold text-blue-700">{{ row.InvoiceNo || '—' }}</td>
+                        <td class="px-3 py-2 text-gray-600">{{ row.OrderDate | date:'dd MMM yyyy' }}</td>
+                        <td class="px-3 py-2 text-gray-700">{{ row.SubmittedBy || '—' }}</td>
+                        <td class="px-3 py-2 text-center">
+                            <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
                                 {{ row.ItemCount | number:'1.0-0' }}
                             </span>
                         </td>
-                        <td class="px-4 py-3.5">
-                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                        <td class="px-3 py-2">
+                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold"
                                 [class.bg-yellow-100]="row.Status === 'Submitted'"
                                 [class.text-yellow-700]="row.Status === 'Submitted'"
                                 [class.bg-blue-100]="row.Status === 'In Process'"
@@ -81,9 +81,9 @@
                                 {{ row.Status }}
                             </span>
                         </td>
-                        <td class="px-4 py-3.5 text-gray-400 text-xs">{{ row.Notes || '—' }}</td>
+                        <td class="px-3 py-2 text-gray-400 text-xs">{{ row.Notes || '—' }}</td>
                         @if (isAdmin) {
-                        <td class="px-4 py-3.5 text-right" (click)="$event.stopPropagation()">
+                        <td class="px-3 py-2 text-right" (click)="$event.stopPropagation()">
                             <div class="flex items-center justify-end gap-2">
                                 @if (row.Status === 'Completed') {
                                     <button mat-stroked-button class="text-xs !min-h-7 !h-7 !px-2"
