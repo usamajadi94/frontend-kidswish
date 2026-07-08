@@ -63,6 +63,10 @@ export class DispatchPlanningComponent implements OnInit {
         });
     }
 
+    blockDecimal(e: KeyboardEvent) {
+        if (e.key === '.' || e.key === ',') e.preventDefault();
+    }
+
     get hasEntries(): boolean {
         return this.orderItems.some(i => (this.plannedQtys[i.ItemID] || 0) > 0);
     }
