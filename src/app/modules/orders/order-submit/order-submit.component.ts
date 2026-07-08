@@ -48,6 +48,10 @@ export class OrderSubmitComponent implements OnInit {
 
     floor = Math.floor;
 
+    blockDecimal(e: KeyboardEvent) {
+        if (e.key === '.' || e.key === ',') e.preventDefault();
+    }
+
     get isEditMode(): boolean { return this.orderId !== null; }
     get isAdmin(): boolean { return this._localStorage.isDistributor !== 'true'; }
 
