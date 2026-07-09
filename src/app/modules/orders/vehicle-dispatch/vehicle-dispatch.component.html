@@ -168,13 +168,15 @@
                                     <thead>
                                         <tr class="border-b border-gray-100">
                                             <th class="py-1.5 text-left font-semibold text-gray-500">Product</th>
-                                            <th class="py-1.5 text-right font-semibold text-gray-500 w-28">Qty (ctns)</th>
+                                            <th class="py-1.5 text-right font-semibold text-gray-500">Available</th>
+                                            <th class="py-1.5 text-right font-semibold text-gray-500 w-28">Deliver (ctns)</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-50">
                                         @for (row of selectionRows; track row.PlanID) {
                                             <tr>
                                                 <td class="py-1.5 text-gray-800 font-medium">{{ row.ProductName }}</td>
+                                                <td class="py-1.5 text-right text-gray-500">{{ row.PlannedQty }}</td>
                                                 <td class="py-1.5 text-right">
                                                     <input type="number" [(ngModel)]="row.inputQty"
                                                            [min]="1" [max]="row.PlannedQty"

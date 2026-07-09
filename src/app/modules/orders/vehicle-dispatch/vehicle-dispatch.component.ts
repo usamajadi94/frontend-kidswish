@@ -176,8 +176,8 @@ export class VehicleDispatchComponent implements OnInit {
         this.isSaving = true;
         this._http.post<any>(this.base, this.form, { headers: this.headers }).subscribe({
             next: (vd) => {
-                const planIds = this.stagedItems.map(i => i.PlanID);
-                this._http.post<any>(`${this.base}/${vd.ID}/items`, { planIds }, { headers: this.headers }).subscribe({
+                const items = this.stagedItems.map(i => ({ planId: i.PlanID, qty: i.Qty }));
+                this._http.post<any>(`${this.base}/${vd.ID}/items`, { items }, { headers: this.headers }).subscribe({
                     next: () => { this.isSaving = false; this.showForm = false; this.loadList(); this.select({ ID: vd.ID }); },
                     error: () => { this.isSaving = false; },
                 });
