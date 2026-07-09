@@ -80,7 +80,6 @@ export const appRoutes: Route[] = [
             {path: 'setup', loadChildren: () => import('app/modules/setup/setup.routes')},
             {path: 'products', loadChildren: () => import('app/modules/products/products.routes')},
             {path: 'security', loadChildren: () => import('app/modules/security/security.routes')},
-            {path: 'reports', loadChildren: () => import('app/modules/reports-generator/report.routes')},
             {path: 'orders', loadChildren: () => import('app/modules/orders/orders.routes')},
             {path: 'clients', loadChildren: () => import('app/modules/clients/clients.routes')},
 {path: 'notifications', loadChildren: () => import('app/modules/notifications/notifications.routes')},

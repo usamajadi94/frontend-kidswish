@@ -32,11 +32,6 @@ export class componentRegister {
     static readonly invoice: IComponentRegister = { Title: 'Invoice', SCode: 'inv_01' };
 
     static readonly saleInvoiceReport: IComponentRegister = { Title: 'Invoice', SCode: 'inv_02' };
-
-    // Reports
-    static readonly expenseByVendorReport: IComponentRegister = { Title: 'Expense by Vendor', SCode: 'rep_01' };
-    static readonly paymentReceivedReport: IComponentRegister = { Title: 'Payment Received Report', SCode: 'rep_02' };
-    static readonly paymentMadeReport: IComponentRegister = { Title: 'Payment Made Report', SCode: 'rep_03' };
 }
 
 export interface IComponentRegister {
