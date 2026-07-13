@@ -31,6 +31,7 @@ export class StockMasterComponent implements OnInit {
     editingId: number | null = null;
     errorMsg = '';
 
+    hoveredTxn: any = null;
     expandedRows = new Set<number>();
     productTxns = new Map<number, any[]>();
     loadingTxnRows = new Set<number>();

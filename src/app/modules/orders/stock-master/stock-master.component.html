@@ -177,7 +177,10 @@
                 </thead>
                 <tbody>
                     @for (t of filteredTransactions; track t.ID) {
-                    <tr class="border-b hover:bg-gray-50">
+                    <tr class="border-b hover:bg-gray-50 group relative"
+                        [class.cursor-pointer]="t.RefType === 'Dispatch'"
+                        (mouseenter)="hoveredTxn = t"
+                        (mouseleave)="hoveredTxn = null">
                         <td class="px-4 py-2.5 text-sm text-gray-500">{{ t.Date | date:'dd MMM yyyy, HH:mm' }}</td>
                         <td class="px-4 py-2.5 text-sm font-medium text-gray-800">{{ t.ProductName }}</td>
                         <td class="px-4 py-2.5 text-center">
@@ -185,8 +188,31 @@
                                 {{ t.Type }}
                             </span>
                         </td>
-                        <td class="px-4 py-2.5 text-xs text-gray-500">
+                        <td class="px-4 py-2.5 text-xs text-gray-500 relative">
                             {{ t.RefType === 'DailyProduction' ? 'Production' : t.RefType === 'DispatchRevert' ? 'Revert' : t.RefType === 'Dispatch' ? 'Dispatch' : t.RefType || '—' }}
+                            @if (t.RefType === 'Dispatch' && hoveredTxn?.ID === t.ID) {
+                                <div class="absolute left-0 top-full z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white shadow-lg p-3 text-xs text-gray-700 pointer-events-none">
+                                    <div class="font-semibold text-gray-800 mb-1.5 border-b pb-1">Dispatch Details</div>
+                                    @if (t.CustomerName) {
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-gray-400">Customer</span>
+                                            <span class="font-medium text-right ml-2">{{ t.CustomerName }}</span>
+                                        </div>
+                                    }
+                                    @if (t.OrderInvoiceNo) {
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-gray-400">Invoice</span>
+                                            <span class="font-medium">{{ t.OrderInvoiceNo }}</span>
+                                        </div>
+                                    }
+                                    @if (t.DONo) {
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">DO No</span>
+                                            <span class="font-medium">{{ t.DONo }}</span>
+                                        </div>
+                                    }
+                                </div>
+                            }
                         </td>
                         <td class="px-4 py-2.5 text-right text-sm font-mono font-semibold">{{ t.Qty }}</td>
                         <td class="px-4 py-2.5 text-right text-sm text-gray-500 font-mono">{{ t.Before }}</td>
