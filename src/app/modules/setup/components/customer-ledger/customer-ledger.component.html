@@ -88,6 +88,7 @@
                                 }
                                 <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Type</th>
                                 <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Notes</th>
+                                <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs whitespace-nowrap">Account</th>
                                 <th class="px-3 py-2 text-right font-semibold text-red-700 text-xs whitespace-nowrap">Invoice (Dr)</th>
                                 <th class="px-3 py-2 text-right font-semibold text-green-700 text-xs whitespace-nowrap">Payment (Cr)</th>
                                 <th class="px-3 py-2 text-right font-semibold text-gray-600 text-xs">Balance</th>
@@ -96,11 +97,11 @@
                         <tbody class="divide-y divide-gray-100">
                             @if (isLoadingFinancial) {
                                 <tr>
-                                    <td [colSpan]="selectedCustomer ? 6 : 7" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
+                                    <td [colSpan]="selectedCustomer ? 7 : 8" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
                                 </tr>
                             } @else if (filteredFinancialRows.length === 0) {
                                 <tr>
-                                    <td [colSpan]="selectedCustomer ? 6 : 7" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found</td>
+                                    <td [colSpan]="selectedCustomer ? 7 : 8" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found</td>
                                 </tr>
                             } @else {
                                 @for (row of filteredFinancialRows; track row.ID) {
@@ -121,6 +122,7 @@
                                             </span>
                                         </td>
                                         <td class="px-3 py-1.5 text-gray-500 text-xs">{{ row.Notes || '—' }}</td>
+                                        <td class="px-3 py-1.5 text-xs text-gray-500">{{ row.AccountName || '—' }}</td>
                                         <td class="px-3 py-1.5 text-right font-medium text-red-700 text-xs">
                                             @if (+row.Debit > 0) { {{ row.Debit | currency:'PKR ':'symbol':'1.0-0' }} }
                                         </td>
@@ -139,7 +141,7 @@
                         @if (!isLoadingFinancial && filteredFinancialRows.length > 0) {
                             <tfoot class="border-t-2 border-gray-300 bg-gray-50">
                                 <tr class="font-semibold text-gray-800">
-                                    <td [colSpan]="selectedCustomer ? 3 : 4" class="px-3 py-2 text-right text-xs">Total</td>
+                                    <td [colSpan]="selectedCustomer ? 4 : 5" class="px-3 py-2 text-right text-xs">Total</td>
                                     <td class="px-3 py-2 text-right text-red-700 text-xs">{{ totalInvoiced | currency:'PKR ':'symbol':'1.0-0' }}</td>
                                     <td class="px-3 py-2 text-right text-green-700 text-xs">{{ totalReceived | currency:'PKR ':'symbol':'1.0-0' }}</td>
                                     <td class="px-3 py-2 text-right text-xs"
