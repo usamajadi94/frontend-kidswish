@@ -17,6 +17,8 @@ import { componentRegister } from 'app/modules/shared/services/component-registe
 import { ListService } from 'app/modules/shared/services/list.service';
 import { MessageModalService } from 'app/modules/shared/services/message.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
+import { DrpService } from 'app/modules/shared/services/drp.service';
+import { BftSelectComponent } from '../../../shared/components/fields/bft-select/bft-select.component';
 import { BftButtonComponent } from '../../../shared/components/buttons/bft-button/bft-button.component';
 import { BftCheckboxComponent } from '../../../shared/components/fields/bft-checkbox/bft-checkbox.component';
 import { RBAC_User_Entity_Groups, Rbac_User } from '../../models/RBAC_User';
@@ -37,7 +39,8 @@ import { NgClass } from '@angular/common';
         BftInputPasswordComponent,
         BftCheckboxComponent,
         BftButtonComponent,
-        NgClass
+        NgClass,
+        BftSelectComponent,
     ],
     templateUrl: './users-form.component.html',
     styleUrl: './users-form.component.scss',
@@ -47,7 +50,9 @@ export class UsersFormComponent extends BaseComponent<
     UsersFormComponent
 > {
     private _listService = inject(ListService);
+    private _drpService = inject(DrpService);
     permissionGroups = [];
+    distributors: any[] = [];
     selectedCount = 0;
 
     constructor(
@@ -68,6 +73,7 @@ export class UsersFormComponent extends BaseComponent<
 
     public override async BeforeInit(): Promise<void> {
         this.getGroupsData();
+        this._drpService.getDistributorDrp().subscribe({ next: (res: any) => { this.distributors = res || []; } });
     }
 
     public override InitializeObject(): void {

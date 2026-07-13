@@ -82,6 +82,7 @@ export class UserService {
                 this._localStorage.uid = response?.Data?.value[0].UID;
                 this._localStorage.eid = response?.Data?.value[0].EID;
                 this._localStorage.isDistributor = response?.Data?.value[0].IsDistributor ? 'true' : 'false';
+                this._localStorage.distributorId = response?.Data?.value[0].DistributorID?.toString() || '';
                 this._cachedUserResponse = response;
                 return of(response);
             })

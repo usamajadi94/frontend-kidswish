@@ -5,7 +5,7 @@
         <bft-input-text name="PhoneNo" label="Phone No" [(ngModel)]="formData.PhoneNo" [skeleton]="isDataLoading" />
     </div>
     <bft-select name="DistributorID" label="Distributor" [displayList]="distributors" valueField="ID" displayField="Name"
-        [(ngModel)]="formData.DistributorID" [clearable]="true" [skeleton]="isDataLoading" />
+        [(ngModel)]="formData.DistributorID" [clearable]="!isDistributorUser" [disabled]="isDistributorUser" [skeleton]="isDataLoading" />
     <bft-input-text name="Email" label="Email" [(ngModel)]="formData.Email" [skeleton]="isDataLoading" />
     <bft-textarea name="Address" label="Address" [(ngModel)]="formData.Address" [skeleton]="isDataLoading" />
     <bft-input-text name="OpeningBalance" label="Opening Balance (PKR)" [(ngModel)]="formData.OpeningBalance" [skeleton]="isDataLoading" type="number" />

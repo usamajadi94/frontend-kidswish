@@ -39,6 +39,7 @@ export class CustomerFormComponent extends BaseComponent<Customer, CustomerFormC
     private _http = inject(HttpClient);
     private _ls = inject(LocalStorageService);
     distributors: any[] = [];
+    isDistributorUser = false;
 
     // Pricing
     pricingProducts: any[] = [];
@@ -69,8 +70,14 @@ export class CustomerFormComponent extends BaseComponent<Customer, CustomerFormC
 
     override ngOnInit(): void {
         super.ngOnInit();
+        this.isDistributorUser = this._ls.isDistributor === 'true';
         this._drpService.getDistributorDrp().subscribe({
-            next: (res: any) => { this.distributors = res; },
+            next: (res: any) => {
+                this.distributors = res;
+                if (this.isDistributorUser && this._ls.distributorId) {
+                    this.formData.DistributorID = +this._ls.distributorId;
+                }
+            },
         });
     }
 

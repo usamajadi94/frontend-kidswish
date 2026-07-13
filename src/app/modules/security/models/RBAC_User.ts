@@ -14,6 +14,7 @@ export class Rbac_User {
     IsCustomer: boolean = false;
     IsActive: boolean = true;
     IsDistributor: boolean = false;
+    DistributorID: number | null = null;
 }
 
 export class RBAC_User_Entity_Groups {
