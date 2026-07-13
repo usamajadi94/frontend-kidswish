@@ -4,25 +4,18 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { NzSelectModule } from 'ng-zorro-antd/select';
 import { LocalStorageService } from 'app/core/auth/localStorage.service';
-import { DrpService } from 'app/modules/shared/services/drp.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 
 @Component({
     selector: 'app-customer-ledger',
     standalone: true,
-    imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, NzSelectModule],
+    imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule],
     templateUrl: './customer-ledger.component.html',
 })
 export class CustomerLedgerComponent implements OnInit {
     private _localStorage = inject(LocalStorageService);
     private _http = inject(HttpClient);
-    private _drp = inject(DrpService);
-
-    distributors: any[] = [];
-    selectedDistributor: number | null = null;
-    isDistributorUser = false;
 
     customers: any[] = [];
     ledger: any[] = [];
@@ -64,32 +57,11 @@ export class CustomerLedgerComponent implements OnInit {
         return new HttpHeaders({ uid: this._localStorage.uid, cid: this._localStorage.cid, eid: this._localStorage.eid });
     }
 
-    ngOnInit() {
-        this.isDistributorUser = this._localStorage.isDistributor === 'true';
-        this._drp.getDistributorDrp().subscribe({
-            next: (res: any) => {
-                this.distributors = res || [];
-                if (this.isDistributorUser && this._localStorage.distributorId) {
-                    this.selectedDistributor = +this._localStorage.distributorId;
-                }
-                this.loadCustomers();
-            },
-        });
-    }
-
-    onDistributorChange() {
-        this.selectedCustomer = null;
-        this.ledger = [];
-        this.filterOrder = '';
-        this.showPaymentForm = false;
-        this.loadCustomers();
-    }
+    ngOnInit() { this.loadCustomers(); }
 
     loadCustomers() {
         this.isLoadingList = true;
-        let url = `${apiUrls.server}${apiUrls.customerLedgerController}`;
-        if (this.selectedDistributor) url += `?distributorId=${this.selectedDistributor}`;
-        this._http.get<any[]>(url, { headers: this.authHeaders }).subscribe({
+        this._http.get<any[]>(`${apiUrls.server}${apiUrls.customerLedgerController}`, { headers: this.authHeaders }).subscribe({
             next: (res) => { this.customers = res || []; this.isLoadingList = false; },
             error: () => { this.isLoadingList = false; },
         });

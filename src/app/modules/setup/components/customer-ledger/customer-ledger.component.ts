@@ -22,11 +22,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     private _localStorage = inject(LocalStorageService);
     private _drpService   = inject(DrpService);
 
-    title = 'Distributor Ledger';
-
-    distributors: any[] = [];
-    selectedDistributor: number | null = null;
-    isDistributorUser = false;
+    title = componentRegister.customerLedger.Title;
 
     customers: any[] = [];
     selectedCustomer: any = null;
@@ -171,37 +167,17 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     ngOnInit() {
         const now = new Date();
         this.dateRange = [new Date(now.getFullYear(), now.getMonth(), 1), now];
-        this.isDistributorUser = this._localStorage.isDistributor === 'true';
-        this._drpService.getDistributorDrp().subscribe({
-            next: (res: any) => {
-                this.distributors = res || [];
-                if (this.isDistributorUser && this._localStorage.distributorId) {
-                    this.selectedDistributor = +this._localStorage.distributorId;
-                    this.onDistributorChange();
-                }
-            },
-        });
         this._drpService.getCustomerInformationDrp().subscribe({ next: (res: any) => { this.customers = res || []; } });
-        if (!this.isDistributorUser) {
-            this.loadBalances();
-            this.loadAll();
-        }
-    }
-
-    onDistributorChange() {
-        this.selectedCustomer = null;
-        this.selectedProducts = [];
-        this.selectedStatuses = [];
-        this.selectedOrderID = null;
         this.loadBalances();
         this.loadAll();
     }
 
     loadBalances() {
         this.isLoadingBalances = true;
-        let url = `${apiUrls.server}${apiUrls.customerLedgerController}`;
-        if (this.selectedDistributor) url += `?distributorId=${this.selectedDistributor}`;
-        this._http.get<any[]>(url, { headers: this.headers }).subscribe({
+        this._http.get<any[]>(
+            `${apiUrls.server}${apiUrls.customerLedgerController}`,
+            { headers: this.headers }
+        ).subscribe({
             next: (res) => { this.customerBalances = res || []; this.isLoadingBalances = false; },
             error: () => { this.isLoadingBalances = false; },
         });

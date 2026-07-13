@@ -171,22 +171,9 @@
     } @else {
 
     <!-- LIST VIEW -->
-    <div class="mb-5 flex flex-wrap items-center gap-3">
-        <div class="text-2xl font-semibold">Distributor Ledger</div>
-        @if (!isDistributorUser) {
-            <nz-select
-                [(ngModel)]="selectedDistributor"
-                (ngModelChange)="onDistributorChange()"
-                nzPlaceHolder="Select Distributor"
-                [nzAllowClear]="true"
-                [nzShowSearch]="true"
-                style="min-width: 220px">
-                @for (d of distributors; track d.ID) {
-                    <nz-option [nzValue]="d.ID" [nzLabel]="d.Name"></nz-option>
-                }
-            </nz-select>
-        }
-        <button mat-stroked-button (click)="loadCustomers()" class="ml-auto">
+    <div class="mb-5 flex items-center justify-between">
+        <div class="text-2xl font-semibold">Customer Ledger</div>
+        <button mat-stroked-button (click)="loadCustomers()">
             <mat-icon class="text-base mr-1">refresh</mat-icon> Refresh
         </button>
     </div>

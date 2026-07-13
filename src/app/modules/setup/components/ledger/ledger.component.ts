@@ -1,99 +1,153 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
-import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NzSelectModule } from 'ng-zorro-antd/select';
-import { ListService } from 'app/modules/shared/services/list.service';
+import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { DrpService } from 'app/modules/shared/services/drp.service';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
-import { componentRegister } from 'app/modules/shared/services/component-register';
+import { apiUrls } from 'app/modules/shared/services/api-url';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
     selector: 'app-ledger',
     standalone: true,
-    imports: [CommonModule, FormsModule, NzDatePickerModule, NzSelectModule, CurrencyPipe, DatePipe],
+    imports: [CommonModule, FormsModule, NzSelectModule, CurrencyPipe, DatePipe, MatButtonModule, MatIconModule],
     templateUrl: './ledger.component.html',
     styleUrl: './ledger.component.scss',
 })
 export class LedgerComponent extends BaseRoutedComponent implements OnInit {
-    private _listService = inject(ListService);
-    private _drpService  = inject(DrpService);
+    private _http          = inject(HttpClient);
+    private _localStorage  = inject(LocalStorageService);
+    private _drpService    = inject(DrpService);
 
-    title = componentRegister.ledger.Title;
-    dateRange: Date[] = [];
-    selectedTxType: string = '';
-    selectedAccount: any = null;
-    bankAccounts: any[] = [];
-    rows: any[] = [];
-    isLoading = false;
+    distributors: any[] = [];
+    selectedDistributor: number | null = null;
+    isDistributorUser = false;
 
-    txTypes = [
-        { id: '',             label: 'All Types' },
-        { id: 'received',     label: 'Payment Received' },
-        { id: 'payment',      label: 'Payment Made' },
-        { id: 'topup',        label: 'Petty Cash Topup' },
-        { id: 'transfer',     label: 'Account Transfer' },
-        { id: 'cash_expense', label: 'Cash Expense' },
-    ];
+    customers: any[] = [];
+    selectedCustomer: any = null;
+    isLoadingList = false;
+    isLoadingLedger = false;
+    isSaving = false;
+    errorMsg = '';
+    showPaymentForm = false;
+    filterOrder = '';
 
-    get totalReceived(): number { return this.rows.reduce((s, r) => s + (+r.Received || 0), 0); }
-    get totalPayment():  number { return this.rows.reduce((s, r) => s + (+r.Payment  || 0), 0); }
-    get closingBalance(): number { return this.totalReceived - this.totalPayment; }
+    ledger: any[] = [];
 
-    ngOnInit() {
-        this._drpService.getBankAccountDrp().subscribe({ next: (res: any) => { this.bankAccounts = res || []; } });
-        this.load();
+    payForm = { CustomerID: null as any, Amount: null as any, PaymentType: 'Cash', Date: '', Notes: '' };
+
+    get authHeaders() {
+        return new HttpHeaders({ uid: this._localStorage.uid, cid: this._localStorage.cid, eid: this._localStorage.eid });
     }
 
-    load() {
-        this.isLoading = true;
-        const from = this.dateRange?.[0]?.toISOString() || null;
-        const to   = this.dateRange?.[1]?.toISOString() || null;
-        this._listService.getLedger(from, to, this.selectedTxType, this.selectedAccount).subscribe({
-            next: (res: any[]) => {
-                let balance = 0;
-                this.rows = (res || []).map(r => {
-                    balance += (+r.Received || 0) - (+r.Payment || 0);
-                    return { ...r, Balance: balance };
-                });
-                this.isLoading = false;
-            },
-            error: () => { this.isLoading = false; },
+    get orderOptions(): string[] {
+        return [...new Set(
+            this.ledger.filter(r => r.EntryType === 'Order').map(r => r.Reference).filter(Boolean)
+        )];
+    }
+
+    get filteredLedger(): any[] {
+        if (!this.filterOrder) return this.ledger;
+        return this.ledger.filter(r => r.EntryType !== 'Order' || r.Reference === this.filterOrder);
+    }
+
+    get runningLedger(): any[] {
+        let balance = 0;
+        return this.filteredLedger.map(row => {
+            balance += (+row.Debit || 0) - (+row.Credit || 0);
+            return { ...row, Balance: balance };
         });
     }
 
-    onDateChange(dates: Date[]) { this.dateRange = dates || []; this.load(); }
-    onTxTypeChange()  { this.load(); }
-    onAccountChange() { this.load(); }
+    get totalDebit(): number  { return this.filteredLedger.reduce((s, r) => s + (+r.Debit  || 0), 0); }
+    get totalCredit(): number { return this.filteredLedger.reduce((s, r) => s + (+r.Credit || 0), 0); }
+    get outstanding(): number { return this.totalDebit - this.totalCredit; }
 
-    clearFilters() {
-        this.dateRange       = [];
-        this.selectedTxType  = '';
-        this.selectedAccount = null;
-        this.load();
+    ngOnInit() {
+        this.isDistributorUser = this._localStorage.isDistributor === 'true';
+        this._drpService.getDistributorDrp().subscribe({
+            next: (res: any) => {
+                this.distributors = res || [];
+                if (this.isDistributorUser && this._localStorage.distributorId) {
+                    this.selectedDistributor = +this._localStorage.distributorId;
+                }
+                this.loadCustomers();
+            },
+        });
     }
 
-    txBadgeClass(type: string): string {
-        const m: Record<string, string> = {
-            received:     'bg-green-100 text-green-800',
-            payment:      'bg-red-100 text-red-800',
-            topup:        'bg-blue-100 text-blue-800',
-            transfer:     'bg-purple-100 text-purple-800',
-            opening:      'bg-gray-100 text-gray-600',
-            cash_expense: 'bg-orange-100 text-orange-800',
-        };
-        return m[type] || 'bg-gray-100 text-gray-700';
+    onDistributorChange() {
+        this.selectedCustomer = null;
+        this.ledger = [];
+        this.filterOrder = '';
+        this.showPaymentForm = false;
+        this.loadCustomers();
     }
 
-    txLabel(type: string): string {
-        const m: Record<string, string> = {
-            received:     'Received',
-            payment:      'Payment',
-            topup:        'PC Topup',
-            transfer:     'Transfer',
-            opening:      'Opening Bal.',
-            cash_expense: 'Cash Expense',
+    loadCustomers() {
+        this.isLoadingList = true;
+        let url = `${apiUrls.server}${apiUrls.customerLedgerController}`;
+        if (this.selectedDistributor) url += `?distributorId=${this.selectedDistributor}`;
+        this._http.get<any[]>(url, { headers: this.authHeaders }).subscribe({
+            next: (res) => { this.customers = res || []; this.isLoadingList = false; },
+            error: () => { this.isLoadingList = false; },
+        });
+    }
+
+    selectCustomer(c: any) {
+        this.selectedCustomer = c;
+        this.ledger = [];
+        this.filterOrder = '';
+        this.showPaymentForm = false;
+        this.isLoadingLedger = true;
+        this._http.get<any[]>(
+            `${apiUrls.server}${apiUrls.customerLedgerController}/${c.CustomerID}`,
+            { headers: this.authHeaders }
+        ).subscribe({
+            next: (res) => { this.ledger = res || []; this.isLoadingLedger = false; },
+            error: () => { this.isLoadingLedger = false; },
+        });
+    }
+
+    openPaymentForm() {
+        this.payForm = {
+            CustomerID: this.selectedCustomer?.CustomerID,
+            Amount: null,
+            PaymentType: 'Cash',
+            Date: new Date().toISOString().split('T')[0],
+            Notes: '',
         };
-        return m[type] || type;
+        this.errorMsg = '';
+        this.showPaymentForm = true;
+    }
+
+    savePayment() {
+        if (!this.payForm.Amount || this.payForm.Amount <= 0) {
+            this.errorMsg = 'Amount must be greater than 0'; return;
+        }
+        this.isSaving = true;
+        this._http.post<any>(
+            `${apiUrls.server}${apiUrls.customerLedgerController}/payment`,
+            this.payForm,
+            { headers: this.authHeaders }
+        ).subscribe({
+            next: () => {
+                this.isSaving = false;
+                this.showPaymentForm = false;
+                this.selectCustomer(this.selectedCustomer);
+                this.loadCustomers();
+            },
+            error: (e) => { this.isSaving = false; this.errorMsg = e?.error?.message || 'Failed'; },
+        });
+    }
+
+    back() {
+        this.selectedCustomer = null;
+        this.ledger = [];
+        this.filterOrder = '';
+        this.showPaymentForm = false;
     }
 }

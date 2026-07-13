@@ -1,21 +1,8 @@
 <div class="absolute inset-0 flex min-w-0 flex-col overflow-hidden p-6 md:p-8">
 
-    <!-- Header + Distributor + Customer Selector -->
+    <!-- Header + Customer Selector -->
     <div class="mb-4 flex flex-wrap items-center gap-4">
         <div class="text-3xl font-semibold leading-8 tracking-tight">{{ title }}</div>
-        @if (!isDistributorUser) {
-            <nz-select
-                [(ngModel)]="selectedDistributor"
-                (ngModelChange)="onDistributorChange()"
-                nzPlaceHolder="Select Distributor"
-                [nzAllowClear]="true"
-                [nzShowSearch]="true"
-                style="min-width: 220px">
-                @for (d of distributors; track d.ID) {
-                    <nz-option [nzValue]="d.ID" [nzLabel]="d.Name"></nz-option>
-                }
-            </nz-select>
-        }
         <nz-select
             [(ngModel)]="selectedCustomer"
             (ngModelChange)="onCustomerChange()"
