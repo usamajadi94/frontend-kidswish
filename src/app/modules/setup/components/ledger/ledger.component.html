@@ -1,19 +1,60 @@
 <div class="absolute inset-0 overflow-y-auto">
 <div class="px-6 pt-4 pb-8 md:px-8 md:pt-5 min-h-full">
 
-    <!-- DETAIL VIEW -->
-    @if (selectedCustomer) {
-
+    <!-- Header -->
     <div class="mb-5 flex flex-wrap items-center gap-3">
-        <button class="text-sm text-gray-500 hover:text-gray-800 transition-colors" (click)="back()">← Back</button>
-        <span class="text-gray-300">|</span>
-        <div class="text-2xl font-semibold">{{ selectedCustomer.CustomerName }}</div>
-        <span class="ml-auto">
-            <button mat-flat-button color="primary" (click)="openPaymentForm()">
-                <mat-icon class="text-base mr-1">add</mat-icon> Record Payment
-            </button>
+        <div class="text-2xl font-semibold">Distributor Ledger</div>
+        <span class="ml-auto flex items-center gap-3">
+            @if (selectedCustomerId) {
+                <button mat-flat-button color="primary" (click)="openPaymentForm()">
+                    <mat-icon class="text-base mr-1">add</mat-icon> Record Payment
+                </button>
+            }
         </span>
     </div>
+
+    <!-- Filters Row -->
+    <div class="flex flex-wrap items-center gap-3 mb-5">
+        @if (!isDistributorUser) {
+            <nz-select
+                [(ngModel)]="selectedDistributor"
+                (ngModelChange)="onDistributorChange()"
+                nzPlaceHolder="Select Distributor"
+                [nzAllowClear]="true"
+                [nzShowSearch]="true"
+                style="min-width: 220px">
+                @for (d of distributors; track d.ID) {
+                    <nz-option [nzValue]="d.ID" [nzLabel]="d.Name"></nz-option>
+                }
+            </nz-select>
+        }
+        <nz-select
+            [(ngModel)]="selectedCustomerId"
+            (ngModelChange)="onCustomerChange()"
+            nzPlaceHolder="{{ selectedDistributor ? 'Select Customer' : 'Select a distributor first' }}"
+            [nzDisabled]="!selectedDistributor && !isDistributorUser"
+            [nzLoading]="isLoadingCustomers"
+            [nzAllowClear]="true"
+            [nzShowSearch]="true"
+            style="min-width: 240px">
+            @for (c of customers; track c.CustomerID) {
+                <nz-option [nzValue]="c.CustomerID" [nzLabel]="c.CustomerName"></nz-option>
+            }
+        </nz-select>
+    </div>
+
+    @if (!selectedCustomerId) {
+
+    <!-- Empty state -->
+    <div class="bg-white border border-gray-200 rounded-xl p-12 text-center text-gray-400">
+        @if (!selectedDistributor && !isDistributorUser) {
+            Select a distributor to get started.
+        } @else if (!selectedCustomerId) {
+            Select a customer to view their ledger.
+        }
+    </div>
+
+    } @else {
 
     <!-- Summary Cards -->
     <div class="grid grid-cols-3 gap-4 mb-5">
@@ -116,8 +157,7 @@
                 } @else {
                     @for (row of runningLedger; track $index) {
                     <tr class="border-b border-gray-100 hover:bg-gray-50"
-                        [class.bg-blue-50]="row.EntryType === 'Order'"
-                        [class.hover:bg-blue-100]="row.EntryType === 'Order'">
+                        [class.bg-blue-50]="row.EntryType === 'Order'">
                         <td class="px-4 py-3 text-gray-600 whitespace-nowrap">{{ row.Date | date:'dd MMM yyyy' }}</td>
                         <td class="px-4 py-3">
                             <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
@@ -159,75 +199,6 @@
                 </tr>
             </tfoot>
             }
-        </table>
-    </div>
-
-    } @else {
-
-    <!-- LIST VIEW -->
-    <div class="mb-5 flex flex-wrap items-center gap-3">
-        <div class="text-2xl font-semibold">Distributor Ledger</div>
-        @if (!isDistributorUser) {
-            <nz-select
-                [(ngModel)]="selectedDistributor"
-                (ngModelChange)="onDistributorChange()"
-                nzPlaceHolder="Select Distributor"
-                [nzAllowClear]="true"
-                [nzShowSearch]="true"
-                style="min-width: 220px">
-                @for (d of distributors; track d.ID) {
-                    <nz-option [nzValue]="d.ID" [nzLabel]="d.Name"></nz-option>
-                }
-            </nz-select>
-        }
-        <button mat-stroked-button (click)="loadCustomers()" class="ml-auto">
-            <mat-icon class="text-base mr-1">refresh</mat-icon> Refresh
-        </button>
-    </div>
-
-    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        <table class="min-w-full text-sm">
-            <thead class="bg-gray-50 border-b border-gray-200">
-                <tr>
-                    <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Customer</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Phone</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Total Cartons</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Total Orders</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Total Paid</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Outstanding</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (isLoadingList) {
-                    <tr><td colspan="6" class="px-5 py-10 text-center text-gray-400">Loading...</td></tr>
-                } @else if (customers.length === 0) {
-                    <tr><td colspan="6" class="px-5 py-10 text-center text-gray-400">
-                        {{ selectedDistributor ? 'No customers found for this distributor.' : 'Select a distributor to view customers.' }}
-                    </td></tr>
-                } @else {
-                    @for (c of customers; track c.CustomerID) {
-                    <tr class="border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors"
-                        (click)="selectCustomer(c)">
-                        <td class="px-5 py-3.5 font-semibold text-blue-700">{{ c.CustomerName }}</td>
-                        <td class="px-4 py-3.5 text-right text-gray-500 text-xs">{{ c.PhoneNo || '—' }}</td>
-                        <td class="px-4 py-3.5 text-right text-gray-600">
-                            {{ +c.TotalCartons > 0 ? (c.TotalCartons | number:'1.0-0') : '—' }}
-                        </td>
-                        <td class="px-4 py-3.5 text-right text-gray-700">
-                            {{ +c.TotalOrders > 0 ? 'PKR ' + (c.TotalOrders | number:'1.0-0') : '—' }}
-                        </td>
-                        <td class="px-4 py-3.5 text-right text-green-600 font-medium">
-                            {{ +c.TotalPaid > 0 ? 'PKR ' + (c.TotalPaid | number:'1.0-0') : '—' }}
-                        </td>
-                        <td class="px-4 py-3.5 text-right font-semibold"
-                            [class.text-red-600]="c.Outstanding > 0"
-                            [class.text-gray-400]="c.Outstanding <= 0">
-                            {{ +c.Outstanding !== 0 ? 'PKR ' + (c.Outstanding | number:'1.0-0') : '—' }}
-                        </td>
-                    </tr>
-                    }
-                }
-            </tbody>
         </table>
     </div>
 

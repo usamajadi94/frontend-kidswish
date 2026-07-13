@@ -314,7 +314,10 @@
                                             } @else {
                                             <!-- Normal row -->
                                             <tr class="border-b border-gray-100 hover:bg-white"
-                                                [class.group]="t.Type === 'IN'">
+                                                [class.group]="t.Type === 'IN'"
+                                                [class.cursor-pointer]="t.RefType === 'Dispatch'"
+                                                (mouseenter)="showTooltip($event, t)"
+                                                (mouseleave)="hideTooltip()">
                                                 <td class="py-1.5 pr-4 text-gray-500">{{ t.Date | date:'dd MMM yy, HH:mm' }}</td>
                                                 <td class="py-1.5 pr-4 text-center">
                                                     <span [class]="t.Type === 'IN'

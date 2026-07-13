@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { LocalStorageService } from 'app/core/auth/localStorage.service';
@@ -13,7 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
     selector: 'app-ledger',
     standalone: true,
-    imports: [CommonModule, FormsModule, NzSelectModule, CurrencyPipe, DatePipe, MatButtonModule, MatIconModule],
+    imports: [CommonModule, FormsModule, NzSelectModule, DatePipe, MatButtonModule, MatIconModule],
     templateUrl: './ledger.component.html',
     styleUrl: './ledger.component.scss',
 })
@@ -27,15 +27,16 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     isDistributorUser = false;
 
     customers: any[] = [];
+    selectedCustomerId: number | null = null;
+    isLoadingCustomers = false;
+
     selectedCustomer: any = null;
-    isLoadingList = false;
+    ledger: any[] = [];
     isLoadingLedger = false;
+    filterOrder = '';
+    showPaymentForm = false;
     isSaving = false;
     errorMsg = '';
-    showPaymentForm = false;
-    filterOrder = '';
-
-    ledger: any[] = [];
 
     payForm = { CustomerID: null as any, Amount: null as any, PaymentType: 'Cash', Date: '', Notes: '' };
 
@@ -73,38 +74,48 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
                 this.distributors = res || [];
                 if (this.isDistributorUser && this._localStorage.distributorId) {
                     this.selectedDistributor = +this._localStorage.distributorId;
+                    this.loadCustomers();
                 }
-                this.loadCustomers();
             },
         });
     }
 
     onDistributorChange() {
+        this.customers = [];
+        this.selectedCustomerId = null;
         this.selectedCustomer = null;
         this.ledger = [];
         this.filterOrder = '';
         this.showPaymentForm = false;
-        this.loadCustomers();
+        if (this.selectedDistributor) this.loadCustomers();
     }
 
     loadCustomers() {
-        this.isLoadingList = true;
+        this.isLoadingCustomers = true;
         let url = `${apiUrls.server}${apiUrls.customerLedgerController}`;
         if (this.selectedDistributor) url += `?distributorId=${this.selectedDistributor}`;
         this._http.get<any[]>(url, { headers: this.authHeaders }).subscribe({
-            next: (res) => { this.customers = res || []; this.isLoadingList = false; },
-            error: () => { this.isLoadingList = false; },
+            next: (res) => { this.customers = res || []; this.isLoadingCustomers = false; },
+            error: () => { this.isLoadingCustomers = false; },
         });
     }
 
-    selectCustomer(c: any) {
-        this.selectedCustomer = c;
+    onCustomerChange() {
+        this.selectedCustomer = null;
         this.ledger = [];
         this.filterOrder = '';
         this.showPaymentForm = false;
+        if (!this.selectedCustomerId) return;
+        const found = this.customers.find(c => c.CustomerID === this.selectedCustomerId);
+        this.selectedCustomer = found || null;
+        this.loadLedger();
+    }
+
+    loadLedger() {
+        if (!this.selectedCustomerId) return;
         this.isLoadingLedger = true;
         this._http.get<any[]>(
-            `${apiUrls.server}${apiUrls.customerLedgerController}/${c.CustomerID}`,
+            `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomerId}`,
             { headers: this.authHeaders }
         ).subscribe({
             next: (res) => { this.ledger = res || []; this.isLoadingLedger = false; },
@@ -114,7 +125,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
 
     openPaymentForm() {
         this.payForm = {
-            CustomerID: this.selectedCustomer?.CustomerID,
+            CustomerID: this.selectedCustomerId,
             Amount: null,
             PaymentType: 'Cash',
             Date: new Date().toISOString().split('T')[0],
@@ -137,17 +148,10 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             next: () => {
                 this.isSaving = false;
                 this.showPaymentForm = false;
-                this.selectCustomer(this.selectedCustomer);
+                this.loadLedger();
                 this.loadCustomers();
             },
             error: (e) => { this.isSaving = false; this.errorMsg = e?.error?.message || 'Failed'; },
         });
-    }
-
-    back() {
-        this.selectedCustomer = null;
-        this.ledger = [];
-        this.filterOrder = '';
-        this.showPaymentForm = false;
     }
 }
