@@ -73,7 +73,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
             { headers: this.headers }
         ).subscribe({
             next: () => { this.isSavingEdit = false; this.closeEdit(); this.loadAll(); this.loadBalances(); },
-            error: () => { this.isSavingEdit = false; },
+            error: (err) => { this.isSavingEdit = false; alert('Save failed: ' + (err?.error?.message || err?.message || 'Unknown error')); },
         });
     }
 
