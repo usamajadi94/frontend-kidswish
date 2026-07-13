@@ -313,8 +313,8 @@
                         <thead>
                             <tr class="text-xs font-semibold text-gray-500 border-b border-gray-200">
                                 <th class="text-left pb-2 pr-2">Product</th>
-                                <th class="text-center pb-2 px-2 w-24">Qty (ctns)</th>
-                                <th class="text-center pb-2 px-2 w-28">Rate (PKR)</th>
+                                <th class="text-center pb-2 px-2 w-20">Qty</th>
+                                <th class="text-center pb-2 px-2 w-32">Rate (PKR)</th>
                                 <th class="text-right pb-2 pl-2 w-28">Total</th>
                             </tr>
                         </thead>
@@ -322,10 +322,7 @@
                             @for (item of editItems; track item.ID; let i = $index) {
                                 <tr>
                                     <td class="py-2 pr-2 text-gray-700 font-medium">{{ item.ProductName }}</td>
-                                    <td class="py-2 px-2">
-                                        <input type="number" [(ngModel)]="editItems[i].Carton" min="0"
-                                               class="w-full text-center border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-200" />
-                                    </td>
+                                    <td class="py-2 px-2 text-center text-gray-600 font-medium">{{ item.Carton }}</td>
                                     <td class="py-2 px-2">
                                         <input type="number" [(ngModel)]="editItems[i].Rate" min="0"
                                                class="w-full text-center border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-200" />
