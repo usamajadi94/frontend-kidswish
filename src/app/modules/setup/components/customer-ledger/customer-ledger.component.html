@@ -105,7 +105,10 @@
                                 </tr>
                             } @else {
                                 @for (row of filteredFinancialRows; track row.ID) {
-                                    <tr class="hover:bg-gray-50 transition-colors">
+                                    <tr class="hover:bg-gray-50 transition-colors"
+                                        [class.cursor-pointer]="row.Type === 'Invoice'"
+                                        [class.hover:bg-blue-50]="row.Type === 'Invoice'"
+                                        (click)="openInvoiceEdit(row)">
                                         <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
                                         @if (!selectedCustomer) {
                                             <td class="px-3 py-1.5 text-xs font-medium text-gray-800">{{ row.CustomerName || '—' }}</td>
@@ -287,3 +290,76 @@
         </div>
 
 </div>
+
+<!-- ══ Invoice Edit Modal ══ -->
+@if (editingPtId) {
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeEdit()">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg" (click)="$event.stopPropagation()">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <div class="font-semibold text-gray-800 text-base">Adjust Invoice</div>
+                <button (click)="closeEdit()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            </div>
+
+            <!-- Body -->
+            <div class="px-6 py-4">
+                @if (isLoadingEdit) {
+                    <div class="py-10 text-center text-gray-400 text-sm">Loading items...</div>
+                } @else if (editItems.length === 0) {
+                    <div class="py-10 text-center text-gray-400 text-sm">No items found for this invoice.</div>
+                } @else {
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-xs font-semibold text-gray-500 border-b border-gray-200">
+                                <th class="text-left pb-2 pr-2">Product</th>
+                                <th class="text-center pb-2 px-2 w-24">Qty (ctns)</th>
+                                <th class="text-center pb-2 px-2 w-28">Rate (PKR)</th>
+                                <th class="text-right pb-2 pl-2 w-28">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @for (item of editItems; track item.ID; let i = $index) {
+                                <tr>
+                                    <td class="py-2 pr-2 text-gray-700 font-medium">{{ item.ProductName }}</td>
+                                    <td class="py-2 px-2">
+                                        <input type="number" [(ngModel)]="editItems[i].Carton" min="0"
+                                               class="w-full text-center border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-200" />
+                                    </td>
+                                    <td class="py-2 px-2">
+                                        <input type="number" [(ngModel)]="editItems[i].Rate" min="0"
+                                               class="w-full text-center border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-200" />
+                                    </td>
+                                    <td class="py-2 pl-2 text-right font-semibold text-gray-800">
+                                        {{ ((+item.Carton || 0) * (+item.Rate || 0)) | currency:'PKR ':'symbol':'1.0-0' }}
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="border-t-2 border-gray-200">
+                            <tr>
+                                <td colspan="3" class="pt-3 text-right font-semibold text-gray-600 text-sm">Total</td>
+                                <td class="pt-3 pl-2 text-right font-bold text-blue-700">
+                                    {{ editTotal | currency:'PKR ':'symbol':'1.0-0' }}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                }
+            </div>
+
+            <!-- Footer -->
+            <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+                <button (click)="closeEdit()"
+                        class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+                <button (click)="saveEdit()" [disabled]="isSavingEdit || isLoadingEdit || editItems.length === 0"
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                    {{ isSavingEdit ? 'Saving...' : 'Save Changes' }}
+                </button>
+            </div>
+
+        </div>
+    </div>
+}

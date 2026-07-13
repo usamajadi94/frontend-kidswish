@@ -39,6 +39,44 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     selectedStatuses: string[] = [];
     selectedOrderID: number | null = null;
 
+    // ── Invoice edit modal ────────────────────────────────────────────────────
+    editingPtId: number | null = null;
+    editItems: any[]    = [];
+    isLoadingEdit       = false;
+    isSavingEdit        = false;
+
+    get editTotal(): number {
+        return this.editItems.reduce((s, i) => s + ((+i.Carton || 0) * (+i.Rate || 0)), 0);
+    }
+
+    openInvoiceEdit(row: any) {
+        if (row.Type !== 'Invoice' || !row.ID) return;
+        this.editingPtId = row.ID;
+        this.editItems = [];
+        this.isLoadingEdit = true;
+        this._http.get<any[]>(
+            `${apiUrls.server}${apiUrls.customerLedgerController}/invoice/${row.ID}/items`,
+            { headers: this.headers }
+        ).subscribe({
+            next: (res) => { this.editItems = res || []; this.isLoadingEdit = false; },
+            error: () => { this.isLoadingEdit = false; },
+        });
+    }
+
+    closeEdit() { this.editingPtId = null; this.editItems = []; }
+
+    saveEdit() {
+        this.isSavingEdit = true;
+        this._http.patch(
+            `${apiUrls.server}${apiUrls.customerLedgerController}/invoice/${this.editingPtId}/items`,
+            { Items: this.editItems },
+            { headers: this.headers }
+        ).subscribe({
+            next: () => { this.isSavingEdit = false; this.closeEdit(); this.loadAll(); this.loadBalances(); },
+            error: () => { this.isSavingEdit = false; },
+        });
+    }
+
     get headers() {
         return new HttpHeaders({
             uid: this._localStorage.uid,
