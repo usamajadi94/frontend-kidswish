@@ -1,0 +1,188 @@
+<div class="absolute inset-0 flex min-w-0 flex-col overflow-hidden p-6 md:p-8">
+
+    <!-- Header + Vendor Selector -->
+    <div class="mb-4 flex flex-wrap items-center gap-4">
+        <div class="text-3xl font-semibold leading-8 tracking-tight">{{ title }}</div>
+        <nz-select
+            [(ngModel)]="selectedVendor"
+            (ngModelChange)="onVendorChange()"
+            nzPlaceHolder="Select Vendor"
+            [nzAllowClear]="true"
+            [nzShowSearch]="true"
+            style="min-width: 260px">
+            @for (v of vendors; track v.ID) {
+                <nz-option [nzValue]="v.ID" [nzLabel]="v.Name"></nz-option>
+            }
+        </nz-select>
+    </div>
+
+    <!-- 65 / 35 Split -->
+    <div class="flex flex-1 gap-4 min-h-0 overflow-hidden">
+
+        <!-- ══ LEFT: Financial Ledger (65%) ══ -->
+        <div class="flex flex-col overflow-y-auto" style="flex: 65; min-width: 0;">
+
+            <!-- Summary Cards -->
+            <div class="mb-4 grid grid-cols-3 gap-3 shrink-0">
+                <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm text-center">
+                    <div class="text-xs text-gray-500 mb-1">Total Expenses</div>
+                    <div class="text-lg font-bold text-red-700">
+                        {{ totalExpenses | currency:'PKR ':'symbol':'1.0-0' }}
+                    </div>
+                </div>
+                <div class="rounded-xl border border-green-100 bg-green-50 p-4 text-center">
+                    <div class="text-xs text-green-600 mb-1">Total Paid</div>
+                    <div class="text-lg font-bold text-green-800">
+                        {{ totalPaid | currency:'PKR ':'symbol':'1.0-0' }}
+                    </div>
+                </div>
+                <div class="rounded-xl border p-4 text-center"
+                     [class.border-red-200]="outstanding > 0"   [class.bg-red-50]="outstanding > 0"
+                     [class.border-green-200]="outstanding <= 0" [class.bg-green-50]="outstanding <= 0">
+                    <div class="text-xs mb-1"
+                         [class.text-red-600]="outstanding > 0"
+                         [class.text-green-600]="outstanding <= 0">
+                        Outstanding
+                    </div>
+                    <div class="text-lg font-bold"
+                         [class.text-red-800]="outstanding > 0"
+                         [class.text-green-800]="outstanding <= 0">
+                        {{ outstanding | currency:'PKR ':'symbol':'1.0-0' }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Filter Bar -->
+            <div class="mb-3 flex items-center justify-between shrink-0">
+                <h2 class="text-sm font-semibold text-gray-700">Financial Ledger</h2>
+                <nz-range-picker
+                    [(ngModel)]="dateRange"
+                    (ngModelChange)="onDateChange($event)"
+                    nzFormat="dd/MM/yyyy"
+                    [nzPlaceHolder]="['From Date', 'To Date']">
+                </nz-range-picker>
+            </div>
+
+            <!-- Financial Table -->
+            <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs whitespace-nowrap">Date</th>
+                            @if (!selectedVendor) {
+                                <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Vendor</th>
+                            }
+                            <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Type</th>
+                            <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Notes</th>
+                            <th class="px-3 py-2 text-right font-semibold text-red-700 text-xs whitespace-nowrap">Expense (Dr)</th>
+                            <th class="px-3 py-2 text-right font-semibold text-green-700 text-xs whitespace-nowrap">Payment (Cr)</th>
+                            <th class="px-3 py-2 text-right font-semibold text-gray-600 text-xs">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @if (isLoadingFinancial) {
+                            <tr>
+                                <td [colSpan]="selectedVendor ? 6 : 7" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
+                            </tr>
+                        } @else if (financialRows.length === 0) {
+                            <tr>
+                                <td [colSpan]="selectedVendor ? 6 : 7" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found</td>
+                            </tr>
+                        } @else {
+                            @for (row of financialRows; track row.ID) {
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
+                                    @if (!selectedVendor) {
+                                        <td class="px-3 py-1.5 text-xs font-medium text-gray-800">{{ row.VendorName || '—' }}</td>
+                                    }
+                                    <td class="px-3 py-1.5 text-xs">
+                                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                                              [class.bg-red-100]="row.Type === 'Expense'"
+                                              [class.text-red-700]="row.Type === 'Expense'"
+                                              [class.bg-green-100]="row.Type === 'Payment'"
+                                              [class.text-green-700]="row.Type === 'Payment'"
+                                              [class.bg-gray-100]="row.Type !== 'Expense' && row.Type !== 'Payment'"
+                                              [class.text-gray-600]="row.Type !== 'Expense' && row.Type !== 'Payment'">
+                                            {{ row.Type }}
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-1.5 text-gray-500 text-xs">{{ row.Notes || '—' }}</td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-red-700 text-xs">
+                                        @if (+row.Debit > 0) { {{ row.Debit | currency:'PKR ':'symbol':'1.0-0' }} }
+                                    </td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-green-700 text-xs">
+                                        @if (+row.Credit > 0) { {{ row.Credit | currency:'PKR ':'symbol':'1.0-0' }} }
+                                    </td>
+                                    <td class="px-3 py-1.5 text-right font-semibold text-xs"
+                                        [class.text-red-700]="row.Balance > 0"
+                                        [class.text-green-700]="row.Balance <= 0">
+                                        {{ row.Balance | currency:'PKR ':'symbol':'1.0-0' }}
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                    @if (!isLoadingFinancial && financialRows.length > 0) {
+                        <tfoot class="border-t-2 border-gray-300 bg-gray-50">
+                            <tr class="font-semibold text-gray-800">
+                                <td [colSpan]="selectedVendor ? 3 : 4" class="px-3 py-2 text-right text-xs">Total</td>
+                                <td class="px-3 py-2 text-right text-red-700 text-xs">{{ totalExpenses | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                                <td class="px-3 py-2 text-right text-green-700 text-xs">{{ totalPaid | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                                <td class="px-3 py-2 text-right text-xs"
+                                    [class.text-red-700]="outstanding > 0"
+                                    [class.text-green-700]="outstanding <= 0">
+                                    {{ outstanding | currency:'PKR ':'symbol':'1.0-0' }}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    }
+                </table>
+            </div>
+
+        </div>
+
+        <!-- ══ RIGHT: Vendor Balances (35%) ══ -->
+        <div class="flex flex-col overflow-y-auto" style="flex: 35; min-width: 0;">
+
+            <div class="mb-3 shrink-0">
+                <h2 class="text-sm font-semibold text-gray-700">Vendor Balances</h2>
+            </div>
+
+            @if (isLoadingBalances) {
+                <div class="flex flex-1 items-center justify-center py-12 text-gray-400 text-sm">
+                    Loading...
+                </div>
+            } @else if (vendorBalances.length === 0) {
+                <div class="flex flex-1 items-center justify-center py-12 text-gray-400 text-sm">
+                    No vendor data found
+                </div>
+            } @else {
+                <div class="flex flex-col gap-2">
+                    @for (v of vendorBalances; track v.VendorID) {
+                        <div (click)="selectVendorFromBalances(v.VendorID)"
+                             class="cursor-pointer rounded-xl border bg-white p-3 shadow-sm hover:shadow-md transition-all"
+                             [class.border-blue-300]="selectedVendor === v.VendorID"
+                             [class.bg-blue-50]="selectedVendor === v.VendorID"
+                             [class.border-gray-100]="selectedVendor !== v.VendorID">
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="text-xs font-semibold text-gray-800 truncate mr-2">{{ v.VendorName }}</div>
+                                <div class="text-xs font-bold shrink-0"
+                                     [class.text-red-700]="v.Outstanding > 0"
+                                     [class.text-green-700]="v.Outstanding <= 0">
+                                    {{ v.Outstanding | currency:'PKR ':'symbol':'1.0-0' }}
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-gray-400">
+                                <span>Exp: {{ v.TotalExpenses | currency:'PKR ':'symbol':'1.0-0' }}</span>
+                                <span>Paid: {{ v.TotalPaid | currency:'PKR ':'symbol':'1.0-0' }}</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

@@ -14,6 +14,7 @@ import { PaymentReceivedListComponent } from './components/payment-received/paym
 import { MakePaymentListComponent } from './components/make-payment/make-payment-list/make-payment-list.component';
 import { LedgerComponent } from './components/ledger/ledger.component';
 import { CustomerLedgerComponent } from './components/customer-ledger/customer-ledger.component';
+import { VendorLedgerComponent } from './components/vendor-ledger/vendor-ledger.component';
 import { PettyCashListComponent } from './components/petty-cash/petty-cash-list/petty-cash-list.component';
 import { PettyCashDetailComponent } from './components/petty-cash/petty-cash-detail/petty-cash-detail.component';
 import { BankAccountDetailComponent } from './components/bank-account/bank-account-detail/bank-account-detail.component';
@@ -109,6 +110,12 @@ export default [
         path: 'customer-ledger',
         component: CustomerLedgerComponent,
         data: { SCode: componentRegister.customerLedger.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'vendor-ledger',
+        component: VendorLedgerComponent,
+        data: { SCode: componentRegister.vendorLedger.SCode },
         canActivate: [permissionGuard],
     },
     {
