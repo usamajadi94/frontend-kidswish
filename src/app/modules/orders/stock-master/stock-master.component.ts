@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, DOCUMENT } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,10 +14,12 @@ import { apiUrls } from 'app/modules/shared/services/api-url';
     imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule],
     templateUrl: './stock-master.component.html',
 })
-export class StockMasterComponent implements OnInit {
+export class StockMasterComponent implements OnInit, OnDestroy {
     private _localStorage = inject(LocalStorageService);
     private _http = inject(HttpClient);
     private _drp = inject(DrpService);
+    private _doc = inject(DOCUMENT);
+    private _tooltipEl: HTMLElement | null = null;
 
     stockList: any[] = [];
     productCards: any[] = [];
@@ -32,8 +34,6 @@ export class StockMasterComponent implements OnInit {
     errorMsg = '';
 
     hoveredTxn: any = null;
-    tooltipX = 0;
-    tooltipY = 0;
     expandedRows = new Set<number>();
     productTxns = new Map<number, any[]>();
     loadingTxnRows = new Set<number>();
@@ -63,9 +63,31 @@ export class StockMasterComponent implements OnInit {
     clearTxnFilter() { this.txnFrom = ''; this.txnTo = ''; this.txnProduct = ''; this.applyTxnFilter(); }
 
     showTooltip(event: MouseEvent, t: any) {
+        if (t.RefType !== 'Dispatch') return;
         this.hoveredTxn = t;
-        this.tooltipX = event.clientX + 14;
-        this.tooltipY = event.clientY - 10;
+        if (!this._tooltipEl) {
+            this._tooltipEl = this._doc.createElement('div');
+            this._tooltipEl.style.cssText = 'position:fixed;z-index:99999;pointer-events:none;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);padding:10px 14px;font-size:12px;color:#374151;min-width:200px;max-width:260px;';
+            this._doc.body.appendChild(this._tooltipEl);
+        }
+        const rows: string[] = ['<div style="font-weight:600;border-bottom:1px solid #f3f4f6;padding-bottom:6px;margin-bottom:6px;color:#111827">Dispatch Details</div>'];
+        if (t.CustomerName) rows.push(`<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:4px"><span style="color:#9ca3af">Customer</span><span style="font-weight:500;text-align:right">${t.CustomerName}</span></div>`);
+        if (t.OrderInvoiceNo) rows.push(`<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:4px"><span style="color:#9ca3af">Invoice</span><span style="font-weight:500">${t.OrderInvoiceNo}</span></div>`);
+        if (t.DONo) rows.push(`<div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#9ca3af">DO No</span><span style="font-weight:500">${t.DONo}</span></div>`);
+        if (rows.length === 1) rows.push('<div style="color:#9ca3af">No details available</div>');
+        this._tooltipEl.innerHTML = rows.join('');
+        this._tooltipEl.style.left = (event.clientX + 14) + 'px';
+        this._tooltipEl.style.top = (event.clientY - 10) + 'px';
+        this._tooltipEl.style.display = 'block';
+    }
+
+    hideTooltip() {
+        this.hoveredTxn = null;
+        if (this._tooltipEl) this._tooltipEl.style.display = 'none';
+    }
+
+    ngOnDestroy() {
+        if (this._tooltipEl) { this._tooltipEl.remove(); this._tooltipEl = null; }
     }
 
     // Daily add form

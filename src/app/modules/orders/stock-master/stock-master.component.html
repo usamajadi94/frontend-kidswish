@@ -180,7 +180,7 @@
                     <tr class="border-b hover:bg-gray-50"
                         [class.cursor-pointer]="t.RefType === 'Dispatch'"
                         (mouseenter)="showTooltip($event, t)"
-                        (mouseleave)="hoveredTxn = null">
+                        (mouseleave)="hideTooltip()">
                         <td class="px-4 py-2.5 text-sm text-gray-500">{{ t.Date | date:'dd MMM yyyy, HH:mm' }}</td>
                         <td class="px-4 py-2.5 text-sm font-medium text-gray-800">{{ t.ProductName }}</td>
                         <td class="px-4 py-2.5 text-center">
@@ -367,30 +367,4 @@
         </div>
     </div>
 
-    <!-- Dispatch hover tooltip — fixed so it escapes all overflow containers -->
-    @if (hoveredTxn?.RefType === 'Dispatch') {
-        <div class="pointer-events-none fixed z-[9999] w-60 rounded-lg border border-gray-200 bg-white shadow-xl p-3 text-xs text-gray-700"
-             [style.top.px]="tooltipY"
-             [style.left.px]="tooltipX">
-            <div class="font-semibold text-gray-800 mb-1.5 pb-1 border-b">Dispatch Details</div>
-            @if (hoveredTxn.CustomerName) {
-                <div class="flex justify-between gap-2 mb-1">
-                    <span class="text-gray-400 shrink-0">Customer</span>
-                    <span class="font-medium text-right">{{ hoveredTxn.CustomerName }}</span>
-                </div>
-            }
-            @if (hoveredTxn.OrderInvoiceNo) {
-                <div class="flex justify-between gap-2 mb-1">
-                    <span class="text-gray-400 shrink-0">Invoice</span>
-                    <span class="font-medium">{{ hoveredTxn.OrderInvoiceNo }}</span>
-                </div>
-            }
-            @if (hoveredTxn.DONo) {
-                <div class="flex justify-between gap-2">
-                    <span class="text-gray-400 shrink-0">DO No</span>
-                    <span class="font-medium">{{ hoveredTxn.DONo }}</span>
-                </div>
-            }
-        </div>
-    }
 </div>
