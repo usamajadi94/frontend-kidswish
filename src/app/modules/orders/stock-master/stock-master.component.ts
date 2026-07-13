@@ -32,6 +32,8 @@ export class StockMasterComponent implements OnInit {
     errorMsg = '';
 
     hoveredTxn: any = null;
+    tooltipX = 0;
+    tooltipY = 0;
     expandedRows = new Set<number>();
     productTxns = new Map<number, any[]>();
     loadingTxnRows = new Set<number>();
@@ -59,6 +61,12 @@ export class StockMasterComponent implements OnInit {
     }
 
     clearTxnFilter() { this.txnFrom = ''; this.txnTo = ''; this.txnProduct = ''; this.applyTxnFilter(); }
+
+    showTooltip(event: MouseEvent, t: any) {
+        this.hoveredTxn = t;
+        this.tooltipX = event.clientX + 14;
+        this.tooltipY = event.clientY - 10;
+    }
 
     // Daily add form
     addForm = { ProductID: null as any, Qty: null as any, Notes: '', Date: '' };
