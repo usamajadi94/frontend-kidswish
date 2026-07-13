@@ -176,6 +176,11 @@
                                 <span>Exp: {{ v.TotalExpenses | currency:'PKR ':'symbol':'1.0-0' }}</span>
                                 <span>Paid: {{ v.TotalPaid | currency:'PKR ':'symbol':'1.0-0' }}</span>
                             </div>
+                            @if (+v.OpeningBalance !== 0) {
+                                <div class="mt-1 text-xs text-gray-400">
+                                    OB: {{ v.OpeningBalance | currency:'PKR ':'symbol':'1.0-0' }}
+                                </div>
+                            }
                         </div>
                     }
                 </div>

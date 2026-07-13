@@ -7,5 +7,6 @@ export class Vendor {
     ContactName: string = null;
     PhoneNo: string = null;
     IsActive: boolean = true;
+    OpeningBalance: number = 0;
     SCode: string = componentRegister.vendor.SCode;
 }

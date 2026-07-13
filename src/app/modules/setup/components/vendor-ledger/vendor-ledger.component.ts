@@ -40,9 +40,10 @@ export class VendorLedgerComponent extends BaseRoutedComponent implements OnInit
         });
     }
 
-    get totalExpenses(): number { return this.financialRows.reduce((s, r) => s + (+r.Debit  || 0), 0); }
-    get totalPaid(): number     { return this.financialRows.reduce((s, r) => s + (+r.Credit || 0), 0); }
-    get outstanding(): number   { return this.totalExpenses - this.totalPaid; }
+    get totalExpenses(): number  { return this.financialRows.reduce((s, r) => s + (+r.Debit  || 0), 0); }
+    get totalPaid(): number      { return this.financialRows.reduce((s, r) => s + (+r.Credit || 0), 0); }
+    get outstanding(): number    { return this.totalExpenses - this.totalPaid; }
+    get balanceTotalOutstanding(): number { return this.vendorBalances.reduce((s, v) => s + (+v.Outstanding || 0), 0); }
 
     ngOnInit() {
         const now = new Date();
