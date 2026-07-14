@@ -28,8 +28,15 @@ export class componentRegister {
     static readonly group: IComponentRegister = { Title: 'Group', SCode: 'sec_02' };
     static readonly groupPermission = 'Group Permission';
 
-    // Main
+    // Orders
     static readonly customerOrder: IComponentRegister = { Title: 'Customer Order', SCode: 'ord_01' };
+    static readonly orderDashboard: IComponentRegister = { Title: 'Order Dashboard', SCode: 'ord_02' };
+    static readonly orderList: IComponentRegister = { Title: 'Order List', SCode: 'ord_03' };
+    static readonly stockMaster: IComponentRegister = { Title: 'Stock Master', SCode: 'ord_04' };
+    static readonly dispatchPlanning: IComponentRegister = { Title: 'Dispatch Planning', SCode: 'ord_05' };
+    static readonly dispatchList: IComponentRegister = { Title: 'Dispatch List', SCode: 'ord_06' };
+    static readonly delivery: IComponentRegister = { Title: 'Delivery', SCode: 'ord_07' };
+
     static readonly invoice: IComponentRegister = { Title: 'Invoice', SCode: 'inv_01' };
 
     static readonly saleInvoiceReport: IComponentRegister = { Title: 'Invoice', SCode: 'inv_02' };
