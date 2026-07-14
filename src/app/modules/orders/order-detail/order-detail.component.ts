@@ -123,6 +123,7 @@ export class OrderDetailComponent implements OnInit {
     private openInvoiceWindow(d: any) {
         const items: any[] = d.Items || [];
         const grandTotal = items.reduce((s: number, i: any) => s + (i.LineTotal || 0), 0);
+        const totalCartons = items.reduce((s: number, i: any) => s + (Number(i.Carton) || 0), 0);
 
         const customerMap = new Map<string, any[]>();
         for (const item of items) {
@@ -131,61 +132,176 @@ export class OrderDetailComponent implements OnInit {
             customerMap.get(key)!.push(item);
         }
 
-        let customerRows = '';
+        const fmt = (n: number) => 'PKR ' + n.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const orderDate = d.OrderDate ? new Date(d.OrderDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+
+        let customerSections = '';
+        let rowIndex = 0;
         customerMap.forEach((citems, cname) => {
             const cTotal = citems.reduce((s: number, i: any) => s + (i.LineTotal || 0), 0);
-            customerRows += `
-              <tr style="background:#f0f4ff">
-                <td colspan="4" style="font-weight:600;padding:6px 10px">${cname}
-                  <span style="font-size:11px;color:#666;margin-left:8px">Invoice: ${citems[0]?.InvoiceNo || '—'}</span>
-                </td>
-                <td style="text-align:right;font-weight:600;padding:6px 10px">PKR ${cTotal.toLocaleString()}</td>
+            const cCartons = citems.reduce((s: number, i: any) => s + (Number(i.Carton) || 0), 0);
+            const invNo = citems[0]?.InvoiceNo || '';
+            customerSections += `
+              <tr class="customer-row">
+                <td colspan="2" class="customer-name">${cname}${invNo ? `<span class="inv-badge">${invNo}</span>` : ''}</td>
+                <td class="num">${cCartons.toLocaleString()}</td>
+                <td class="num" colspan="2">${fmt(cTotal)}</td>
               </tr>`;
             citems.forEach((item: any) => {
-                customerRows += `<tr>
-                  <td style="padding:6px 10px 6px 20px;color:#555">${item.ProductName}</td>
-                  <td style="text-align:right;padding:6px 10px">${item.Carton}</td>
-                  <td style="text-align:right;padding:6px 10px">PKR ${(item.CartonPrice || 0).toLocaleString()}</td>
-                  <td colspan="2" style="text-align:right;padding:6px 10px">PKR ${(item.LineTotal || 0).toLocaleString()}</td>
-                </tr>`;
+                rowIndex++;
+                customerSections += `
+              <tr class="${rowIndex % 2 === 0 ? 'row-even' : 'row-odd'}">
+                <td class="row-num">${rowIndex}</td>
+                <td class="product-cell">${item.ProductName || '—'}</td>
+                <td class="num">${Number(item.Carton).toLocaleString()}</td>
+                <td class="num">${fmt(item.CartonPrice || 0)}</td>
+                <td class="num amount-cell">${fmt(item.LineTotal || 0)}</td>
+              </tr>`;
             });
         });
 
-        const html = `<!DOCTYPE html><html><head><title>Invoice — ${d.OrderInvoiceNo}</title>
-        <style>
-          body{font-family:Arial,sans-serif;padding:30px;font-size:13px}
-          h2{text-align:center;margin-bottom:4px}
-          .sub{text-align:center;color:#666;margin-bottom:20px;font-size:12px}
-          table{width:100%;border-collapse:collapse;margin-top:16px}
-          th,td{border:1px solid #ddd;padding:8px 10px}
-          th{background:#f0f0f0;font-weight:600;text-align:left}
-          .total{background:#e8f5e9;font-weight:700;font-size:14px}
-          .sig{display:flex;justify-content:space-between;margin-top:60px}
-          .sig div{text-align:center;width:180px}
-          .sig .line{border-top:1px solid #333;padding-top:6px;margin-top:30px}
-        </style></head><body>
-        <h2>INVOICE — ${d.OrderInvoiceNo}</h2>
-        <p class="sub">Order Date: ${new Date(d.OrderDate).toLocaleDateString()} | Submitted By: ${d.SubmittedBy || '—'}</p>
-        <table>
-          <thead><tr>
-            <th>Product</th><th style="text-align:right">Cartons</th>
-            <th style="text-align:right">Price/Carton</th>
-            <th colspan="2" style="text-align:right">Amount</th>
-          </tr></thead>
-          <tbody>${customerRows}</tbody>
-          <tfoot>
-            <tr class="total">
-              <td colspan="4" style="text-align:right;padding:10px">Grand Total</td>
-              <td style="text-align:right;padding:10px">PKR ${grandTotal.toLocaleString()}</td>
-            </tr>
-          </tfoot>
-        </table>
-        <div class="sig">
-          <div><div class="line">Prepared By</div></div>
-          <div><div class="line">Authorized By</div></div>
-          <div><div class="line">Received By</div></div>
-        </div>
-        </body></html>`;
+        const html = `<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>Invoice — ${d.OrderInvoiceNo}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f6fa;color:#1a1a2e;font-size:13px}
+  .page{background:#fff;max-width:900px;margin:0 auto;padding:40px 44px;min-height:100vh}
+
+  /* Header */
+  .header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:24px;border-bottom:3px solid #1e3a8a;margin-bottom:28px}
+  .brand{display:flex;flex-direction:column}
+  .brand-name{font-size:26px;font-weight:800;color:#1e3a8a;letter-spacing:-0.5px}
+  .brand-sub{font-size:11px;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:1px}
+  .inv-box{text-align:right}
+  .inv-label{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:1px}
+  .inv-no{font-size:22px;font-weight:800;color:#1e3a8a;margin-top:2px}
+
+  /* Meta grid */
+  .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:28px}
+  .meta-cell{padding:14px 18px;border-right:1px solid #e2e8f0}
+  .meta-cell:last-child{border-right:none}
+  .meta-label{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+  .meta-value{font-size:14px;font-weight:600;color:#1e293b}
+
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .table-header tr th{background:#1e3a8a;color:#fff;padding:10px 12px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
+  .table-header tr th.num{text-align:right}
+  .table-header tr th.row-num{width:36px;text-align:center}
+
+  .customer-row td{background:#dbeafe;padding:9px 12px;font-weight:700;font-size:12.5px;color:#1e3a8a;border-bottom:1px solid #bfdbfe}
+  .customer-name{font-size:13px}
+  .inv-badge{display:inline-block;margin-left:10px;font-size:10px;font-weight:600;background:#1e3a8a;color:#fff;border-radius:4px;padding:2px 7px;vertical-align:middle}
+  .customer-row .num{text-align:right;font-size:12px;color:#1e40af}
+
+  .row-odd td,.row-even td{padding:8px 12px;border-bottom:1px solid #f1f5f9}
+  .row-even td{background:#f8fafc}
+  .row-odd td{background:#ffffff}
+  .row-num{text-align:center;color:#94a3b8;font-size:11px;width:36px}
+  .product-cell{color:#334155;font-weight:500}
+  .num{text-align:right;color:#475569}
+  .amount-cell{font-weight:600;color:#1e293b}
+
+  /* Totals */
+  .total-section{margin-top:0;border-top:2px solid #1e3a8a}
+  .total-row td{padding:12px 12px;font-weight:700;font-size:13px;background:#1e3a8a;color:#fff}
+  .total-row .num{text-align:right;font-size:14px}
+  .subtotal-row td{padding:9px 12px;background:#eff6ff;border-bottom:1px solid #dbeafe;font-size:12.5px;color:#1e40af;font-weight:600}
+  .subtotal-row .num{text-align:right}
+
+  /* Signatures */
+  .signatures{display:flex;justify-content:space-between;margin-top:56px;gap:24px}
+  .sig-block{flex:1;text-align:center}
+  .sig-line{border-top:1.5px solid #cbd5e1;padding-top:8px;margin-top:40px;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px}
+
+  /* Footer */
+  .footer{margin-top:32px;padding-top:16px;border-top:1px solid #e2e8f0;text-align:center;font-size:10.5px;color:#94a3b8}
+
+  @media print{
+    body{background:#fff}
+    .page{padding:20px;max-width:100%}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-name">Kids Wish</div>
+      <div class="brand-sub">Distributor Order Invoice</div>
+    </div>
+    <div class="inv-box">
+      <div class="inv-label">Invoice No</div>
+      <div class="inv-no">${d.OrderInvoiceNo}</div>
+    </div>
+  </div>
+
+  <!-- Meta info -->
+  <div class="meta">
+    <div class="meta-cell">
+      <div class="meta-label">Order Date</div>
+      <div class="meta-value">${orderDate}</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">Submitted By</div>
+      <div class="meta-value">${d.SubmittedBy || '—'}</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">Total Customers</div>
+      <div class="meta-value">${customerMap.size}</div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <table>
+    <thead class="table-header">
+      <tr>
+        <th class="row-num">#</th>
+        <th>Product</th>
+        <th class="num">Cartons</th>
+        <th class="num">Price/Carton</th>
+        <th class="num">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${customerSections}
+    </tbody>
+  </table>
+
+  <!-- Grand Total -->
+  <table class="total-section">
+    <tbody>
+      <tr class="subtotal-row">
+        <td style="width:36px"></td>
+        <td>Total Cartons</td>
+        <td class="num" style="width:110px">${totalCartons.toLocaleString()}</td>
+        <td class="num" style="width:140px"></td>
+        <td class="num" style="width:150px"></td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="4" style="text-align:right;padding-right:16px;letter-spacing:0.5px">GRAND TOTAL</td>
+        <td class="num">${fmt(grandTotal)}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Signatures -->
+  <div class="signatures">
+    <div class="sig-block"><div class="sig-line">Prepared By</div></div>
+    <div class="sig-block"><div class="sig-line">Authorized By</div></div>
+    <div class="sig-block"><div class="sig-line">Received By</div></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">Printed on ${new Date().toLocaleString('en-GB')} &nbsp;·&nbsp; Kids Wish — Distributor Management System</div>
+
+</div>
+</body></html>`;
+
         const w = window.open('', '_blank');
         w?.document.write(html);
         w?.document.close();
