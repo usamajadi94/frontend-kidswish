@@ -1,20 +1,9 @@
-<div class="absolute inset-0 overflow-y-auto">
-<div class="px-6 pt-4 pb-8 md:px-8 md:pt-5 min-h-full">
+<div class="absolute inset-0 flex min-w-0 flex-col overflow-hidden p-6 md:p-8">
 
-    <!-- Header -->
-    <div class="mb-5 flex flex-wrap items-center gap-3">
-        <div class="text-2xl font-semibold">Distributor Ledger</div>
-        <span class="ml-auto flex items-center gap-3">
-            @if (selectedCustomerId) {
-                <button mat-flat-button color="primary" (click)="openPaymentForm()">
-                    <mat-icon class="text-base mr-1">add</mat-icon> Record Payment
-                </button>
-            }
-        </span>
-    </div>
+    <!-- Header + Filters -->
+    <div class="mb-4 flex flex-wrap items-center gap-4">
+        <div class="text-3xl font-semibold leading-8 tracking-tight">{{ title }}</div>
 
-    <!-- Filters Row -->
-    <div class="flex flex-wrap items-center gap-3 mb-5">
         @if (!isDistributorUser) {
             <nz-select
                 [(ngModel)]="selectedDistributor"
@@ -28,181 +17,351 @@
                 }
             </nz-select>
         }
+
         <nz-select
-            [(ngModel)]="selectedCustomerId"
+            [(ngModel)]="selectedCustomer"
             (ngModelChange)="onCustomerChange()"
-            nzPlaceHolder="{{ selectedDistributor ? 'Select Customer' : 'Select a distributor first' }}"
-            [nzDisabled]="!selectedDistributor && !isDistributorUser"
-            [nzLoading]="isLoadingCustomers"
+            nzPlaceHolder="Select Customer"
             [nzAllowClear]="true"
             [nzShowSearch]="true"
-            style="min-width: 240px">
-            @for (c of customers; track c.CustomerID) {
-                <nz-option [nzValue]="c.CustomerID" [nzLabel]="c.CustomerName"></nz-option>
+            [nzLoading]="isLoadingCustomers"
+            style="min-width: 260px">
+            @for (c of customers; track c.ID) {
+                <nz-option [nzValue]="c.ID" [nzLabel]="c.Name"></nz-option>
             }
         </nz-select>
-    </div>
 
-    @if (!selectedCustomerId) {
-
-    <!-- Empty state -->
-    <div class="bg-white border border-gray-200 rounded-xl p-12 text-center text-gray-400">
-        @if (!selectedDistributor && !isDistributorUser) {
-            Select a distributor to get started.
-        } @else if (!selectedCustomerId) {
-            Select a customer to view their ledger.
-        }
-    </div>
-
-    } @else {
-
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-3 gap-4 mb-5">
-        <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm text-center">
-            <div class="text-xs text-gray-500 mb-1">Total Orders</div>
-            <div class="text-lg font-bold text-gray-800">PKR {{ totalDebit | number:'1.0-0' }}</div>
-        </div>
-        <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm text-center">
-            <div class="text-xs text-gray-500 mb-1">Total Paid</div>
-            <div class="text-lg font-bold text-green-600">PKR {{ totalCredit | number:'1.0-0' }}</div>
-        </div>
-        <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm text-center"
-            [class.border-red-200]="outstanding > 0"
-            [class.border-green-200]="outstanding <= 0">
-            <div class="text-xs text-gray-500 mb-1">Outstanding</div>
-            <div class="text-lg font-bold"
-                [class.text-red-600]="outstanding > 0"
-                [class.text-green-600]="outstanding <= 0">
-                PKR {{ outstanding | number:'1.0-0' }}
-            </div>
-        </div>
-    </div>
-
-    <!-- Payment Form -->
-    @if (showPaymentForm) {
-    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-5">
-        <div class="text-sm font-semibold text-blue-800 mb-3">Record Payment</div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Date <span class="text-red-500">*</span></label>
-                <input type="date" [(ngModel)]="payForm.Date"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Amount (PKR) <span class="text-red-500">*</span></label>
-                <input type="number" [(ngModel)]="payForm.Amount" min="1" placeholder="0"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Method</label>
-                <select [(ngModel)]="payForm.PaymentType"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    <option value="Cash">Cash</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
-                    <option value="Cheque">Cheque</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
-                <input type="text" [(ngModel)]="payForm.Notes" placeholder="Optional"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-            </div>
-        </div>
-        @if (errorMsg) { <p class="text-xs text-red-500 mt-2">{{ errorMsg }}</p> }
-        <div class="flex gap-2 mt-3">
-            <button mat-flat-button color="primary" (click)="savePayment()" [disabled]="isSaving">
-                {{ isSaving ? 'Saving...' : 'Save Payment' }}
-            </button>
-            <button mat-stroked-button (click)="showPaymentForm = false">Cancel</button>
-        </div>
-    </div>
-    }
-
-    <!-- Order Filter -->
-    @if (orderOptions.length > 1) {
-    <div class="flex items-center gap-3 mb-4">
-        <span class="text-xs font-medium text-gray-600">Filter by Order:</span>
-        <select [(ngModel)]="filterOrder"
-            class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-            <option value="">All Orders</option>
-            @for (o of orderOptions; track o) {
-                <option [value]="o">{{ o }}</option>
-            }
-        </select>
-        @if (filterOrder) {
-            <button class="text-xs text-gray-400 hover:text-red-500 underline" (click)="filterOrder = ''">Clear</button>
-        }
-    </div>
-    }
-
-    <!-- Ledger Table -->
-    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        <table class="min-w-full text-sm">
-            <thead class="bg-gray-50 border-b border-gray-200">
-                <tr>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Date</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Type</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Order / Reference</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Cartons</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Debit (Order)</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Credit (Paid)</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Balance</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (isLoadingLedger) {
-                    <tr><td colspan="7" class="px-4 py-10 text-center text-gray-400">Loading...</td></tr>
-                } @else if (runningLedger.length === 0) {
-                    <tr><td colspan="7" class="px-4 py-10 text-center text-gray-400">No transactions found.</td></tr>
-                } @else {
-                    @for (row of runningLedger; track $index) {
-                    <tr class="border-b border-gray-100 hover:bg-gray-50"
-                        [class.bg-blue-50]="row.EntryType === 'Order'">
-                        <td class="px-4 py-3 text-gray-600 whitespace-nowrap">{{ row.Date | date:'dd MMM yyyy' }}</td>
-                        <td class="px-4 py-3">
-                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                                [class.bg-blue-100]="row.EntryType === 'Order'"
-                                [class.text-blue-700]="row.EntryType === 'Order'"
-                                [class.bg-green-100]="row.EntryType === 'Payment'"
-                                [class.text-green-700]="row.EntryType === 'Payment'">
-                                {{ row.EntryType }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 font-medium text-gray-700">{{ row.Reference || '—' }}</td>
-                        <td class="px-4 py-3 text-right text-gray-600">{{ row.Qty != null ? (row.Qty | number:'1.0-0') : '—' }}</td>
-                        <td class="px-4 py-3 text-right font-medium text-red-600">
-                            {{ +row.Debit > 0 ? 'PKR ' + (row.Debit | number:'1.0-0') : (row.EntryType === 'Order' ? 'PKR 0' : '—') }}
-                        </td>
-                        <td class="px-4 py-3 text-right font-medium text-green-600">
-                            {{ +row.Credit > 0 ? 'PKR ' + (row.Credit | number:'1.0-0') : '—' }}
-                        </td>
-                        <td class="px-4 py-3 text-right font-semibold whitespace-nowrap"
-                            [class.text-red-600]="row.Balance > 0"
-                            [class.text-green-600]="row.Balance <= 0">
-                            PKR {{ row.Balance | number:'1.0-0' }}
-                        </td>
-                    </tr>
-                    }
+        @if (selectedCustomer && allOrdersForDrp.length > 0) {
+            <nz-select
+                [(ngModel)]="selectedOrderID"
+                (ngModelChange)="onOrderChange()"
+                nzPlaceHolder="All Orders"
+                [nzAllowClear]="true"
+                [nzShowSearch]="true"
+                style="min-width: 200px">
+                @for (o of allOrdersForDrp; track o.id) {
+                    <nz-option [nzValue]="o.id" [nzLabel]="o.label"></nz-option>
                 }
-            </tbody>
-            @if (runningLedger.length > 0) {
-            <tfoot class="bg-gray-50 border-t-2 border-gray-200">
-                <tr>
-                    <td colspan="4" class="px-4 py-3 text-sm font-semibold text-gray-600">Total</td>
-                    <td class="px-4 py-3 text-right font-bold text-red-600">PKR {{ totalDebit | number:'1.0-0' }}</td>
-                    <td class="px-4 py-3 text-right font-bold text-green-600">PKR {{ totalCredit | number:'1.0-0' }}</td>
-                    <td class="px-4 py-3 text-right font-bold"
-                        [class.text-red-600]="outstanding > 0"
-                        [class.text-green-600]="outstanding <= 0">
-                        PKR {{ outstanding | number:'1.0-0' }}
-                    </td>
-                </tr>
-            </tfoot>
-            }
-        </table>
+            </nz-select>
+        }
     </div>
 
-    }
+
+    <!-- 70 / 30 Split -->
+    <div class="flex flex-1 gap-4 min-h-0 overflow-hidden">
+
+        <!-- ══ LEFT: Financial Ledger (70%) ══ -->
+        <div class="flex flex-col overflow-y-auto" style="flex: 7; min-width: 0;">
+
+            <!-- Summary Cards -->
+            <div class="mb-4 grid grid-cols-3 gap-3 shrink-0">
+                <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm text-center">
+                    <div class="text-xs text-gray-500 mb-1">Total Invoiced</div>
+                    <div class="text-lg font-bold text-red-700">
+                        {{ totalInvoiced | currency:'PKR ':'symbol':'1.0-0' }}
+                    </div>
+                </div>
+                <div class="rounded-xl border border-green-100 bg-green-50 p-4 text-center">
+                    <div class="text-xs text-green-600 mb-1">Total Received</div>
+                    <div class="text-lg font-bold text-green-800">
+                        {{ totalReceived | currency:'PKR ':'symbol':'1.0-0' }}
+                    </div>
+                </div>
+                <div class="rounded-xl border p-4 text-center"
+                     [class.border-red-200]="closingBalance > 0"   [class.bg-red-50]="closingBalance > 0"
+                     [class.border-green-200]="closingBalance <= 0" [class.bg-green-50]="closingBalance <= 0">
+                    <div class="text-xs mb-1"
+                         [class.text-red-600]="closingBalance > 0"
+                         [class.text-green-600]="closingBalance <= 0">
+                        Outstanding
+                    </div>
+                    <div class="text-lg font-bold"
+                         [class.text-red-800]="closingBalance > 0"
+                         [class.text-green-800]="closingBalance <= 0">
+                        {{ closingBalance | currency:'PKR ':'symbol':'1.0-0' }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Filter Bar -->
+            <div class="mb-3 flex items-center justify-between shrink-0">
+                <h2 class="text-sm font-semibold text-gray-700">Financial Ledger</h2>
+                <nz-range-picker
+                    [(ngModel)]="dateRange"
+                    (ngModelChange)="onDateChange($event)"
+                    nzFormat="dd/MM/yyyy"
+                    [nzPlaceHolder]="['From Date', 'To Date']">
+                </nz-range-picker>
+            </div>
+
+            <!-- Financial Table -->
+            <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs whitespace-nowrap">Date</th>
+                            @if (!selectedCustomer) {
+                                <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Customer</th>
+                            }
+                            <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Type</th>
+                            <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Notes</th>
+                            <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs whitespace-nowrap">Account</th>
+                            <th class="px-3 py-2 text-right font-semibold text-red-700 text-xs whitespace-nowrap">Invoice (Dr)</th>
+                            <th class="px-3 py-2 text-right font-semibold text-green-700 text-xs whitespace-nowrap">Payment (Cr)</th>
+                            <th class="px-3 py-2 text-right font-semibold text-gray-600 text-xs">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @if (isLoadingFinancial) {
+                            <tr>
+                                <td [colSpan]="selectedCustomer ? 7 : 8" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
+                            </tr>
+                        } @else if (filteredFinancialRows.length === 0) {
+                            <tr>
+                                <td [colSpan]="selectedCustomer ? 7 : 8" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found</td>
+                            </tr>
+                        } @else {
+                            @for (row of filteredFinancialRows; track row.ID) {
+                                <tr class="hover:bg-gray-50 transition-colors"
+                                    [class.cursor-pointer]="row.Type === 'Invoice'"
+                                    [class.hover:bg-blue-50]="row.Type === 'Invoice'"
+                                    (click)="openInvoiceEdit(row)">
+                                    <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
+                                    @if (!selectedCustomer) {
+                                        <td class="px-3 py-1.5 text-xs font-medium text-gray-800">{{ row.CustomerName || '—' }}</td>
+                                    }
+                                    <td class="px-3 py-1.5 text-xs">
+                                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                                              [class.bg-red-100]="row.Type === 'Invoice'"
+                                              [class.text-red-700]="row.Type === 'Invoice'"
+                                              [class.bg-green-100]="row.Type === 'Payment'"
+                                              [class.text-green-700]="row.Type === 'Payment'"
+                                              [class.bg-gray-100]="row.Type !== 'Invoice' && row.Type !== 'Payment'"
+                                              [class.text-gray-600]="row.Type !== 'Invoice' && row.Type !== 'Payment'">
+                                            {{ row.Type }}
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-1.5 text-gray-500 text-xs">{{ row.Notes || '—' }}</td>
+                                    <td class="px-3 py-1.5 text-xs text-gray-500">{{ row.AccountName || '—' }}</td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-red-700 text-xs">
+                                        @if (+row.Debit > 0) { {{ row.Debit | currency:'PKR ':'symbol':'1.0-0' }} }
+                                    </td>
+                                    <td class="px-3 py-1.5 text-right font-medium text-green-700 text-xs">
+                                        @if (+row.Credit > 0) { {{ row.Credit | currency:'PKR ':'symbol':'1.0-0' }} }
+                                    </td>
+                                    <td class="px-3 py-1.5 text-right font-semibold text-xs"
+                                        [class.text-red-700]="row.Balance > 0"
+                                        [class.text-green-700]="row.Balance <= 0">
+                                        {{ row.Balance | currency:'PKR ':'symbol':'1.0-0' }}
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                    @if (!isLoadingFinancial && filteredFinancialRows.length > 0) {
+                        <tfoot class="border-t-2 border-gray-300 bg-gray-50">
+                            <tr class="font-semibold text-gray-800">
+                                <td [colSpan]="selectedCustomer ? 4 : 5" class="px-3 py-2 text-right text-xs">Total</td>
+                                <td class="px-3 py-2 text-right text-red-700 text-xs">{{ totalInvoiced | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                                <td class="px-3 py-2 text-right text-green-700 text-xs">{{ totalReceived | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                                <td class="px-3 py-2 text-right text-xs"
+                                    [class.text-red-700]="closingBalance > 0"
+                                    [class.text-green-700]="closingBalance <= 0">
+                                    {{ closingBalance | currency:'PKR ':'symbol':'1.0-0' }}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    }
+                </table>
+            </div>
+
+        </div>
+
+        <!-- ══ RIGHT: Order Ledger (30%) ══ -->
+        <div class="flex flex-col overflow-y-auto" style="flex: 3; min-width: 0;">
+
+            <div class="mb-3 shrink-0">
+                <h2 class="text-sm font-semibold text-gray-700">Order Ledger</h2>
+            </div>
+
+            <!-- Status Filter Chips -->
+            @if (!isLoadingOrders && uniqueStatuses.length > 0) {
+                <div class="mb-2 flex flex-wrap gap-1.5 shrink-0">
+                    @for (s of uniqueStatuses; track s) {
+                        <button
+                            class="rounded-full px-3 py-0.5 text-xs font-medium border transition-all"
+                            [ngClass]="selectedStatuses.includes(s)
+                                ? statusClass(s)
+                                : 'bg-white text-gray-500 border-gray-300 hover:border-gray-400'"
+                            (click)="toggleStatus(s)">
+                            {{ s }}
+                        </button>
+                    }
+                    @if (selectedStatuses.length > 0) {
+                        <button
+                            class="rounded-full px-3 py-0.5 text-xs font-medium text-gray-400 hover:text-gray-600 border border-dashed border-gray-300"
+                            (click)="selectedStatuses = []">
+                            All
+                        </button>
+                    }
+                </div>
+            }
+
+            <!-- Product Filter Chips -->
+            @if (!isLoadingOrders && uniqueProducts.length > 0) {
+                <div class="mb-3 flex flex-wrap gap-1.5 shrink-0">
+                    @for (p of uniqueProducts; track p.id) {
+                        <button
+                            class="rounded-full px-3 py-0.5 text-xs font-medium border transition-all"
+                            [ngClass]="selectedProducts.includes(p.id)
+                                ? ['bg-indigo-600', 'text-white', 'border-indigo-600']
+                                : ['bg-white', 'text-gray-500', 'border-gray-300', 'hover:border-gray-400']"
+                            (click)="toggleProduct(p.id)">
+                            {{ p.name }}
+                        </button>
+                    }
+                    @if (selectedProducts.length > 0) {
+                        <button
+                            class="rounded-full px-3 py-0.5 text-xs font-medium text-gray-400 hover:text-gray-600 border border-dashed border-gray-300"
+                            (click)="selectedProducts = []">
+                            Clear
+                        </button>
+                    }
+                </div>
+            }
+
+            <!-- Order Cards -->
+            @if (isLoadingOrders) {
+                <div class="flex flex-1 items-center justify-center py-12 text-gray-400 text-sm">
+                    Loading orders...
+                </div>
+            } @else if (orderError) {
+                <div class="py-4 px-3 text-red-500 text-xs break-all rounded bg-red-50 border border-red-200">
+                    {{ orderError }}
+                </div>
+            } @else if (groupedOrders.length === 0) {
+                <div class="flex flex-1 items-center justify-center text-gray-400 text-sm py-12">
+                    No orders found
+                </div>
+            } @else {
+                <div class="flex flex-col gap-3">
+                    @for (order of groupedOrders; track order.OrderID) {
+                        <div class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <div class="text-xs font-semibold text-gray-800">
+                                    {{ order.InvoiceNo || ('#' + order.OrderID) }}
+                                </div>
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                                      [ngClass]="statusClass(order.Status)">
+                                    {{ order.Status }}
+                                </span>
+                            </div>
+                            <div class="text-xs text-gray-400 mb-2">{{ order.OrderDate | date:'dd/MM/yyyy' }}</div>
+                            <div class="space-y-2">
+                                @for (item of order.items; track item.ProductID) {
+                                    <div class="text-xs">
+                                        <div class="flex items-center justify-between mb-0.5">
+                                            <span class="text-gray-600 truncate mr-2">{{ item.ProductName }}</span>
+                                            <span class="font-medium text-gray-800 whitespace-nowrap shrink-0">{{ item.Cartons }} ctns</span>
+                                        </div>
+                                        <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                            <div class="h-full rounded-full transition-all"
+                                                 [style.width.%]="item.Cartons > 0 ? (+item.Dispatched / +item.Cartons * 100) : 0"
+                                                 [class.bg-green-500]="+item.Remaining === 0"
+                                                 [class.bg-blue-400]="+item.Remaining > 0"></div>
+                                        </div>
+                                        <div class="flex justify-between mt-0.5 text-gray-400">
+                                            <span>{{ item.Dispatched }} dispatched</span>
+                                            @if (+item.Remaining > 0) {
+                                                <span class="text-orange-500">{{ item.Remaining }} left</span>
+                                            } @else {
+                                                <span class="text-green-600">Done</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="mt-2 border-t border-gray-100 pt-2 flex items-center justify-between text-xs font-semibold text-gray-700">
+                                <span>Total</span>
+                                <span>
+                                    {{ order.dispatched }}/{{ order.total }} ctns
+                                    @if (order.dispatched < order.total) {
+                                        <span class="ml-1 font-normal text-orange-500">({{ order.total - order.dispatched }} left)</span>
+                                    } @else {
+                                        <span class="ml-1 font-normal text-green-600">&#10003;</span>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+        </div>
+
+    </div>
 
 </div>
-</div>
+
+<!-- ══ Invoice Edit Modal ══ -->
+@if (editingPtId) {
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="closeEdit()">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg" (click)="$event.stopPropagation()">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <div class="font-semibold text-gray-800 text-base">Adjust Invoice</div>
+                <button (click)="closeEdit()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            </div>
+            <div class="px-6 py-4">
+                @if (isLoadingEdit) {
+                    <div class="py-10 text-center text-gray-400 text-sm">Loading items...</div>
+                } @else if (editItems.length === 0) {
+                    <div class="py-10 text-center text-gray-400 text-sm">No items found for this invoice.</div>
+                } @else {
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-xs font-semibold text-gray-500 border-b border-gray-200">
+                                <th class="text-left pb-2 pr-2">Product</th>
+                                <th class="text-center pb-2 px-2 w-20">Qty</th>
+                                <th class="text-center pb-2 px-2 w-32">Rate (PKR)</th>
+                                <th class="text-right pb-2 pl-2 w-28">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @for (item of editItems; track item.ID; let i = $index) {
+                                <tr>
+                                    <td class="py-2 pr-2 text-gray-700 font-medium">{{ item.ProductName }}</td>
+                                    <td class="py-2 px-2 text-center text-gray-600 font-medium">{{ item.Carton }}</td>
+                                    <td class="py-2 px-2">
+                                        <input type="number" [(ngModel)]="editItems[i].Rate" min="0"
+                                               class="w-full text-center border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-200" />
+                                    </td>
+                                    <td class="py-2 pl-2 text-right font-semibold text-gray-800">
+                                        {{ ((+item.Carton || 0) * (+item.Rate || 0)) | currency:'PKR ':'symbol':'1.0-0' }}
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="border-t-2 border-gray-200">
+                            <tr>
+                                <td colspan="3" class="pt-3 text-right font-semibold text-gray-600 text-sm">Total</td>
+                                <td class="pt-3 pl-2 text-right font-bold text-blue-700">
+                                    {{ editTotal | currency:'PKR ':'symbol':'1.0-0' }}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                }
+            </div>
+            <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+                <button (click)="closeEdit()"
+                        class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+                <button (click)="saveEdit()" [disabled]="isSavingEdit || isLoadingEdit || editItems.length === 0"
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                    {{ isSavingEdit ? 'Saving...' : 'Save Changes' }}
+                </button>
+            </div>
+        </div>
+    </div>
+}

@@ -1,74 +1,133 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { LocalStorageService } from 'app/core/auth/localStorage.service';
+import { apiUrls } from 'app/modules/shared/services/api-url';
 import { DrpService } from 'app/modules/shared/services/drp.service';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
-import { apiUrls } from 'app/modules/shared/services/api-url';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 
 @Component({
     selector: 'app-ledger',
     standalone: true,
-    imports: [CommonModule, FormsModule, NzSelectModule, DatePipe, MatButtonModule, MatIconModule],
+    imports: [CommonModule, FormsModule, NzDatePickerModule, NzSelectModule, CurrencyPipe, DatePipe],
     templateUrl: './ledger.component.html',
     styleUrl: './ledger.component.scss',
 })
 export class LedgerComponent extends BaseRoutedComponent implements OnInit {
-    private _http          = inject(HttpClient);
-    private _localStorage  = inject(LocalStorageService);
-    private _drpService    = inject(DrpService);
+    private _http         = inject(HttpClient);
+    private _localStorage = inject(LocalStorageService);
+    private _drpService   = inject(DrpService);
 
+    title = 'Distributor Ledger';
+
+    // Distributor filter
     distributors: any[] = [];
     selectedDistributor: number | null = null;
     isDistributorUser = false;
-
-    customers: any[] = [];
-    selectedCustomerId: number | null = null;
     isLoadingCustomers = false;
 
-    selectedCustomer: any = null;
-    ledger: any[] = [];
-    isLoadingLedger = false;
-    filterOrder = '';
-    showPaymentForm = false;
-    isSaving = false;
-    errorMsg = '';
+    // Customer select
+    customers: any[] = [];
+    selectedCustomer: number | null = null;
 
-    payForm = { CustomerID: null as any, Amount: null as any, PaymentType: 'Cash', Date: '', Notes: '' };
+    dateRange: Date[] = [];
+    isLoadingFinancial = false;
+    isLoadingOrders    = false;
+    orderError         = '';
 
-    get authHeaders() {
+    financialRows: any[] = [];
+    orderItems:    any[] = [];
+    selectedProducts: number[] = [];
+    selectedStatuses: string[] = [];
+    selectedOrderID: number | null = null;
+
+    // Invoice edit modal
+    editingPtId: number | null = null;
+    editItems: any[]   = [];
+    isLoadingEdit      = false;
+    isSavingEdit       = false;
+
+    get editTotal(): number {
+        return this.editItems.reduce((s, i) => s + ((+i.Carton || 0) * (+i.Rate || 0)), 0);
+    }
+
+    get headers() {
         return new HttpHeaders({ uid: this._localStorage.uid, cid: this._localStorage.cid, eid: this._localStorage.eid });
     }
 
-    get orderOptions(): string[] {
-        return [...new Set(
-            this.ledger.filter(r => r.EntryType === 'Order').map(r => r.Reference).filter(Boolean)
-        )];
-    }
-
-    get filteredLedger(): any[] {
-        if (!this.filterOrder) return this.ledger;
-        return this.ledger.filter(r => r.EntryType !== 'Order' || r.Reference === this.filterOrder);
-    }
-
-    get runningLedger(): any[] {
+    get filteredFinancialRows(): any[] {
+        if (!this.selectedStatuses.length) return this.financialRows;
+        const matchingIds = new Set(
+            this.orderItems.filter(i => this.selectedStatuses.includes(i.Status)).map(i => i.OrderID)
+        );
+        const filtered = this.financialRows.filter(r =>
+            r.Type === 'Payment' || r.Type === 'Opening Balance' || matchingIds.has(r.OrderID)
+        );
         let balance = 0;
-        return this.filteredLedger.map(row => {
-            balance += (+row.Debit || 0) - (+row.Credit || 0);
-            return { ...row, Balance: balance };
+        return filtered.map(r => {
+            balance += (+r.Debit || 0) - (+r.Credit || 0);
+            return { ...r, Balance: balance };
         });
     }
 
-    get totalDebit(): number  { return this.filteredLedger.reduce((s, r) => s + (+r.Debit  || 0), 0); }
-    get totalCredit(): number { return this.filteredLedger.reduce((s, r) => s + (+r.Credit || 0), 0); }
-    get outstanding(): number { return this.totalDebit - this.totalCredit; }
+    get totalInvoiced(): number  { return this.filteredFinancialRows.reduce((s, r) => s + (+r.Debit  || 0), 0); }
+    get totalReceived(): number  { return this.filteredFinancialRows.reduce((s, r) => s + (+r.Credit || 0), 0); }
+    get closingBalance(): number { return this.totalInvoiced - this.totalReceived; }
+
+    get uniqueProducts(): { id: number; name: string }[] {
+        const map = new Map<number, string>();
+        this.orderItems.forEach(i => map.set(i.ProductID, i.ProductName));
+        return [...map.entries()].map(([id, name]) => ({ id, name }));
+    }
+
+    get uniqueStatuses(): string[] {
+        return [...new Set(this.orderItems.map(i => i.Status).filter(Boolean))];
+    }
+
+    get allOrdersForDrp(): { id: number; label: string }[] {
+        const map = new Map<number, string>();
+        this.orderItems.forEach(i => {
+            if (!map.has(i.OrderID)) map.set(i.OrderID, i.InvoiceNo || ('#' + i.OrderID));
+        });
+        return [...map.entries()].map(([id, label]) => ({ id, label }));
+    }
+
+    get groupedOrders(): any[] {
+        const preFiltered = this.selectedOrderID
+            ? this.orderItems.filter(i => i.OrderID === this.selectedOrderID)
+            : this.orderItems;
+        const filtered = this.selectedProducts.length
+            ? preFiltered.filter(i => this.selectedProducts.includes(i.ProductID))
+            : preFiltered;
+        const map = new Map<number, any>();
+        for (const item of filtered) {
+            if (!map.has(item.OrderID)) {
+                map.set(item.OrderID, {
+                    OrderID: item.OrderID, InvoiceNo: item.InvoiceNo,
+                    OrderDate: item.OrderDate, Status: item.Status,
+                    items: [], total: 0, dispatched: 0,
+                });
+            }
+            const order = map.get(item.OrderID);
+            order.items.push(item);
+            order.total      += +item.Cartons    || 0;
+            order.dispatched += +item.Dispatched || 0;
+        }
+        let orders = [...map.values()];
+        if (this.selectedStatuses.length) {
+            orders = orders.filter(o => this.selectedStatuses.includes(o.Status));
+        }
+        return orders;
+    }
 
     ngOnInit() {
+        const now = new Date();
+        this.dateRange = [new Date(now.getFullYear(), now.getMonth(), 1), now];
         this.isDistributorUser = this._localStorage.isDistributor === 'true';
+
         this._drpService.getDistributorDrp().subscribe({
             next: (res: any) => {
                 this.distributors = res || [];
@@ -78,80 +137,147 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
                 }
             },
         });
+
+        if (!this.isDistributorUser) {
+            this.loadCustomers();
+            this.loadAll();
+        }
     }
 
     onDistributorChange() {
         this.customers = [];
-        this.selectedCustomerId = null;
         this.selectedCustomer = null;
-        this.ledger = [];
-        this.filterOrder = '';
-        this.showPaymentForm = false;
-        if (this.selectedDistributor) this.loadCustomers();
+        this.financialRows = [];
+        this.orderItems = [];
+        this.selectedProducts = [];
+        this.selectedStatuses = [];
+        this.selectedOrderID = null;
+        if (this.selectedDistributor != null) {
+            this.loadCustomers();
+        }
+        this.loadAll();
     }
 
     loadCustomers() {
         this.isLoadingCustomers = true;
         let url = `${apiUrls.server}${apiUrls.customerLedgerController}`;
         if (this.selectedDistributor) url += `?distributorId=${this.selectedDistributor}`;
-        this._http.get<any[]>(url, { headers: this.authHeaders }).subscribe({
-            next: (res) => { this.customers = res || []; this.isLoadingCustomers = false; },
+        this._http.get<any[]>(url, { headers: this.headers }).subscribe({
+            next: (res) => {
+                this.customers = (res || []).map(c => ({ ID: c.CustomerID, Name: c.CustomerName }));
+                this.isLoadingCustomers = false;
+            },
             error: () => { this.isLoadingCustomers = false; },
         });
     }
 
     onCustomerChange() {
-        this.selectedCustomer = null;
-        this.ledger = [];
-        this.filterOrder = '';
-        this.showPaymentForm = false;
-        if (!this.selectedCustomerId) return;
-        const found = this.customers.find(c => c.CustomerID === this.selectedCustomerId);
-        this.selectedCustomer = found || null;
-        this.loadLedger();
+        this.selectedProducts = [];
+        this.selectedStatuses = [];
+        this.selectedOrderID = null;
+        this.loadAll();
     }
 
-    loadLedger() {
-        if (!this.selectedCustomerId) return;
-        this.isLoadingLedger = true;
-        this._http.get<any[]>(
-            `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomerId}`,
-            { headers: this.authHeaders }
-        ).subscribe({
-            next: (res) => { this.ledger = res || []; this.isLoadingLedger = false; },
-            error: () => { this.isLoadingLedger = false; },
+    onDateChange(dates: Date[]) {
+        this.dateRange = dates || [];
+        this.loadFinancial();
+        this.loadOrders();
+    }
+
+    onOrderChange() { this.loadFinancial(); }
+
+    loadAll() { this.loadFinancial(); this.loadOrders(); }
+
+    loadFinancial() {
+        this.isLoadingFinancial = true;
+        const from = this.dateRange?.[0]?.toISOString() || '';
+        const to   = this.dateRange?.[1]?.toISOString() || '';
+        const base = this.selectedCustomer
+            ? `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomer}/financial?`
+            : `${apiUrls.server}${apiUrls.customerLedgerController}/all/financial?`;
+        let url = base;
+        if (from) url += `from=${encodeURIComponent(from)}&`;
+        if (to)   url += `to=${encodeURIComponent(to)}&`;
+        if (this.selectedCustomer && this.selectedOrderID) url += `orderId=${this.selectedOrderID}&`;
+        if (!this.selectedCustomer && this.selectedDistributor) url += `distributorId=${this.selectedDistributor}&`;
+        this._http.get<any[]>(url, { headers: this.headers }).subscribe({
+            next: (res) => { this.financialRows = res || []; this.isLoadingFinancial = false; },
+            error: () => { this.isLoadingFinancial = false; },
         });
     }
 
-    openPaymentForm() {
-        this.payForm = {
-            CustomerID: this.selectedCustomerId,
-            Amount: null,
-            PaymentType: 'Cash',
-            Date: new Date().toISOString().split('T')[0],
-            Notes: '',
-        };
-        this.errorMsg = '';
-        this.showPaymentForm = true;
-    }
-
-    savePayment() {
-        if (!this.payForm.Amount || this.payForm.Amount <= 0) {
-            this.errorMsg = 'Amount must be greater than 0'; return;
-        }
-        this.isSaving = true;
-        this._http.post<any>(
-            `${apiUrls.server}${apiUrls.customerLedgerController}/payment`,
-            this.payForm,
-            { headers: this.authHeaders }
-        ).subscribe({
-            next: () => {
-                this.isSaving = false;
-                this.showPaymentForm = false;
-                this.loadLedger();
-                this.loadCustomers();
+    loadOrders() {
+        this.isLoadingOrders = true;
+        this.orderError = '';
+        const from = this.dateRange?.[0]?.toISOString() || '';
+        const to   = this.dateRange?.[1]?.toISOString() || '';
+        const base = this.selectedCustomer
+            ? `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomer}/orders?`
+            : `${apiUrls.server}${apiUrls.customerLedgerController}/all/orders?`;
+        let url = base;
+        if (from) url += `from=${encodeURIComponent(from)}&`;
+        if (to)   url += `to=${encodeURIComponent(to)}&`;
+        if (!this.selectedCustomer && this.selectedDistributor) url += `distributorId=${this.selectedDistributor}&`;
+        this._http.get<any>(url, { headers: this.headers }).subscribe({
+            next: (res: any) => {
+                if (res?.__error) { this.orderError = res.__error; this.orderItems = []; }
+                else { this.orderItems = res || []; }
+                this.isLoadingOrders = false;
             },
-            error: (e) => { this.isSaving = false; this.errorMsg = e?.error?.message || 'Failed'; },
+            error: (err) => {
+                this.orderError = err?.error?.message || err?.message || 'HTTP error';
+                this.isLoadingOrders = false;
+            },
         });
+    }
+
+    openInvoiceEdit(row: any) {
+        if (row.Type !== 'Invoice' || !row.ID) return;
+        this.editingPtId = row.ID;
+        this.editItems = [];
+        this.isLoadingEdit = true;
+        this._http.get<any[]>(
+            `${apiUrls.server}${apiUrls.customerLedgerController}/invoice/${row.ID}/items`,
+            { headers: this.headers }
+        ).subscribe({
+            next: (res) => { this.editItems = res || []; this.isLoadingEdit = false; },
+            error: () => { this.isLoadingEdit = false; },
+        });
+    }
+
+    closeEdit() { this.editingPtId = null; this.editItems = []; }
+
+    saveEdit() {
+        this.isSavingEdit = true;
+        this._http.patch(
+            `${apiUrls.server}${apiUrls.customerLedgerController}/invoice/${this.editingPtId}/items`,
+            { Items: this.editItems },
+            { headers: this.headers }
+        ).subscribe({
+            next: () => { this.isSavingEdit = false; this.closeEdit(); this.loadAll(); },
+            error: (err) => { this.isSavingEdit = false; alert('Save failed: ' + (err?.error?.message || err?.message || 'Unknown error')); },
+        });
+    }
+
+    toggleProduct(id: number) {
+        this.selectedProducts = this.selectedProducts.includes(id)
+            ? this.selectedProducts.filter(p => p !== id)
+            : [...this.selectedProducts, id];
+    }
+
+    toggleStatus(status: string) {
+        this.selectedStatuses = this.selectedStatuses.includes(status)
+            ? this.selectedStatuses.filter(s => s !== status)
+            : [...this.selectedStatuses, status];
+    }
+
+    statusClass(status: string): string {
+        switch (status) {
+            case 'In Process':  return 'bg-blue-100 text-blue-700';
+            case 'Submitted':   return 'bg-yellow-100 text-yellow-700';
+            case 'Completed':   return 'bg-green-100 text-green-700';
+            case 'Cancelled':   return 'bg-red-100 text-red-700';
+            default:            return 'bg-gray-100 text-gray-600';
+        }
     }
 }
