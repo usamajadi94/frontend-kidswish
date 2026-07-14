@@ -90,6 +90,9 @@ export class CustomerFormComponent extends BaseComponent<Customer, CustomerFormC
         if (!formData.Name || formData.Name.trim() === '') {
             this.validation.push('Name is required.');
         }
+        if (!formData.DistributorID) {
+            this.validation.push('Distributor is required.');
+        }
         return this.validation.length > 0;
     }
 
