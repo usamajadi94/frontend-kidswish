@@ -122,7 +122,7 @@ export class OrderDetailComponent implements OnInit {
 
     private openInvoiceWindow(d: any) {
         const items: any[] = d.Items || [];
-        const grandTotal = items.reduce((s: number, i: any) => s + (i.LineTotal || 0), 0);
+        const grandTotal = items.reduce((s: number, i: any) => s + (Number(i.LineTotal) || 0), 0);
         const totalCartons = items.reduce((s: number, i: any) => s + (Number(i.Carton) || 0), 0);
 
         const customerMap = new Map<string, any[]>();
@@ -138,7 +138,7 @@ export class OrderDetailComponent implements OnInit {
         let customerSections = '';
         let rowIndex = 0;
         customerMap.forEach((citems, cname) => {
-            const cTotal = citems.reduce((s: number, i: any) => s + (i.LineTotal || 0), 0);
+            const cTotal = citems.reduce((s: number, i: any) => s + (Number(i.LineTotal) || 0), 0);
             const cCartons = citems.reduce((s: number, i: any) => s + (Number(i.Carton) || 0), 0);
             const invNo = citems[0]?.InvoiceNo || '';
             customerSections += `
