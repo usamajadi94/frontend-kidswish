@@ -51,17 +51,14 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-3 mt-4 gap-2">
+            <div class="grid grid-cols-2 mt-4 gap-2">
                 <bft-checkbox name="IsActive" label="Active" [(ngModel)]="formData.IsActive" [skeleton]="isDataLoading" />
-                <bft-checkbox name="IsDistributor" label="Is Distributor" [(ngModel)]="formData.IsDistributor" [skeleton]="isDataLoading" />
                 <bft-checkbox name="IsCustomer" label="Is Customer" [(ngModel)]="formData.IsCustomer" [skeleton]="isDataLoading" />
             </div>
-            @if (formData.IsDistributor) {
-                <div class="mt-3">
-                    <bft-select name="DistributorID" label="Link to Distributor" [displayList]="distributors" valueField="ID" displayField="Name"
-                        [(ngModel)]="formData.DistributorID" [clearable]="true" [skeleton]="isDataLoading" />
-                </div>
-            }
+            <div class="mt-3">
+                <bft-select name="DistributorID" label="Distributor" [displayList]="distributors" valueField="ID" displayField="Name"
+                    [(ngModel)]="formData.DistributorID" [clearable]="true" [skeleton]="isDataLoading" />
+            </div>
             <div class="grid grid-cols-1 mt-4">
                 <div class="w-full flex justify-end">
                     <button class="ml-4" mat-flat-button type="button" [color]="'primary'" (click)="verticalStepper.next()">Next</button>
