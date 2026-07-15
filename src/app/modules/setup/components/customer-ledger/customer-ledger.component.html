@@ -124,7 +124,12 @@
                                                 {{ row.Type }}
                                             </span>
                                         </td>
-                                        <td class="px-3 py-1.5 text-gray-500 text-xs">{{ row.Notes || '—' }}</td>
+                                        <td class="px-3 py-1.5 text-gray-500 text-xs">
+                                            <div>{{ row.Notes || '—' }}</div>
+                                            @if (row.InvoiceNo) {
+                                                <div class="text-blue-600 font-medium mt-0.5">{{ row.InvoiceNo }}</div>
+                                            }
+                                        </td>
                                         <td class="px-3 py-1.5 text-xs text-gray-500">{{ row.AccountName || '—' }}</td>
                                         <td class="px-3 py-1.5 text-right font-medium text-red-700 text-xs">
                                             @if (+row.Debit > 0) { {{ row.Debit | currency:'PKR ':'symbol':'1.0-0' }} }
