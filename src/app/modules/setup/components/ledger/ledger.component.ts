@@ -134,6 +134,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
                 if (this.isDistributorUser && this._localStorage.distributorId) {
                     this.selectedDistributor = +this._localStorage.distributorId;
                     this.loadCustomers();
+                    this.loadAll();
                 }
             },
         });
