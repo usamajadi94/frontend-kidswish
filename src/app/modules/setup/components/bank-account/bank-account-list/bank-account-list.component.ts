@@ -45,7 +45,10 @@ export class BankAccountListComponent extends BaseRoutedComponent implements OnI
         });
     }
 
-    onView(row) { }
+    onView(row) {
+        this.modalService.openModal({ component: BankAccountFormComponent, title: this.title, ID: row.ID })
+            .afterClose.subscribe((res: boolean) => { if (res) this.getData(); });
+    }
 
     addBankAccount() {
         this.modalService.openModal({ component: BankAccountFormComponent, title: this.title })
