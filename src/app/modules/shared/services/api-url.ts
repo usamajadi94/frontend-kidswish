@@ -53,6 +53,7 @@ static readonly navigation = `${apiUrls.server}api/GetNavigation`;
     static readonly customerPricingController = `api/customer-pricing`;
     static readonly customerLedgerController = `api/customer-ledger`;
     static readonly vendorLedgerController   = `api/vendor-ledger`;
+    static readonly vendorInvoiceController  = `api/vendor-invoice`;
     static readonly cashInHandController = `api/cash-in-hand`;
     static readonly vehicleDispatchController = `api/vehicle-dispatch`;
 

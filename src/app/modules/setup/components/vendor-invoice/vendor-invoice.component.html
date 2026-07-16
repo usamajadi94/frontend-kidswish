@@ -1,0 +1,272 @@
+<div class="absolute inset-0 flex min-w-0 flex-col overflow-hidden px-6 pt-3 pb-5 md:px-8 md:pt-4">
+
+    <!-- Header -->
+    <div class="mb-4 flex items-center justify-between shrink-0">
+        <div class="text-3xl font-semibold leading-8 tracking-tight">{{ title }}</div>
+        <button (click)="newInvoice()"
+                class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition-colors">
+            + New Invoice
+        </button>
+    </div>
+
+    <!-- Two-panel layout -->
+    <div class="flex flex-1 gap-4 min-h-0 overflow-hidden">
+
+        <!-- LEFT: Invoice List (40%) -->
+        <div class="flex flex-col overflow-hidden" style="flex: 40; min-width: 0;">
+            <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm flex-1">
+                @if (isLoading) {
+                    <div class="flex items-center justify-center py-16 text-gray-400 text-sm">Loading...</div>
+                } @else if (invoices.length === 0) {
+                    <div class="flex items-center justify-center py-16 text-gray-400 text-sm">No invoices yet</div>
+                } @else {
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50 sticky top-0">
+                            <tr>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">Invoice No</th>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">Vendor</th>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600 whitespace-nowrap">Date</th>
+                                <th class="px-3 py-2 text-right text-xs font-semibold text-gray-600">Total</th>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @for (inv of invoices; track inv.ID) {
+                                <tr class="cursor-pointer hover:bg-blue-50 transition-colors"
+                                    [class.bg-blue-50]="selected?.ID === inv.ID && !isNew"
+                                    [class.border-l-2]="selected?.ID === inv.ID && !isNew"
+                                    [class.border-blue-500]="selected?.ID === inv.ID && !isNew"
+                                    (click)="selectInvoice(inv)">
+                                    <td class="px-3 py-2 text-xs font-medium text-blue-700">{{ inv.InvoiceNo }}</td>
+                                    <td class="px-3 py-2 text-xs text-gray-800 truncate max-w-[120px]">{{ inv.VendorName }}</td>
+                                    <td class="px-3 py-2 text-xs text-gray-600 whitespace-nowrap">{{ inv.InvoiceDate | date:'dd/MM/yyyy' }}</td>
+                                    <td class="px-3 py-2 text-xs text-right font-medium text-gray-800">{{ inv.TotalAmount | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                                    <td class="px-3 py-2 text-xs">
+                                        <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
+                                              [class.bg-yellow-100]="inv.Status === 'Draft'"
+                                              [class.text-yellow-700]="inv.Status === 'Draft'"
+                                              [class.bg-green-100]="inv.Status === 'Confirmed'"
+                                              [class.text-green-700]="inv.Status === 'Confirmed'">
+                                            {{ inv.Status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+
+        <!-- RIGHT: Detail / Form (60%) -->
+        <div class="flex flex-col overflow-hidden" style="flex: 60; min-width: 0;">
+
+            @if (!selected && !isNew) {
+                <div class="flex flex-1 items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 text-gray-400 text-sm">
+                    Select an invoice or click "+ New Invoice"
+                </div>
+            }
+
+            @if (isLoadingDetail && !isNew) {
+                <div class="flex flex-1 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-400 text-sm">
+                    Loading...
+                </div>
+            }
+
+            <!-- View mode: confirmed invoice detail -->
+            @if (selected && !isNew && !isLoadingDetail) {
+                <div class="flex flex-col flex-1 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-sm p-5 gap-4">
+
+                    <!-- Invoice header info -->
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="text-lg font-bold text-gray-900">{{ selected.InvoiceNo }}</div>
+                            <div class="text-sm text-gray-500">{{ selected.VendorName }}</div>
+                            <div class="text-xs text-gray-400 mt-0.5">{{ selected.InvoiceDate | date:'dd MMM yyyy' }}</div>
+                            @if (selected.Notes) {
+                                <div class="text-xs text-gray-500 mt-1 italic">{{ selected.Notes }}</div>
+                            }
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+                                  [class.bg-yellow-100]="selected.Status === 'Draft'"
+                                  [class.text-yellow-700]="selected.Status === 'Draft'"
+                                  [class.bg-green-100]="selected.Status === 'Confirmed'"
+                                  [class.text-green-700]="selected.Status === 'Confirmed'">
+                                {{ selected.Status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    @if (errorMsg) {
+                        <div class="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">{{ errorMsg }}</div>
+                    }
+
+                    <!-- Line items table -->
+                    <div class="overflow-auto rounded-lg border border-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">Description</th>
+                                    <th class="px-3 py-2 text-right text-xs font-semibold text-gray-600">Qty</th>
+                                    <th class="px-3 py-2 text-right text-xs font-semibold text-gray-600">Rate</th>
+                                    <th class="px-3 py-2 text-right text-xs font-semibold text-gray-600">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @for (item of selected.Items; track $index) {
+                                    <tr>
+                                        <td class="px-3 py-2 text-xs text-gray-800">{{ item.Description }}</td>
+                                        <td class="px-3 py-2 text-xs text-right text-gray-600">{{ item.Qty }}</td>
+                                        <td class="px-3 py-2 text-xs text-right text-gray-600">{{ item.Rate | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                                        <td class="px-3 py-2 text-xs text-right font-medium text-gray-800">{{ item.Amount | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="border-t-2 border-gray-300 bg-gray-50">
+                                <tr class="font-bold">
+                                    <td colspan="3" class="px-3 py-2 text-right text-xs text-gray-700">Total</td>
+                                    <td class="px-3 py-2 text-right text-sm text-gray-900">{{ selected.TotalAmount | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Action buttons -->
+                    @if (selected.Status === 'Draft') {
+                        <div class="flex gap-2 pt-1">
+                            <button (click)="editSelected()"
+                                    class="rounded-lg border border-gray-300 bg-white px-4 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                                Edit
+                            </button>
+                            <button (click)="confirm()" [disabled]="isConfirming"
+                                    class="rounded-lg bg-green-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50 transition-colors">
+                                {{ isConfirming ? 'Confirming...' : 'Confirm Invoice' }}
+                            </button>
+                            <button (click)="delete()" [disabled]="isDeleting"
+                                    class="rounded-lg bg-red-50 border border-red-200 px-4 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50 transition-colors">
+                                {{ isDeleting ? 'Deleting...' : 'Delete' }}
+                            </button>
+                        </div>
+                    }
+
+                </div>
+            }
+
+            <!-- Edit / New form -->
+            @if (isNew) {
+                <div class="flex flex-col flex-1 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-sm p-5 gap-4">
+
+                    <div class="text-sm font-semibold text-gray-700">
+                        {{ selected ? 'Edit Invoice ' + selected.InvoiceNo : 'New Vendor Invoice' }}
+                    </div>
+
+                    @if (errorMsg) {
+                        <div class="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">{{ errorMsg }}</div>
+                    }
+
+                    <!-- Header fields -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-medium text-gray-600">Vendor *</label>
+                            <nz-select [(ngModel)]="form.VendorID" nzPlaceHolder="Select Vendor"
+                                       [nzShowSearch]="true" class="w-full">
+                                @for (v of vendors; track v.ID) {
+                                    <nz-option [nzValue]="v.ID" [nzLabel]="v.Name"></nz-option>
+                                }
+                            </nz-select>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-medium text-gray-600">Invoice Date *</label>
+                            <nz-date-picker [(ngModel)]="form.InvoiceDate" nzFormat="dd/MM/yyyy" class="w-full"></nz-date-picker>
+                        </div>
+                        <div class="col-span-2 flex flex-col gap-1">
+                            <label class="text-xs font-medium text-gray-600">Notes</label>
+                            <textarea [(ngModel)]="form.Notes" rows="2"
+                                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none resize-none"
+                                      placeholder="Optional notes..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Items table -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-semibold text-gray-700">Items</span>
+                            <button (click)="addItem()"
+                                    class="text-xs text-blue-600 hover:text-blue-800 font-medium">+ Add Item</button>
+                        </div>
+                        <div class="overflow-auto rounded-lg border border-gray-200">
+                            <table class="min-w-full text-sm">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">Description</th>
+                                        <th class="px-2 py-2 text-right text-xs font-semibold text-gray-600 w-20">Qty</th>
+                                        <th class="px-2 py-2 text-right text-xs font-semibold text-gray-600 w-28">Rate (PKR)</th>
+                                        <th class="px-2 py-2 text-right text-xs font-semibold text-gray-600 w-28">Amount</th>
+                                        <th class="px-2 py-2 w-8"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    @for (item of form.Items; track $index) {
+                                        <tr>
+                                            <td class="px-3 py-1.5">
+                                                <input [(ngModel)]="item.Description" type="text"
+                                                       class="w-full rounded border border-gray-200 px-2 py-1 text-xs focus:border-blue-400 focus:outline-none"
+                                                       placeholder="Item description" />
+                                            </td>
+                                            <td class="px-2 py-1.5">
+                                                <input [(ngModel)]="item.Qty" type="number" min="0"
+                                                       (input)="recalc(item)"
+                                                       class="w-full rounded border border-gray-200 px-2 py-1 text-xs text-right focus:border-blue-400 focus:outline-none" />
+                                            </td>
+                                            <td class="px-2 py-1.5">
+                                                <input [(ngModel)]="item.Rate" type="number" min="0"
+                                                       (input)="recalc(item)"
+                                                       class="w-full rounded border border-gray-200 px-2 py-1 text-xs text-right focus:border-blue-400 focus:outline-none" />
+                                            </td>
+                                            <td class="px-2 py-1.5 text-right text-xs font-medium text-gray-700 whitespace-nowrap">
+                                                {{ item.Amount | currency:'PKR ':'symbol':'1.0-0' }}
+                                            </td>
+                                            <td class="px-2 py-1.5 text-center">
+                                                <button (click)="removeItem($index)" class="text-red-400 hover:text-red-600 text-xs">✕</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (form.Items.length === 0) {
+                                        <tr>
+                                            <td colspan="5" class="px-3 py-6 text-center text-xs text-gray-400">
+                                                Click "+ Add Item" to add line items
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="border-t-2 border-gray-300 bg-gray-50">
+                                    <tr class="font-bold">
+                                        <td colspan="3" class="px-3 py-2 text-right text-xs text-gray-700">Total</td>
+                                        <td class="px-2 py-2 text-right text-sm text-gray-900">{{ formTotal | currency:'PKR ':'symbol':'1.0-0' }}</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Save / Cancel -->
+                    <div class="flex gap-2 pt-1">
+                        <button (click)="save()" [disabled]="isSaving"
+                                class="rounded-lg bg-blue-600 px-5 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                            {{ isSaving ? 'Saving...' : 'Save Draft' }}
+                        </button>
+                        <button (click)="cancelEdit()"
+                                class="rounded-lg border border-gray-300 bg-white px-4 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                            Cancel
+                        </button>
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

@@ -12,7 +12,8 @@ export class componentRegister {
     static readonly makePayment: IComponentRegister = { Title: 'Make Payment', SCode: 'pay_02' };
     static readonly ledger: IComponentRegister = { Title: 'Ledger', SCode: 'pay_03' };
     static readonly customerLedger: IComponentRegister = { Title: 'Customer Ledger', SCode: 'pay_04' };
-    static readonly vendorLedger: IComponentRegister  = { Title: 'Vendor Ledger',   SCode: 'pay_06' };
+    static readonly vendorLedger: IComponentRegister   = { Title: 'Vendor Ledger',   SCode: 'pay_06' };
+    static readonly vendorInvoice: IComponentRegister  = { Title: 'Vendor Invoice',  SCode: 'pay_07' };
 
     // Products
     static readonly product: IComponentRegister = { Title: 'Product', SCode: 'prod_01' };
