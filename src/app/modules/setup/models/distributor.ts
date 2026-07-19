@@ -8,4 +8,5 @@ export class Distributor {
     Address: string = null;
     IsActive: boolean = true;
     SCode: string = componentRegister.distributor.SCode;
+    OpeningBalance: number = 0;
 }

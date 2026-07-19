@@ -5,6 +5,7 @@ import { BaseComponent } from 'app/core/Base/base/base.component';
 import { GenericService } from 'app/core/Base/services/generic.service';
 import { ToastService } from 'app/core/toaster/toast.service';
 import { BftCheckboxComponent } from 'app/modules/shared/components/fields/bft-checkbox/bft-checkbox.component';
+import { BftInputCurrencyComponent } from 'app/modules/shared/components/fields/bft-input-currency/bft-input-currency.component';
 import { BftInputTextComponent } from 'app/modules/shared/components/fields/bft-input-text/bft-input-text.component';
 import { BftTextareaComponent } from 'app/modules/shared/components/fields/bft-textarea/bft-textarea.component';
 import { MessageModalService } from 'app/modules/shared/services/message.service';
@@ -16,7 +17,7 @@ import { Distributor } from '../../models/distributor';
 @Component({
     selector: 'app-distributor-form',
     standalone: true,
-    imports: [FormsModule, BftInputTextComponent, BftTextareaComponent, BftCheckboxComponent],
+    imports: [FormsModule, BftInputTextComponent, BftInputCurrencyComponent, BftTextareaComponent, BftCheckboxComponent],
     templateUrl: './distributor-form.component.html',
     styleUrl: './distributor-form.component.scss',
 })
