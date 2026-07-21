@@ -133,49 +133,21 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
                 this.distributors = res || [];
                 if (this.isDistributorUser && this._localStorage.distributorId) {
                     this.selectedDistributor = +this._localStorage.distributorId;
-                    this.loadCustomers();
                     this.loadAll();
                 }
             },
         });
 
         if (!this.isDistributorUser) {
-            this.loadCustomers();
             this.loadAll();
         }
     }
 
     onDistributorChange() {
-        this.customers = [];
-        this.selectedCustomer = null;
         this.financialRows = [];
         this.orderItems = [];
         this.selectedProducts = [];
         this.selectedStatuses = [];
-        this.selectedOrderID = null;
-        if (this.selectedDistributor != null) {
-            this.loadCustomers();
-        }
-        this.loadAll();
-    }
-
-    loadCustomers() {
-        this.isLoadingCustomers = true;
-        let url = `${apiUrls.server}${apiUrls.customerLedgerController}`;
-        if (this.selectedDistributor) url += `?distributorId=${this.selectedDistributor}`;
-        this._http.get<any[]>(url, { headers: this.headers }).subscribe({
-            next: (res) => {
-                this.customers = (res || []).map(c => ({ ID: c.CustomerID, Name: c.CustomerName }));
-                this.isLoadingCustomers = false;
-            },
-            error: () => { this.isLoadingCustomers = false; },
-        });
-    }
-
-    onCustomerChange() {
-        this.selectedProducts = [];
-        this.selectedStatuses = [];
-        this.selectedOrderID = null;
         this.loadAll();
     }
 
@@ -193,14 +165,10 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         this.isLoadingFinancial = true;
         const from = this.dateRange?.[0]?.toISOString() || '';
         const to   = this.dateRange?.[1]?.toISOString() || '';
-        const base = this.selectedCustomer
-            ? `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomer}/financial?`
-            : `${apiUrls.server}${apiUrls.customerLedgerController}/all/financial?`;
-        let url = base;
+        let url = `${apiUrls.server}${apiUrls.customerLedgerController}/all/financial?`;
         if (from) url += `from=${encodeURIComponent(from)}&`;
         if (to)   url += `to=${encodeURIComponent(to)}&`;
-        if (this.selectedCustomer && this.selectedOrderID) url += `orderId=${this.selectedOrderID}&`;
-        if (!this.selectedCustomer && this.selectedDistributor) url += `distributorId=${this.selectedDistributor}&`;
+        if (this.selectedDistributor) url += `distributorId=${this.selectedDistributor}&`;
         this._http.get<any[]>(url, { headers: this.headers }).subscribe({
             next: (res) => { this.financialRows = res || []; this.isLoadingFinancial = false; },
             error: () => { this.isLoadingFinancial = false; },
@@ -212,13 +180,10 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         this.orderError = '';
         const from = this.dateRange?.[0]?.toISOString() || '';
         const to   = this.dateRange?.[1]?.toISOString() || '';
-        const base = this.selectedCustomer
-            ? `${apiUrls.server}${apiUrls.customerLedgerController}/${this.selectedCustomer}/orders?`
-            : `${apiUrls.server}${apiUrls.customerLedgerController}/all/orders?`;
-        let url = base;
+        let url = `${apiUrls.server}${apiUrls.customerLedgerController}/all/orders?`;
         if (from) url += `from=${encodeURIComponent(from)}&`;
         if (to)   url += `to=${encodeURIComponent(to)}&`;
-        if (!this.selectedCustomer && this.selectedDistributor) url += `distributorId=${this.selectedDistributor}&`;
+        if (this.selectedDistributor) url += `distributorId=${this.selectedDistributor}&`;
         this._http.get<any>(url, { headers: this.headers }).subscribe({
             next: (res: any) => {
                 if (res?.__error) { this.orderError = res.__error; this.orderItems = []; }
