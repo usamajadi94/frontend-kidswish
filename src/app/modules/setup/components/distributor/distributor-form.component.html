@@ -5,6 +5,6 @@
         <bft-input-text name="City" label="City" [(ngModel)]="formData.City" [skeleton]="isDataLoading" />
     </div>
     <bft-textarea name="Address" label="Address" [(ngModel)]="formData.Address" [skeleton]="isDataLoading" />
-    <bft-input-currency name="OpeningBalance" label="Opening Balance" [(ngModel)]="formData.OpeningBalance" [skeleton]="isDataLoading" [disabled]="primaryKey > 0 && savedOpeningBalance !== 0" />
+    <bft-input-currency name="OpeningBalance" label="Opening Balance" [(ngModel)]="formData.OpeningBalance" [skeleton]="isDataLoading" [disabled]="isView || (primaryKey > 0 && savedOpeningBalance !== 0)" />
     <bft-checkbox name="IsActive" label="Active" [(ngModel)]="formData.IsActive" [skeleton]="isDataLoading" />
 </div>
