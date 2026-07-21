@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { BaseComponent } from 'app/core/Base/base/base.component';
 import { GenericService } from 'app/core/Base/services/generic.service';
 import { ToastService } from 'app/core/toaster/toast.service';
@@ -16,11 +17,18 @@ import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { PaymentTransaction } from '../../models/payment-transaction';
+import { DecimalPipe } from '@angular/common';
+
+interface BulkLine {
+    Amount: number | null;
+    ToPartyID: number | null;
+    Notes: string;
+}
 
 @Component({
     selector: 'app-make-payment-form',
     standalone: true,
-    imports: [FormsModule, BftInputDateComponent, BftSelectComponent, BftInputCurrencyComponent, BftTextareaComponent],
+    imports: [FormsModule, BftInputDateComponent, BftSelectComponent, BftInputCurrencyComponent, BftTextareaComponent, DecimalPipe],
     templateUrl: './make-payment-form.component.html',
     styleUrl: './make-payment-form.component.scss',
 })
@@ -44,6 +52,12 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
     isDailyExpense = false;
     dailyExpensePettyCashID: number | null = null;
     dailyExpenseCategoryID: number | null = null;
+
+    bulkLines: BulkLine[] = [];
+
+    get bulkTotal(): number {
+        return this.bulkLines.reduce((s, l) => s + (parseFloat(l.Amount as any) || 0), 0);
+    }
 
     constructor(
         private genSer: GenericService,
@@ -72,15 +86,77 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         this.formData.FromPartyType = 'bank_account';
         this.formData.ToPartyType = 'vendor';
         this.formData.SCode = 'pay_02';
+        this.bulkLines = [
+            { Amount: null, ToPartyID: null, Notes: '' },
+            { Amount: null, ToPartyID: null, Notes: '' },
+            { Amount: null, ToPartyID: null, Notes: '' },
+        ];
+    }
+
+    addLine() {
+        this.bulkLines.push({ Amount: null, ToPartyID: null, Notes: '' });
+    }
+
+    removeLine(i: number) {
+        this.bulkLines.splice(i, 1);
+    }
+
+    override async InsertRecord(): Promise<void> {
+        if (this.primaryKey > 0) {
+            return super.InsertRecord();
+        }
+
+        // Bulk add path
+        const validLines = this.bulkLines.filter(l => (parseFloat(l.Amount as any) || 0) > 0);
+        this.validation = [];
+        if (!this.formData.Date) this.validation.push('Date is required.');
+        if (!this.formData.PaymentType) this.validation.push('Payment Type is required.');
+        if (!this.formData.FromPartyID) this.validation.push('Bank Account is required.');
+        if (validLines.length === 0) this.validation.push('At least one line with an amount is required.');
+        if (this.validation.length > 0) {
+            this.modalSer.validationModal(this.validation);
+            return;
+        }
+
+        this.isSubmitLoading = true;
+        const headers = new HttpHeaders({
+            uid: this._localStorage.uid,
+            cid: this._localStorage.cid,
+            eid: this._localStorage.eid,
+        });
+
+        try {
+            for (const line of validLines) {
+                await firstValueFrom(
+                    this._http.post(`${apiUrls.server}${apiUrls.paymentTransactionController}`, {
+                        Date: this.formData.Date,
+                        Amount: parseFloat(line.Amount as any),
+                        PaymentType: this.formData.PaymentType,
+                        FromPartyType: 'bank_account',
+                        FromPartyID: this.formData.FromPartyID,
+                        ToPartyType: line.ToPartyID ? 'vendor' : null,
+                        ToPartyID: line.ToPartyID || null,
+                        TransactionType: 'payment',
+                        Notes: line.Notes || null,
+                        SCode: 'pay_02',
+                    }, { headers })
+                );
+            }
+            this.msgSer.success(`${validLines.length} payment(s) saved successfully!`);
+            this.isCreated = true;
+            this.isSubmitLoading = false;
+        } catch (e: any) {
+            this.isSubmitLoading = false;
+            this.toasterSer.openResult(e.status || 500);
+        }
     }
 
     override BeforeUpSert(): void {
         if (this.isDailyExpense) {
-            // Entry 1: topup — bank → petty cash (vendor is tracked on expense entry, not here)
             this.formData.TransactionType = 'topup';
             this.formData.FromPartyType = 'bank_account';
             this.formData.ToPartyType = 'petty_cash';
-            this._vendorIdForExpense = this.formData.ToPartyID; // save before overwrite
+            this._vendorIdForExpense = this.formData.ToPartyID;
             this.formData.ToPartyID = this.dailyExpensePettyCashID;
             this.formData.SCode = 'pay_03';
         } else {
@@ -96,7 +172,6 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
     override AfterUpsert(data: PaymentTransaction): void {
         if (!this.isDailyExpense) return;
 
-        // Entry 2: expense from petty cash account
         const headers = new HttpHeaders({
             uid: this._localStorage.uid,
             cid: this._localStorage.cid,
