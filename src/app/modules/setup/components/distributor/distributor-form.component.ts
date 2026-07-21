@@ -22,6 +22,8 @@ import { Distributor } from '../../models/distributor';
     styleUrl: './distributor-form.component.scss',
 })
 export class DistributorFormComponent extends BaseComponent<Distributor, DistributorFormComponent> {
+    savedOpeningBalance: number = 0;
+
     constructor(
         private genSer: GenericService,
         private msgSer: MessageModalService,
@@ -40,6 +42,10 @@ export class DistributorFormComponent extends BaseComponent<Distributor, Distrib
 
     public override InitializeObject(): void {
         this.formData = new Distributor();
+    }
+
+    public override async AfterGetData(): Promise<void> {
+        this.savedOpeningBalance = this.formData.OpeningBalance ?? 0;
     }
 
     override ValidateBeforeSave(formData: Distributor): boolean {
