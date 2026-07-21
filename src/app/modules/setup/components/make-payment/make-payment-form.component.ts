@@ -90,8 +90,6 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         this.formData.SCode = 'pay_02';
         this.bulkLines = [
             { PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' },
-            { PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' },
-            { PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' },
         ];
     }
 
