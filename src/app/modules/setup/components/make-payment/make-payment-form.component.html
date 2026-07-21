@@ -3,13 +3,9 @@
 <!-- ── BULK ADD MODE ─────────────────────────────────────────── -->
 <div class="flex flex-col gap-4">
 
-    <!-- Shared header: Date / Type / Bank Account -->
-    <div class="grid grid-cols-3 gap-4">
+    <!-- Only Date at top -->
+    <div class="w-64">
         <bft-input-date name="Date" label="Date" [(ngModel)]="formData.Date" [required]="true" [skeleton]="isDataLoading" />
-        <bft-select name="PaymentType" label="Payment Type" [displayList]="paymentTypes" valueField="ID" displayField="Name"
-            [(ngModel)]="formData.PaymentType" [skeleton]="isDataLoading" />
-        <bft-select name="FromPartyID" label="From (Bank Account)" [displayList]="bankAccounts" valueField="ID" displayField="Name"
-            [(ngModel)]="formData.FromPartyID" [clearable]="true" [skeleton]="isDataLoading" />
     </div>
 
     <!-- Lines table -->
@@ -17,8 +13,10 @@
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b">
                 <tr>
-                    <th class="text-right px-3 py-2 font-medium text-gray-600 w-36">Amount (PKR)</th>
-                    <th class="text-left px-3 py-2 font-medium text-gray-600 w-48">Vendor</th>
+                    <th class="text-left px-3 py-2 font-medium text-gray-600 w-36">Payment Type</th>
+                    <th class="text-left px-3 py-2 font-medium text-gray-600 w-44">From (Bank Account)</th>
+                    <th class="text-right px-3 py-2 font-medium text-gray-600 w-32">Amount (PKR)</th>
+                    <th class="text-left px-3 py-2 font-medium text-gray-600 w-40">Vendor</th>
                     <th class="text-left px-3 py-2 font-medium text-gray-600">Notes</th>
                     <th class="w-8"></th>
                 </tr>
@@ -26,6 +24,24 @@
             <tbody>
                 @for (line of bulkLines; track $index; let i = $index) {
                 <tr class="border-b last:border-0 hover:bg-gray-50">
+                    <td class="px-2 py-1.5">
+                        <select [(ngModel)]="line.PaymentType"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                            <option [ngValue]="null">— Type —</option>
+                            @for (pt of paymentTypes; track pt.ID) {
+                                <option [ngValue]="pt.ID">{{ pt.Name }}</option>
+                            }
+                        </select>
+                    </td>
+                    <td class="px-2 py-1.5">
+                        <select [(ngModel)]="line.FromPartyID"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                            <option [ngValue]="null">— Account —</option>
+                            @for (b of bankAccounts; track b.ID) {
+                                <option [ngValue]="b.ID">{{ b.Name }}</option>
+                            }
+                        </select>
+                    </td>
                     <td class="px-2 py-1.5">
                         <input type="number" [(ngModel)]="line.Amount" placeholder="0.00" min="0"
                             class="w-full border rounded px-2 py-1 text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-400" />
@@ -54,15 +70,16 @@
             </tbody>
             <tfoot class="bg-gray-50 border-t">
                 <tr>
-                    <td class="px-3 py-2 text-right font-semibold text-sm text-gray-800">
-                        {{ bulkTotal | number:'1.2-2' }}
-                    </td>
-                    <td colspan="3" class="px-2 py-1.5">
+                    <td colspan="2" class="px-2 py-1.5">
                         <button type="button" (click)="addLine()"
                             class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1">
                             <span class="text-base font-bold">+</span> Add Line
                         </button>
                     </td>
+                    <td class="px-3 py-2 text-right font-semibold text-sm text-gray-800">
+                        {{ bulkTotal | number:'1.2-2' }}
+                    </td>
+                    <td colspan="3"></td>
                 </tr>
             </tfoot>
         </table>
