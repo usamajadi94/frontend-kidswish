@@ -148,6 +148,7 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
             this.msgSer.success(`${validLines.length} payment(s) saved successfully!`);
             this.isCreated = true;
             this.isSubmitLoading = false;
+            this.modalSer.closeModal(true);
         } catch (e: any) {
             this.isSubmitLoading = false;
             this.toasterSer.openResult(e.status || 500);
