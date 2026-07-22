@@ -35,7 +35,7 @@
                         <select [(ngModel)]="line.FromPartyID"
                             class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
                             <option [ngValue]="null">— Account —</option>
-                            @for (b of bankAccounts; track b.ID) {
+                            @for (b of bulkBankAccounts; track b.ID) {
                                 <option [ngValue]="b.ID">{{ b.Name }}</option>
                             }
                         </select>

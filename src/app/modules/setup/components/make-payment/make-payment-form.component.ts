@@ -48,6 +48,7 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
     bulkPaymentTypes = this.paymentTypes.filter(t => t.ID !== 'Cash');
 
     bankAccounts: any[] = [];
+    get bulkBankAccounts(): any[] { return this.bankAccounts.filter(b => b.Type !== 'Cash'); }
     vendors: any[] = [];
     pettyCashList: any[] = [];
     expenseCategories: any[] = [];
