@@ -23,6 +23,7 @@ interface BulkCashLine {
     Date: string;
     Type: string;
     PaymentCategoryID: number | null;
+    ExpenseCategoryID: number | null;
     Amount: number | null;
     ToPartyID: number | null;
     Notes: string;
@@ -57,8 +58,17 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
     bulkLines: BulkCashLine[] = [];
     get bulkTotal(): number { return this.bulkLines.reduce((s, l) => s + (parseFloat(l.Amount as any) || 0), 0); }
 
+    isLineDailyExpense(line: BulkCashLine): boolean {
+        if (!line.PaymentCategoryID) return false;
+        const cat = this.paymentCategories.find(c => c.ID === line.PaymentCategoryID);
+        return cat?.Description === 'Daily Expense';
+    }
+    onLineCategoryChange(line: BulkCashLine): void {
+        if (!this.isLineDailyExpense(line)) line.ExpenseCategoryID = null;
+    }
+
     private emptyLine(): BulkCashLine {
-        return { Date: new Date().toISOString().split('T')[0], Type: 'out', PaymentCategoryID: null, Amount: null, ToPartyID: null, Notes: '' };
+        return { Date: new Date().toISOString().split('T')[0], Type: 'out', PaymentCategoryID: null, ExpenseCategoryID: null, Amount: null, ToPartyID: null, Notes: '' };
     }
     addLine() { this.bulkLines.push(this.emptyLine()); }
     removeLine(i: number) { this.bulkLines.splice(i, 1); }
@@ -104,6 +114,7 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
         validLines.forEach((l, i) => {
             if (!l.Date) this.validation.push(`Row ${i + 1}: Date is required.`);
             if (!l.PaymentCategoryID) this.validation.push(`Row ${i + 1}: Category is required.`);
+            if (this.isLineDailyExpense(l) && !l.ExpenseCategoryID) this.validation.push(`Row ${i + 1}: Sub Category is required for Daily Expense.`);
         });
         if (this.validation.length > 0) { this.modalSer.validationModal(this.validation); return; }
 
@@ -115,6 +126,7 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
                     Date: line.Date,
                     Type: line.Type,
                     PaymentCategoryID: line.PaymentCategoryID,
+                    ExpenseCategoryID: line.ExpenseCategoryID || null,
                     Amount: parseFloat(line.Amount as any),
                     ToPartyID: line.ToPartyID || null,
                     Notes: line.Notes || null,
