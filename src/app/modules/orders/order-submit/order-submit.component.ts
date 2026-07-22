@@ -184,14 +184,7 @@ export class OrderSubmitComponent implements OnInit {
             .afterClose.subscribe((saved: boolean) => {
                 if (!saved) return;
                 this._drp.getCustomerInformationDrp().subscribe({
-                    next: (list: any) => {
-                        this.customers = list || [];
-                        // auto-select the newest customer (last in list) into the first empty group
-                        const emptyGroup = this.groups.find(g => !g.CustomerID);
-                        if (emptyGroup && this.customers.length) {
-                            emptyGroup.CustomerID = this.customers[this.customers.length - 1].ID;
-                        }
-                    }
+                    next: (list: any) => { this.customers = list || []; }
                 });
             });
     }
