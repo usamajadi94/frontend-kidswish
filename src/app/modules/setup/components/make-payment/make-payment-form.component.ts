@@ -24,8 +24,6 @@ interface BulkLine {
     FromPartyID: number | null;
     Amount: number | null;
     ToPartyID: number | null;
-    PettyCashID: number | null;
-    ExpenseCategoryID: number | null;
     Notes: string;
 }
 
@@ -47,6 +45,7 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         { ID: 'Cheque', Name: 'Cheque' },
         { ID: 'Online Transfer', Name: 'Online Transfer' },
     ];
+    bulkPaymentTypes = this.paymentTypes.filter(t => t.ID !== 'Cash');
 
     bankAccounts: any[] = [];
     vendors: any[] = [];
@@ -90,14 +89,13 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         this.formData.FromPartyType = 'bank_account';
         this.formData.ToPartyType = 'vendor';
         this.formData.SCode = 'pay_02';
-        this.isDailyExpense = false;
         this.bulkLines = [
-            { PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, PettyCashID: null, ExpenseCategoryID: null, Notes: '' },
+            { PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' },
         ];
     }
 
     addLine() {
-        this.bulkLines.push({ PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, PettyCashID: null, ExpenseCategoryID: null, Notes: '' });
+        this.bulkLines.push({ PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' });
     }
 
     removeLine(i: number) {
@@ -114,18 +112,10 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         this.validation = [];
         if (!this.formData.Date) this.validation.push('Date is required.');
         if (validLines.length === 0) this.validation.push('At least one line with an amount is required.');
-        if (this.isDailyExpense) {
-            validLines.forEach((l, i) => {
-                if (!l.FromPartyID) this.validation.push(`Row ${i + 1}: Bank Account is required.`);
-                if (!l.PettyCashID) this.validation.push(`Row ${i + 1}: Petty Cash Account is required.`);
-                if (!l.ExpenseCategoryID) this.validation.push(`Row ${i + 1}: Expense Category is required.`);
-            });
-        } else {
-            validLines.forEach((l, i) => {
-                if (!l.PaymentType) this.validation.push(`Row ${i + 1}: Payment Type is required.`);
-                if (!l.FromPartyID) this.validation.push(`Row ${i + 1}: Bank Account is required.`);
-            });
-        }
+        validLines.forEach((l, i) => {
+            if (!l.PaymentType) this.validation.push(`Row ${i + 1}: Payment Type is required.`);
+            if (!l.FromPartyID) this.validation.push(`Row ${i + 1}: Bank Account is required.`);
+        });
         if (this.validation.length > 0) {
             this.modalSer.validationModal(this.validation);
             return;
@@ -140,50 +130,20 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
 
         try {
             for (const line of validLines) {
-                if (this.isDailyExpense) {
-                    // Topup: bank → petty cash
-                    await firstValueFrom(
-                        this._http.post(`${apiUrls.server}${apiUrls.paymentTransactionController}`, {
-                            Date: this.formData.Date,
-                            Amount: parseFloat(line.Amount as any),
-                            PaymentType: line.PaymentType || 'Bank Transfer',
-                            FromPartyType: 'bank_account',
-                            FromPartyID: line.FromPartyID,
-                            ToPartyType: 'petty_cash',
-                            ToPartyID: line.PettyCashID,
-                            TransactionType: 'topup',
-                            Notes: line.Notes || null,
-                            SCode: 'pay_03',
-                        }, { headers })
-                    );
-                    // Expense: from petty cash
-                    await firstValueFrom(
-                        this._http.post(`${apiUrls.server}${apiUrls.expenseController}`, {
-                            Date: this.formData.Date,
-                            Amount: parseFloat(line.Amount as any),
-                            PettyCashID: line.PettyCashID,
-                            ExpenseCategoryID: line.ExpenseCategoryID,
-                            VendorID: line.ToPartyID || null,
-                            Notes: line.Notes || null,
-                            SCode: componentRegister.expense?.SCode || 'set_05',
-                        }, { headers })
-                    );
-                } else {
-                    await firstValueFrom(
-                        this._http.post(`${apiUrls.server}${apiUrls.paymentTransactionController}`, {
-                            Date: this.formData.Date,
-                            Amount: parseFloat(line.Amount as any),
-                            PaymentType: line.PaymentType,
-                            FromPartyType: 'bank_account',
-                            FromPartyID: line.FromPartyID,
-                            ToPartyType: line.ToPartyID ? 'vendor' : null,
-                            ToPartyID: line.ToPartyID || null,
-                            TransactionType: 'payment',
-                            Notes: line.Notes || null,
-                            SCode: 'pay_02',
-                        }, { headers })
-                    );
-                }
+                await firstValueFrom(
+                    this._http.post(`${apiUrls.server}${apiUrls.paymentTransactionController}`, {
+                        Date: this.formData.Date,
+                        Amount: parseFloat(line.Amount as any),
+                        PaymentType: line.PaymentType,
+                        FromPartyType: 'bank_account',
+                        FromPartyID: line.FromPartyID,
+                        ToPartyType: line.ToPartyID ? 'vendor' : null,
+                        ToPartyID: line.ToPartyID || null,
+                        TransactionType: 'payment',
+                        Notes: line.Notes || null,
+                        SCode: 'pay_02',
+                    }, { headers })
+                );
             }
             this.msgSer.success(`${validLines.length} payment(s) saved successfully!`);
             this.isCreated = true;

@@ -3,35 +3,18 @@
 <!-- ── BULK ADD MODE ─────────────────────────────────────────── -->
 <div class="flex flex-col gap-4">
 
-    <!-- Date + Daily Expense toggle -->
-    <div class="flex items-end gap-6">
-        <div class="w-64">
-            <bft-input-date name="Date" label="Date" [(ngModel)]="formData.Date" [required]="true" [skeleton]="isDataLoading" />
-        </div>
-        <div class="flex items-center gap-2 pb-2">
-            <input type="checkbox" id="isDailyExpenseBulk" [(ngModel)]="isDailyExpense"
-                class="w-4 h-4 rounded border-gray-300 text-blue-600 cursor-pointer" />
-            <label for="isDailyExpenseBulk" class="text-sm font-medium text-gray-700 cursor-pointer select-none whitespace-nowrap">
-                Daily Expense
-            </label>
-        </div>
+    <div class="w-64">
+        <bft-input-date name="Date" label="Date" [(ngModel)]="formData.Date" [required]="true" [skeleton]="isDataLoading" />
     </div>
 
-    <!-- Lines table -->
-    <div class="border rounded-lg overflow-hidden">
-        <table class="w-full text-sm">
+    <div class="border rounded-lg overflow-x-auto">
+        <table class="w-full text-sm" style="min-width:700px">
             <thead class="bg-gray-50 border-b">
                 <tr>
-                    @if (!isDailyExpense) {
-                        <th class="text-left px-3 py-2 font-medium text-gray-600 w-32">Payment Type</th>
-                        <th class="text-left px-3 py-2 font-medium text-gray-600 w-40">From (Bank Account)</th>
-                    } @else {
-                        <th class="text-left px-3 py-2 font-medium text-gray-600 w-40">From (Bank Account)</th>
-                        <th class="text-left px-3 py-2 font-medium text-gray-600 w-40">Petty Cash Account</th>
-                        <th class="text-left px-3 py-2 font-medium text-gray-600 w-40">Expense Category</th>
-                    }
+                    <th class="text-left px-3 py-2 font-medium text-gray-600 w-36">Payment Type</th>
+                    <th class="text-left px-3 py-2 font-medium text-gray-600 w-44">From (Bank Account)</th>
                     <th class="text-right px-3 py-2 font-medium text-gray-600 w-32">Amount (PKR)</th>
-                    <th class="text-left px-3 py-2 font-medium text-gray-600 w-36">Vendor</th>
+                    <th class="text-left px-3 py-2 font-medium text-gray-600 w-40">Vendor</th>
                     <th class="text-left px-3 py-2 font-medium text-gray-600">Notes</th>
                     <th class="w-8"></th>
                 </tr>
@@ -39,54 +22,24 @@
             <tbody>
                 @for (line of bulkLines; track $index; let i = $index) {
                 <tr class="border-b last:border-0 hover:bg-gray-50">
-                    @if (!isDailyExpense) {
-                        <td class="px-2 py-1.5">
-                            <select [(ngModel)]="line.PaymentType"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option [ngValue]="null">— Type —</option>
-                                @for (pt of paymentTypes; track pt.ID) {
-                                    <option [ngValue]="pt.ID">{{ pt.Name }}</option>
-                                }
-                            </select>
-                        </td>
-                        <td class="px-2 py-1.5">
-                            <select [(ngModel)]="line.FromPartyID"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option [ngValue]="null">— Account —</option>
-                                @for (b of bankAccounts; track b.ID) {
-                                    <option [ngValue]="b.ID">{{ b.Name }}</option>
-                                }
-                            </select>
-                        </td>
-                    } @else {
-                        <td class="px-2 py-1.5">
-                            <select [(ngModel)]="line.FromPartyID"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option [ngValue]="null">— Account —</option>
-                                @for (b of bankAccounts; track b.ID) {
-                                    <option [ngValue]="b.ID">{{ b.Name }}</option>
-                                }
-                            </select>
-                        </td>
-                        <td class="px-2 py-1.5">
-                            <select [(ngModel)]="line.PettyCashID"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option [ngValue]="null">— Petty Cash —</option>
-                                @for (p of pettyCashList; track p.ID) {
-                                    <option [ngValue]="p.ID">{{ p.Name }}</option>
-                                }
-                            </select>
-                        </td>
-                        <td class="px-2 py-1.5">
-                            <select [(ngModel)]="line.ExpenseCategoryID"
-                                class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option [ngValue]="null">— Category —</option>
-                                @for (ec of expenseCategories; track ec.ID) {
-                                    <option [ngValue]="ec.ID">{{ ec.Description }}</option>
-                                }
-                            </select>
-                        </td>
-                    }
+                    <td class="px-2 py-1.5">
+                        <select [(ngModel)]="line.PaymentType"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                            <option [ngValue]="null">— Type —</option>
+                            @for (pt of bulkPaymentTypes; track pt.ID) {
+                                <option [ngValue]="pt.ID">{{ pt.Name }}</option>
+                            }
+                        </select>
+                    </td>
+                    <td class="px-2 py-1.5">
+                        <select [(ngModel)]="line.FromPartyID"
+                            class="w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                            <option [ngValue]="null">— Account —</option>
+                            @for (b of bankAccounts; track b.ID) {
+                                <option [ngValue]="b.ID">{{ b.Name }}</option>
+                            }
+                        </select>
+                    </td>
                     <td class="px-2 py-1.5">
                         <input type="number" [(ngModel)]="line.Amount" placeholder="0.00" min="0"
                             class="w-full border rounded px-2 py-1 text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-400" />
@@ -134,7 +87,7 @@
 
 } @else {
 
-<!-- ── VIEW / EDIT MODE (single entry) ─────────────────────────── -->
+<!-- ── VIEW / EDIT MODE ─────────────────────────────────────────── -->
 <div class="flex flex-col gap-4">
 
     <div class="grid grid-cols-2 gap-4">
