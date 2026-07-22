@@ -1,3 +1,105 @@
+@if (primaryKey === 0) {
+
+<!-- ── BULK ADD MODE ─────────────────────────────────────────── -->
+<div class="flex flex-col gap-3">
+
+    @for (line of bulkLines; track $index; let i = $index) {
+    <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
+
+        <!-- Line 1: Date | From Type | From | Amount -->
+        <div class="grid grid-cols-4 gap-2 mb-2 items-end">
+            <div class="flex flex-col gap-1">
+                <label class="text-xs font-medium text-gray-600">Date <span class="text-red-500">*</span></label>
+                <input type="date" [(ngModel)]="line.Date"
+                    class="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white" />
+            </div>
+            <div class="flex flex-col gap-1">
+                <label class="text-xs font-medium text-gray-600">From Type</label>
+                <select [(ngModel)]="line.FromPartyType" (ngModelChange)="onLineFromTypeChange(line)"
+                    class="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                    <option value="customer">Customer</option>
+                    <option value="distributor">Distributor</option>
+                </select>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label class="text-xs font-medium text-gray-600">From <span class="text-red-500">*</span></label>
+                <select [(ngModel)]="line.FromPartyID"
+                    class="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                    <option [ngValue]="null">— Select —</option>
+                    @for (f of getFromList(line.FromPartyType); track f.ID) {
+                        <option [ngValue]="f.ID">{{ f.Name }}</option>
+                    }
+                </select>
+            </div>
+            <div class="flex items-end gap-2">
+                <div class="flex flex-col gap-1 flex-1">
+                    <label class="text-xs font-medium text-gray-600">Amount (PKR) <span class="text-red-500">*</span></label>
+                    <input type="number" [(ngModel)]="line.Amount" placeholder="0.00" min="0"
+                        class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                </div>
+                @if (bulkLines.length > 1) {
+                    <button type="button" (click)="removeLine(i)"
+                        class="text-red-400 hover:text-red-600 font-bold text-xl leading-none pb-1">&times;</button>
+                }
+            </div>
+        </div>
+
+        <!-- Line 2: Payment Type | To Type | To | Notes -->
+        <div class="grid grid-cols-4 gap-2 items-end">
+            <div class="flex flex-col gap-1">
+                <label class="text-xs font-medium text-gray-600">Payment Type <span class="text-red-500">*</span></label>
+                <select [(ngModel)]="line.PaymentType"
+                    class="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                    <option [ngValue]="null">— Select —</option>
+                    @for (pt of paymentTypes; track pt.ID) {
+                        <option [ngValue]="pt.ID">{{ pt.Name }}</option>
+                    }
+                </select>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label class="text-xs font-medium text-gray-600">To Type</label>
+                <select [(ngModel)]="line.ToPartyType" (ngModelChange)="onLineToTypeChange(line)"
+                    class="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                    <option value="bank_account">Account</option>
+                    <option value="vendor">Vendor</option>
+                </select>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label class="text-xs font-medium text-gray-600">To <span class="text-red-500">*</span></label>
+                <select [(ngModel)]="line.ToPartyID"
+                    class="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                    <option [ngValue]="null">— Select —</option>
+                    @for (t of getToList(line.ToPartyType); track t.ID) {
+                        <option [ngValue]="t.ID">{{ t.Name }}</option>
+                    }
+                </select>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label class="text-xs font-medium text-gray-600">Notes</label>
+                <input type="text" [(ngModel)]="line.Notes" placeholder="Optional"
+                    class="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400" />
+            </div>
+        </div>
+
+    </div>
+    }
+
+    <!-- Footer -->
+    <div class="flex items-center justify-between px-1 pt-1">
+        <button type="button" (click)="addLine()"
+            class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1">
+            <span class="text-base font-bold">+</span> Add Line
+        </button>
+        <div class="text-sm font-semibold text-gray-700">
+            Total: PKR {{ bulkTotal | number:'1.2-2' }}
+        </div>
+    </div>
+
+</div>
+
+} @else {
+
+<!-- ── VIEW / EDIT MODE ─────────────────────────────────────────── -->
 <div class="flex flex-col gap-4">
 
     <div class="grid grid-cols-2 gap-4">
@@ -34,3 +136,5 @@
     <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes" [skeleton]="isDataLoading" [disabled]="isView" />
 
 </div>
+
+}

@@ -1,6 +1,9 @@
 import { Component, inject } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { BaseComponent } from 'app/core/Base/base/base.component';
 import { GenericService } from 'app/core/Base/services/generic.service';
 import { ToastService } from 'app/core/toaster/toast.service';
@@ -11,19 +14,33 @@ import { BftTextareaComponent } from 'app/modules/shared/components/fields/bft-t
 import { MessageModalService } from 'app/modules/shared/services/message.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { DrpService } from 'app/modules/shared/services/drp.service';
+import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { PaymentTransaction } from '../../models/payment-transaction';
 
+interface BulkReceivedLine {
+    Date: string;
+    Amount: number | null;
+    FromPartyType: string;
+    FromPartyID: number | null;
+    PaymentType: string | null;
+    ToPartyType: string;
+    ToPartyID: number | null;
+    Notes: string;
+}
+
 @Component({
     selector: 'app-payment-received-form',
     standalone: true,
-    imports: [FormsModule, BftInputDateComponent, BftSelectComponent, BftInputCurrencyComponent, BftTextareaComponent],
+    imports: [CommonModule, FormsModule, DecimalPipe, BftInputDateComponent, BftSelectComponent, BftInputCurrencyComponent, BftTextareaComponent],
     templateUrl: './payment-received-form.component.html',
     styleUrl: './payment-received-form.component.scss',
 })
 export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransaction, PaymentReceivedFormComponent> {
     private _drpService = inject(DrpService);
+    private _http = inject(HttpClient);
+    private _localStorage = inject(LocalStorageService);
 
     fromPartyTypes = [
         { ID: 'distributor', Name: 'Distributor' },
@@ -40,14 +57,36 @@ export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransacti
         { ID: 'Online Transfer', Name: 'Online Transfer' },
     ];
 
-    private customers: any[] = [];
-    private distributors: any[] = [];
-    private bankAccounts: any[] = [];
-    private vendors: any[] = [];
+    customers: any[] = [];
+    distributors: any[] = [];
+    bankAccounts: any[] = [];
+    vendors: any[] = [];
 
     fromList: any[] = [];
     toList: any[] = [];
     customerOrders: any[] = [];
+
+    bulkLines: BulkReceivedLine[] = [];
+    get bulkTotal(): number { return this.bulkLines.reduce((s, l) => s + (parseFloat(l.Amount as any) || 0), 0); }
+
+    getFromList(type: string): any[] {
+        if (type === 'customer') return this.customers;
+        if (type === 'distributor') return this.distributors;
+        return [];
+    }
+    getToList(type: string): any[] {
+        if (type === 'bank_account') return this.bankAccounts;
+        if (type === 'vendor') return this.vendors;
+        return [];
+    }
+    onLineFromTypeChange(line: BulkReceivedLine): void { line.FromPartyID = null; }
+    onLineToTypeChange(line: BulkReceivedLine): void { line.ToPartyID = null; }
+
+    private emptyLine(): BulkReceivedLine {
+        return { Date: new Date().toISOString().split('T')[0], Amount: null, FromPartyType: 'customer', FromPartyID: null, PaymentType: null, ToPartyType: 'bank_account', ToPartyID: null, Notes: '' };
+    }
+    addLine() { this.bulkLines.push(this.emptyLine()); }
+    removeLine(i: number) { this.bulkLines.splice(i, 1); }
 
     constructor(
         private genSer: GenericService,
@@ -74,6 +113,48 @@ export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransacti
         this.formData.Date = new Date() as any;
         this.formData.TransactionType = 'received';
         this.formData.SCode = 'pay_01';
+        this.bulkLines = [this.emptyLine()];
+    }
+
+    override async InsertRecord(): Promise<void> {
+        if (this.primaryKey > 0) return super.InsertRecord();
+
+        const validLines = this.bulkLines.filter(l => (parseFloat(l.Amount as any) || 0) > 0);
+        this.validation = [];
+        if (validLines.length === 0) this.validation.push('At least one line with an amount is required.');
+        validLines.forEach((l, i) => {
+            if (!l.Date) this.validation.push(`Row ${i + 1}: Date is required.`);
+            if (!l.FromPartyID) this.validation.push(`Row ${i + 1}: From is required.`);
+            if (!l.PaymentType) this.validation.push(`Row ${i + 1}: Payment Type is required.`);
+            if (!l.ToPartyID) this.validation.push(`Row ${i + 1}: To is required.`);
+        });
+        if (this.validation.length > 0) { this.modalSer.validationModal(this.validation); return; }
+
+        this.isSubmitLoading = true;
+        const headers = new HttpHeaders({ uid: this._localStorage.uid, cid: this._localStorage.cid, eid: this._localStorage.eid });
+        try {
+            for (const line of validLines) {
+                await firstValueFrom(this._http.post(`${apiUrls.server}${apiUrls.paymentTransactionController}`, {
+                    Date: line.Date,
+                    Amount: parseFloat(line.Amount as any),
+                    PaymentType: line.PaymentType,
+                    FromPartyType: line.FromPartyType,
+                    FromPartyID: line.FromPartyID,
+                    ToPartyType: line.ToPartyType,
+                    ToPartyID: line.ToPartyID,
+                    TransactionType: 'received',
+                    Notes: line.Notes || null,
+                    SCode: 'pay_01',
+                }, { headers }));
+            }
+            this.msgSer.success(`${validLines.length} entr${validLines.length === 1 ? 'y' : 'ies'} saved!`);
+            this.isCreated = true;
+            this.isSubmitLoading = false;
+            this.modalSer.closeModal(true);
+        } catch (e: any) {
+            this.isSubmitLoading = false;
+            this.toasterSer.openResult(e.status || 500);
+        }
     }
 
     override AfterGetData(): void {
