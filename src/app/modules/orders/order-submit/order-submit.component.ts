@@ -46,6 +46,11 @@ export class OrderSubmitComponent implements OnInit {
     isSaving = false;
     orderId: number | null = null;
 
+    showQuickAdd = false;
+    quickName = '';
+    quickPhone = '';
+    isSavingQuick = false;
+
     floor = Math.floor;
 
     blockDecimal(e: KeyboardEvent) {
@@ -172,6 +177,39 @@ export class OrderSubmitComponent implements OnInit {
                 error: (err) => { this._msg.error(err?.error?.message || 'Failed to submit order.'); this.isSaving = false; },
             });
         }
+    }
+
+    toggleQuickAdd() {
+        this.showQuickAdd = !this.showQuickAdd;
+        if (!this.showQuickAdd) { this.quickName = ''; this.quickPhone = ''; }
+    }
+
+    saveQuickCustomer() {
+        if (!this.quickName.trim()) { this._msg.warning('Customer name is required.'); return; }
+        this.isSavingQuick = true;
+        this._http.post<any>(`${apiUrls.server}${apiUrls.customerController}`,
+            { Name: this.quickName.trim(), PhoneNo: this.quickPhone || null, SCode: 'set_03' },
+            { headers: this.authHeaders }
+        ).subscribe({
+            next: (res) => {
+                this.isSavingQuick = false;
+                this._drp.getCustomerInformationDrp().subscribe({
+                    next: (list: any) => {
+                        this.customers = list || [];
+                        const emptyGroup = this.groups.find(g => !g.CustomerID);
+                        if (emptyGroup && res?.ID) emptyGroup.CustomerID = res.ID;
+                    }
+                });
+                this._msg.success(`"${this.quickName.trim()}" added!`);
+                this.showQuickAdd = false;
+                this.quickName = '';
+                this.quickPhone = '';
+            },
+            error: (err) => {
+                this.isSavingQuick = false;
+                this._msg.error(err?.error?.message || 'Failed to add customer.');
+            }
+        });
     }
 
     reset() {

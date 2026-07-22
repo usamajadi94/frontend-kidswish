@@ -31,6 +31,37 @@
         </div>
     </div>
 
+    <!-- Quick Add Customer -->
+    <div class="mb-4">
+        @if (!showQuickAdd) {
+            <button (click)="toggleQuickAdd()"
+                class="flex items-center gap-1.5 text-sm text-emerald-600 hover:text-emerald-800 font-medium transition-colors">
+                <mat-icon class="text-base leading-none">person_add_alt</mat-icon> Quick Add New Customer
+            </button>
+        } @else {
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex flex-wrap items-end gap-3">
+                <div class="flex flex-col gap-1 flex-1 min-w-[180px]">
+                    <label class="text-xs font-medium text-gray-600">Name <span class="text-red-500">*</span></label>
+                    <input type="text" [(ngModel)]="quickName" placeholder="Customer name"
+                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+                </div>
+                <div class="flex flex-col gap-1 w-44">
+                    <label class="text-xs font-medium text-gray-600">Phone</label>
+                    <input type="text" [(ngModel)]="quickPhone" placeholder="Optional"
+                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+                </div>
+                <button (click)="saveQuickCustomer()" [disabled]="isSavingQuick || !quickName.trim()"
+                    class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 transition-colors">
+                    {{ isSavingQuick ? 'Saving…' : 'Add Customer' }}
+                </button>
+                <button (click)="toggleQuickAdd()"
+                    class="px-4 py-2 rounded-lg border border-gray-300 text-sm text-gray-600 hover:bg-gray-100 transition-colors">
+                    Cancel
+                </button>
+            </div>
+        }
+    </div>
+
     <!-- Customer Groups -->
     @for (group of groups; track $index; let gi = $index) {
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm mb-4 overflow-hidden">
