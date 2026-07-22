@@ -23,7 +23,7 @@ export class ModalService {
   ) { }
 
   openModal(config: FormConfig, width: number = 1450): NzModalRef {
-    const modalRef = this.modal.create({
+    this.formModalRef = this.modal.create({
       nzContent: BftFormComponent,
       nzData: this.dataInfo(config.ID, config.component, config?.Data),
       nzFooter: null,
@@ -31,7 +31,7 @@ export class ModalService {
       nzWidth: width,
       nzMaskClosable: false,
     });
-    return modalRef;
+    return this.formModalRef;
   }
 
   closeModal(result?: any, modalRef?: NzModalRef) {
