@@ -10,11 +10,7 @@
             }
             <div class="text-3xl font-semibold leading-8 tracking-tight">{{ isEditMode ? 'Edit Order' : 'Submit Order' }}</div>
         </div>
-        <button (click)="toggleQuickAdd()"
-            class="flex items-center gap-1.5 text-sm text-emerald-600 hover:text-emerald-800 font-medium transition-colors shrink-0">
-            <mat-icon class="text-base leading-none">{{ showQuickAdd ? 'close' : 'person_add_alt' }}</mat-icon>
-            {{ showQuickAdd ? 'Cancel' : 'Add New Customer' }}
-        </button>
+        <bft-button [name]="showQuickAdd ? 'Cancel' : 'New Customer'" [icon]="showQuickAdd ? 'close' : 'add'" (onClick)="toggleQuickAdd()" />
     </div>
 
     <!-- Quick Add Customer inline form -->
