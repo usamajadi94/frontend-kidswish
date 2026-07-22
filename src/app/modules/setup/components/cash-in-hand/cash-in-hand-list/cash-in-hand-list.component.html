@@ -5,8 +5,8 @@
         <div class="text-3xl font-semibold leading-8 tracking-tight">{{ title }}</div>
         <div class="flex items-center gap-2">
             <wrapper-add [SCode]="SCode">
-                <button nz-button nz-dropdown [nzDropdownMenu]="categoryMenu" nzType="primary">
-                    + New &nbsp;<span nz-icon nzType="down"></span>
+                <button nz-button nzType="primary" (click)="addNew()">
+                    + New
                 </button>
             </wrapper-add>
         </div>
@@ -154,11 +154,3 @@
     </div>
 
 </div>
-
-<nz-dropdown-menu #categoryMenu="nzDropdownMenu">
-    <ul nz-menu>
-        @for (cat of paymentCategories; track cat.ID) {
-            <li nz-menu-item (click)="addNew(cat.ID)">{{ cat.Description }}</li>
-        }
-    </ul>
-</nz-dropdown-menu>

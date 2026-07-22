@@ -2,13 +2,9 @@ import { Component, inject } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzSelectModule } from 'ng-zorro-antd/select';
 import { ListService } from 'app/modules/shared/services/list.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
-import { DrpService } from 'app/modules/shared/services/drp.service';
 import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-button/bft-button.component';
 import { WrapperAddComponent } from 'app/modules/shared/permission-wrapper/wrapper-add/wrapper-add.component';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
@@ -32,17 +28,14 @@ const CATEGORY_COLORS = [
     selector: 'app-cash-in-hand-list',
     standalone: true,
     imports: [CommonModule, FormsModule, CurrencyPipe, DatePipe,
-              NzDatePickerModule, NzDropDownModule, NzButtonModule, NzIconModule, NzSelectModule,
+              NzDatePickerModule, NzButtonModule,
               BftButtonComponent, WrapperAddComponent],
     templateUrl: './cash-in-hand-list.component.html',
 })
 export class CashInHandListComponent extends BaseRoutedComponent {
     private _listService = inject(ListService);
     private _modalService = inject(ModalService);
-    private _drp = inject(DrpService);
-
     title = componentRegister.cashInHand.Title;
-    paymentCategories: any[] = [];
     summary: any = null;
     ledger: any[] = [];
     isLoading = false;
@@ -80,7 +73,6 @@ export class CashInHandListComponent extends BaseRoutedComponent {
         const today = new Date();
         const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
         this.dateRange = [firstDay, today];
-        this._drp.getPaymentCategoryDrp().subscribe({ next: (res: any) => { this.paymentCategories = res; } });
         this.loadAll();
     }
 
@@ -124,12 +116,11 @@ export class CashInHandListComponent extends BaseRoutedComponent {
         }
     }
 
-    addNew(categoryID: number) {
+    addNew() {
         this._modalService.openModal({
             component: CashInHandFormComponent,
             title: this.title,
             ID: null,
-            Data: { PaymentCategoryID: categoryID },
         }).afterClose.subscribe((res: boolean) => { if (res) this.loadAll(); });
     }
 
