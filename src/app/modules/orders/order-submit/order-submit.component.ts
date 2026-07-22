@@ -11,6 +11,9 @@ import { DrpService } from 'app/modules/shared/services/drp.service';
 import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-button/bft-button.component';
+import { ModalService } from 'app/modules/shared/services/modal.service';
+import { CustomerFormComponent } from 'app/modules/setup/components/customer/customer-form.component';
+import { componentRegister } from 'app/modules/shared/services/component-register';
 
 interface ProductRow {
     ProductID: number | null;
@@ -36,6 +39,7 @@ export class OrderSubmitComponent implements OnInit {
     private _msg = inject(NzMessageService);
     private _router = inject(Router);
     private _route = inject(ActivatedRoute);
+    private _modal = inject(ModalService);
 
     invoiceNo = '';
     orderDate: string = new Date().toISOString().split('T')[0];
@@ -46,10 +50,6 @@ export class OrderSubmitComponent implements OnInit {
     isSaving = false;
     orderId: number | null = null;
 
-    showQuickAdd = false;
-    quickName = '';
-    quickPhone = '';
-    isSavingQuick = false;
 
     floor = Math.floor;
 
@@ -179,37 +179,21 @@ export class OrderSubmitComponent implements OnInit {
         }
     }
 
-    toggleQuickAdd() {
-        this.showQuickAdd = !this.showQuickAdd;
-        if (!this.showQuickAdd) { this.quickName = ''; this.quickPhone = ''; }
-    }
-
-    saveQuickCustomer() {
-        if (!this.quickName.trim()) { this._msg.warning('Customer name is required.'); return; }
-        this.isSavingQuick = true;
-        this._http.post<any>(`${apiUrls.server}${apiUrls.customerController}`,
-            { Name: this.quickName.trim(), PhoneNo: this.quickPhone || null, SCode: 'set_03' },
-            { headers: this.authHeaders }
-        ).subscribe({
-            next: (res) => {
-                this.isSavingQuick = false;
+    openNewCustomer() {
+        this._modal.openModal({ component: CustomerFormComponent, title: componentRegister.customer?.Title || 'Customer' })
+            .afterClose.subscribe((saved: boolean) => {
+                if (!saved) return;
                 this._drp.getCustomerInformationDrp().subscribe({
                     next: (list: any) => {
                         this.customers = list || [];
+                        // auto-select the newest customer (last in list) into the first empty group
                         const emptyGroup = this.groups.find(g => !g.CustomerID);
-                        if (emptyGroup && res?.ID) emptyGroup.CustomerID = res.ID;
+                        if (emptyGroup && this.customers.length) {
+                            emptyGroup.CustomerID = this.customers[this.customers.length - 1].ID;
+                        }
                     }
                 });
-                this._msg.success(`"${this.quickName.trim()}" added!`);
-                this.showQuickAdd = false;
-                this.quickName = '';
-                this.quickPhone = '';
-            },
-            error: (err) => {
-                this.isSavingQuick = false;
-                this._msg.error(err?.error?.message || 'Failed to add customer.');
-            }
-        });
+            });
     }
 
     reset() {
