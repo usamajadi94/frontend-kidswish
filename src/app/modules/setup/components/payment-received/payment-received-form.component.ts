@@ -23,6 +23,7 @@ interface BulkReceivedLine {
     Date: string;
     Amount: number | null;
     FromPartyType: string;
+    DistributorID: number | null;  // used when FromPartyType = distributor, to pick sub-customers
     FromPartyID: number | null;
     PaymentType: string | null;
     ToPartyType: string;
@@ -69,21 +70,27 @@ export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransacti
     bulkLines: BulkReceivedLine[] = [];
     get bulkTotal(): number { return this.bulkLines.reduce((s, l) => s + (parseFloat(l.Amount as any) || 0), 0); }
 
-    getFromList(type: string): any[] {
-        if (type === 'customer') return this.customers;
-        if (type === 'distributor') return this.distributors;
-        return [];
+    // Customers with no distributor tagged (for direct customer payments)
+    get untaggedCustomers(): any[] { return this.customers.filter(c => !c.DistributorID); }
+    // Customers belonging to a specific distributor
+    getDistributorCustomers(distributorId: number | null): any[] {
+        if (!distributorId) return [];
+        return this.customers.filter(c => c.DistributorID === distributorId);
     }
     getToList(type: string): any[] {
         if (type === 'bank_account') return this.bankAccounts;
         if (type === 'vendor') return this.vendors;
         return [];
     }
-    onLineFromTypeChange(line: BulkReceivedLine): void { line.FromPartyID = null; }
+    onLineFromTypeChange(line: BulkReceivedLine): void {
+        line.DistributorID = null;
+        line.FromPartyID = null;
+    }
+    onLineDistributorChange(line: BulkReceivedLine): void { line.FromPartyID = null; }
     onLineToTypeChange(line: BulkReceivedLine): void { line.ToPartyID = null; }
 
     private emptyLine(): BulkReceivedLine {
-        return { Date: new Date().toISOString().split('T')[0], Amount: null, FromPartyType: 'customer', FromPartyID: null, PaymentType: null, ToPartyType: 'bank_account', ToPartyID: null, Notes: '' };
+        return { Date: new Date().toISOString().split('T')[0], Amount: null, FromPartyType: 'customer', DistributorID: null, FromPartyID: null, PaymentType: null, ToPartyType: 'bank_account', ToPartyID: null, Notes: '' };
     }
     addLine() { this.bulkLines.push(this.emptyLine()); }
     removeLine(i: number) { this.bulkLines.splice(i, 1); }
@@ -138,7 +145,7 @@ export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransacti
                     Date: line.Date,
                     Amount: parseFloat(line.Amount as any),
                     PaymentType: line.PaymentType,
-                    FromPartyType: line.FromPartyType,
+                    FromPartyType: 'customer',
                     FromPartyID: line.FromPartyID,
                     ToPartyType: line.ToPartyType,
                     ToPartyID: line.ToPartyID,

@@ -6,8 +6,9 @@
     @for (line of bulkLines; track $index; let i = $index) {
     <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
 
-        <!-- Line 1: Date | From Type | From | Amount -->
-        <div class="grid grid-cols-4 gap-2 mb-2 items-end">
+        <!-- Line 1: Date | From Type | Distributor (if dist mode) | Customer | Amount -->
+        <div class="grid gap-2 mb-2 items-end"
+             [class]="line.FromPartyType === 'distributor' ? 'grid-cols-5' : 'grid-cols-4'">
             <div class="flex flex-col gap-1">
                 <label class="text-xs font-medium text-gray-600">Date <span class="text-red-500">*</span></label>
                 <input type="date" [(ngModel)]="line.Date"
@@ -18,19 +19,40 @@
                 <select [(ngModel)]="line.FromPartyType" (ngModelChange)="onLineFromTypeChange(line)"
                     class="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
                     <option value="customer">Customer</option>
-                    <option value="distributor">Distributor</option>
+                    <option value="distributor">Via Distributor</option>
                 </select>
             </div>
+
+            @if (line.FromPartyType === 'distributor') {
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs font-medium text-gray-600">Distributor <span class="text-red-500">*</span></label>
+                    <select [(ngModel)]="line.DistributorID" (ngModelChange)="onLineDistributorChange(line)"
+                        class="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                        <option [ngValue]="null">— Select —</option>
+                        @for (d of distributors; track d.ID) {
+                            <option [ngValue]="d.ID">{{ d.Name }}</option>
+                        }
+                    </select>
+                </div>
+            }
+
             <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-gray-600">From <span class="text-red-500">*</span></label>
+                <label class="text-xs font-medium text-gray-600">Customer <span class="text-red-500">*</span></label>
                 <select [(ngModel)]="line.FromPartyID"
                     class="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
                     <option [ngValue]="null">— Select —</option>
-                    @for (f of getFromList(line.FromPartyType); track f.ID) {
-                        <option [ngValue]="f.ID">{{ f.Name }}</option>
+                    @if (line.FromPartyType === 'distributor') {
+                        @for (c of getDistributorCustomers(line.DistributorID); track c.ID) {
+                            <option [ngValue]="c.ID">{{ c.Name }}</option>
+                        }
+                    } @else {
+                        @for (c of untaggedCustomers; track c.ID) {
+                            <option [ngValue]="c.ID">{{ c.Name }}</option>
+                        }
                     }
                 </select>
             </div>
+
             <div class="flex items-end gap-2">
                 <div class="flex flex-col gap-1 flex-1">
                     <label class="text-xs font-medium text-gray-600">Amount (PKR) <span class="text-red-500">*</span></label>
