@@ -18,6 +18,7 @@ import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { PaymentTransaction } from '../../models/payment-transaction';
+import { CustomerFormComponent } from '../customer/customer-form.component';
 
 interface BulkReceivedLine {
     Date: string;
@@ -80,6 +81,14 @@ export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransacti
     }
     onLineDistributorChange(line: BulkReceivedLine): void { line.FromPartyID = null; }
     onLineToTypeChange(line: BulkReceivedLine): void { line.ToPartyID = null; }
+
+    openNewCustomer(): void {
+        this.modalSer.openModal({ component: CustomerFormComponent, title: componentRegister.customer?.Title || 'Customer' })
+            .afterClose.subscribe((saved: boolean) => {
+                if (!saved) return;
+                this._drpService.getCustomerInformationDrp().subscribe({ next: (res: any) => { this.customers = res || []; } });
+            });
+    }
 
     private emptyLine(): BulkReceivedLine {
         return { Date: new Date().toISOString().split('T')[0], Amount: null, DistributorID: null, FromPartyID: null, PaymentType: null, ToPartyType: 'bank_account', ToPartyID: null, Notes: '' };
