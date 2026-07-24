@@ -130,7 +130,20 @@
                                                 <div class="text-blue-600 font-medium mt-0.5">{{ row.InvoiceNo }}</div>
                                             }
                                         </td>
-                                        <td class="px-3 py-1.5 text-xs text-gray-500">{{ row.AccountName || '—' }}</td>
+                                        <td class="px-3 py-1.5 text-xs text-gray-500">
+                                            @if (row.AccountName) {
+                                                <div class="flex items-center gap-1.5">
+                                                    <span>{{ row.AccountName }}</span>
+                                                    @if (row.AccountType === 'Bank') {
+                                                        <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-blue-100 text-blue-700">Bank</span>
+                                                    } @else if (row.AccountType === 'Vendor') {
+                                                        <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-orange-100 text-orange-700">Vendor</span>
+                                                    } @else if (row.AccountType === 'Cash') {
+                                                        <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-green-100 text-green-700">Cash</span>
+                                                    }
+                                                </div>
+                                            } @else { — }
+                                        </td>
                                         <td class="px-3 py-1.5 text-right font-medium text-red-700 text-xs">
                                             @if (+row.Debit > 0) { {{ row.Debit | currency:'PKR ':'symbol':'1.0-0' }} }
                                         </td>
