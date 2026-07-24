@@ -70,19 +70,17 @@ export class CustomerFormComponent extends BaseComponent<Customer, CustomerFormC
 
     override ngOnInit(): void {
         super.ngOnInit();
-        this.isDistributorUser = this._ls.isDistributor === 'true';
+        this.isDistributorUser = this._ls.isDistributor === 'true' && !!this._ls.distributorId;
         this._drpService.getDistributorDrp().subscribe({
-            next: (res: any) => {
-                this.distributors = res;
-                if (this.isDistributorUser && this._ls.distributorId) {
-                    this.formData.DistributorID = +this._ls.distributorId;
-                }
-            },
+            next: (res: any) => { this.distributors = res; },
         });
     }
 
     public override InitializeObject(): void {
         this.formData = new Customer();
+        if (this._ls.isDistributor === 'true' && this._ls.distributorId) {
+            this.formData.DistributorID = +this._ls.distributorId;
+        }
     }
 
     override ValidateBeforeSave(formData: Customer): boolean {
