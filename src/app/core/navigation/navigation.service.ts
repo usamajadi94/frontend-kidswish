@@ -47,14 +47,18 @@ export class NavigationService {
             if (!navigation?.Data || !Array.isArray(navigation.Data)) {
                 navigation = { ...navigation, Data: [] };
             }
-            // Detect distributor: their nav has order-submit, no dashboard
             const links = navigation.Data.flatMap((g: any) => g.children?.map((c: any) => c.link) || []);
-            const isDistributor = links.includes('/orders/order-submit');
-            this._localStorage.isDistributor = isDistributor ? 'true' : 'false';
             const isGlobalAdmin = links.includes('/clients/client-list');
             this._localStorage.isGlobalAdmin = isGlobalAdmin ? 'true' : 'false';
-            // Non-distributor users who receive admin navigation have full route access
-            this._localStorage.isAdmin = !isDistributor ? 'true' : 'false';
+            // Trust API-provided isAdmin/isDistributor (set by user.service) when available.
+            // Only fall back to nav-based detection if user.service hasn't run yet.
+            const apiIsAdmin = this._localStorage.isAdmin === 'true';
+            if (!apiIsAdmin) {
+                // Detect distributor: their nav has order-submit, no dashboard
+                const isDistributor = links.includes('/orders/order-submit');
+                this._localStorage.isDistributor = isDistributor ? 'true' : 'false';
+                this._localStorage.isAdmin = !isDistributor ? 'true' : 'false';
+            }
             return this.buildNavigationVariants(navigation);
         }),
         tap((navObj: Navigation) => {
