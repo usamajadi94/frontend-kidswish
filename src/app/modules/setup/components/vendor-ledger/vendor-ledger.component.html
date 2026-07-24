@@ -74,6 +74,7 @@
                             }
                             <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Type</th>
                             <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Notes</th>
+                            <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Account</th>
                             <th class="px-3 py-2 text-right font-semibold text-red-700 text-xs whitespace-nowrap">Expense (Dr)</th>
                             <th class="px-3 py-2 text-right font-semibold text-green-700 text-xs whitespace-nowrap">Payment (Cr)</th>
                             <th class="px-3 py-2 text-right font-semibold text-gray-600 text-xs">Balance</th>
@@ -82,11 +83,11 @@
                     <tbody class="divide-y divide-gray-100">
                         @if (isLoadingFinancial) {
                             <tr>
-                                <td [colSpan]="selectedVendor ? 6 : 7" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
+                                <td [colSpan]="selectedVendor ? 7 : 8" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
                             </tr>
                         } @else if (financialRows.length === 0) {
                             <tr>
-                                <td [colSpan]="selectedVendor ? 6 : 7" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found</td>
+                                <td [colSpan]="selectedVendor ? 7 : 8" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found</td>
                             </tr>
                         } @else {
                             @for (row of financialRows; track row.ID) {
@@ -107,6 +108,18 @@
                                         </span>
                                     </td>
                                     <td class="px-3 py-1.5 text-gray-500 text-xs">{{ row.Notes || '—' }}</td>
+                                    <td class="px-3 py-1.5 text-xs text-gray-500">
+                                        @if (row.AccountName) {
+                                            <div class="flex items-center gap-1.5">
+                                                <span>{{ row.AccountName }}</span>
+                                                @if (row.AccountType === 'Bank') {
+                                                    <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-blue-100 text-blue-700">Bank</span>
+                                                } @else if (row.AccountType === 'Cash') {
+                                                    <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-green-100 text-green-700">Cash</span>
+                                                }
+                                            </div>
+                                        } @else { — }
+                                    </td>
                                     <td class="px-3 py-1.5 text-right font-medium text-red-700 text-xs">
                                         @if (+row.Debit > 0) { {{ row.Debit | currency:'PKR ':'symbol':'1.0-0' }} }
                                     </td>
@@ -125,7 +138,7 @@
                     @if (!isLoadingFinancial && financialRows.length > 0) {
                         <tfoot class="border-t-2 border-gray-300 bg-gray-50">
                             <tr class="font-semibold text-gray-800">
-                                <td [colSpan]="selectedVendor ? 3 : 4" class="px-3 py-2 text-right text-xs">Total</td>
+                                <td [colSpan]="selectedVendor ? 4 : 5" class="px-3 py-2 text-right text-xs">Total</td>
                                 <td class="px-3 py-2 text-right text-red-700 text-xs">{{ totalExpenses | currency:'PKR ':'symbol':'1.0-0' }}</td>
                                 <td class="px-3 py-2 text-right text-green-700 text-xs">{{ totalPaid | currency:'PKR ':'symbol':'1.0-0' }}</td>
                                 <td class="px-3 py-2 text-right text-xs"
