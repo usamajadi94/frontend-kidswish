@@ -16,6 +16,7 @@ export class ModalService {
   modalRef: NzModalRef;
   formModalRef: NzModalRef;
   private drawerRef: NzDrawerRef | undefined;
+  private _modalStack: NzModalRef[] = [];
 
   modal = inject(NzModalService);
   private _fuseConfirmationService = inject(FuseConfirmationService);
@@ -23,7 +24,7 @@ export class ModalService {
   ) { }
 
   openModal(config: FormConfig, width: number = 1450): NzModalRef {
-    this.formModalRef = this.modal.create({
+    const ref = this.modal.create({
       nzContent: BftFormComponent,
       nzData: this.dataInfo(config.ID, config.component, config?.Data),
       nzFooter: null,
@@ -31,14 +32,21 @@ export class ModalService {
       nzWidth: width,
       nzMaskClosable: false,
     });
-    return this.formModalRef;
+    this._modalStack.push(ref);
+    this.formModalRef = ref;
+    ref.afterClose.subscribe(() => {
+      this._modalStack.pop();
+      this.formModalRef = this._modalStack[this._modalStack.length - 1] ?? null;
+    });
+    return ref;
   }
 
   closeModal(result?: any, modalRef?: NzModalRef) {
     if (modalRef) {
       modalRef.destroy(result);
-    } else if (this.formModalRef) {
-      this.formModalRef.destroy(true);
+    } else {
+      const ref = this._modalStack[this._modalStack.length - 1];
+      if (ref) ref.destroy(result ?? true);
     }
   }
 
