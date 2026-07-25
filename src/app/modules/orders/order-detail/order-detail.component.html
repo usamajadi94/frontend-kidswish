@@ -42,8 +42,8 @@
             <div class="mt-3 text-sm text-gray-500"><span class="font-medium">Notes:</span> {{ order.Notes }}</div>
         }
 
-        <!-- Edit button for Submitted orders (all users) -->
-        @if (order.Status === 'Submitted') {
+        <!-- Edit button: Submitted (all users) or In Process (admin only) -->
+        @if (order.Status === 'Submitted' || (order.Status === 'In Process' && isAdmin)) {
         <div class="mt-4">
             <button mat-stroked-button (click)="editOrder()">
                 <mat-icon class="text-base mr-1">edit</mat-icon> Edit Order
