@@ -19,11 +19,13 @@ interface ProductRow {
     ProductID: number | null;
     Carton: number;
     Notes: string;
+    dispatched?: boolean; // true = has confirmed dispatch, row is read-only in edit mode
 }
 
 interface CustomerGroup {
     CustomerID: number | null;
     products: ProductRow[];
+    hasDispatched?: boolean; // true = at least one product dispatched, CustomerID locked
 }
 
 @Component({
@@ -85,8 +87,10 @@ export class OrderSubmitComponent implements OnInit {
                 const groupMap = new Map<number, CustomerGroup>();
                 for (const item of (order.Items || [])) {
                     const cid = item.CustomerID;
-                    if (!groupMap.has(cid)) groupMap.set(cid, { CustomerID: cid, products: [] });
-                    groupMap.get(cid)!.products.push({ ProductID: item.ProductID, Carton: item.Carton, Notes: item.Notes || '' });
+                    if (!groupMap.has(cid)) groupMap.set(cid, { CustomerID: cid, products: [], hasDispatched: false });
+                    const dispatched = (item.DispatchedQty || 0) > 0;
+                    groupMap.get(cid)!.products.push({ ProductID: item.ProductID, Carton: item.Carton, Notes: item.Notes || '', dispatched });
+                    if (dispatched) groupMap.get(cid)!.hasDispatched = true;
                 }
                 this.groups = [...groupMap.values()];
                 if (this.groups.length === 0) this.addCustomer();

@@ -45,13 +45,17 @@
                     {{ gi + 1 }}
                 </span>
                 <nz-select [(ngModel)]="group.CustomerID" nzShowSearch nzAllowClear
+                    [nzDisabled]="isEditMode && group.hasDispatched"
                     nzPlaceHolder="Select customer..." class="min-w-[200px]" nzSize="default">
                     @for (c of customers; track c.ID) {
                         <nz-option [nzValue]="c.ID" [nzLabel]="c.Name" />
                     }
                 </nz-select>
+                @if (isEditMode && group.hasDispatched) {
+                    <span class="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded px-2 py-0.5">Partially dispatched</span>
+                }
             </div>
-            <button (click)="removeCustomer(gi)" [disabled]="groups.length === 1"
+            <button (click)="removeCustomer(gi)" [disabled]="groups.length === 1 || (isEditMode && group.hasDispatched)"
                 class="ml-4 text-red-400 hover:text-red-600 disabled:opacity-30 transition-colors flex items-center gap-1 text-xs shrink-0">
                 <mat-icon class="text-base leading-none">delete</mat-icon> Remove
             </button>
@@ -71,31 +75,41 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @for (row of group.products; track $index; let pi = $index) {
-                    <tr class="hover:bg-gray-50">
+                    <tr [class.bg-gray-50]="row.dispatched">
                         <td class="px-3 py-2 text-gray-400 text-xs">{{ pi + 1 }}</td>
                         <td class="px-3 py-2">
-                            <nz-select [(ngModel)]="row.ProductID" nzShowSearch nzAllowClear
-                                nzPlaceHolder="Select product" class="w-full min-w-[180px]" nzSize="small">
-                                @for (p of products; track p.ID) {
-                                    <nz-option [nzValue]="p.ID" [nzLabel]="p.Name" />
+                            <div class="flex items-center gap-2">
+                                <nz-select [(ngModel)]="row.ProductID" nzShowSearch nzAllowClear
+                                    [nzDisabled]="row.dispatched"
+                                    nzPlaceHolder="Select product" class="w-full min-w-[180px]" nzSize="small">
+                                    @for (p of products; track p.ID) {
+                                        <nz-option [nzValue]="p.ID" [nzLabel]="p.Name" />
+                                    }
+                                </nz-select>
+                                @if (row.dispatched) {
+                                    <span class="text-[10px] font-medium text-green-700 bg-green-100 border border-green-200 rounded-full px-1.5 py-0.5 whitespace-nowrap">Dispatched</span>
                                 }
-                            </nz-select>
+                            </div>
                         </td>
                         <td class="px-3 py-2">
                             <input type="number" [(ngModel)]="row.Carton" min="1" step="1" placeholder="Qty"
-                                class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                [disabled]="row.dispatched"
+                                class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                                 (keydown)="blockDecimal($event)"
                                 (change)="row.Carton = row.Carton ? floor(+row.Carton) : 1" />
                         </td>
                         <td class="px-3 py-2">
                             <input type="text" [(ngModel)]="row.Notes" placeholder="Optional"
-                                class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                                [disabled]="row.dispatched"
+                                class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed" />
                         </td>
                         <td class="px-3 py-2 text-center">
-                            <button (click)="removeProduct(gi, pi)" [disabled]="group.products.length === 1"
-                                class="text-red-400 hover:text-red-600 disabled:opacity-30 transition-colors">
-                                <mat-icon class="text-base leading-none">remove_circle_outline</mat-icon>
-                            </button>
+                            @if (!row.dispatched) {
+                                <button (click)="removeProduct(gi, pi)" [disabled]="group.products.length === 1"
+                                    class="text-red-400 hover:text-red-600 disabled:opacity-30 transition-colors">
+                                    <mat-icon class="text-base leading-none">remove_circle_outline</mat-icon>
+                                </button>
+                            }
                         </td>
                     </tr>
                     }
