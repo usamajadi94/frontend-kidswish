@@ -22,8 +22,9 @@ export const permissionGuard: CanActivateFn = (route) => {
     }
   }
 
-  // If no permissions loaded yet (empty SectionAccess), allow access
-  if (!LoginUser.SectionAccess || LoginUser.SectionAccess.length === 0) return true;
+  // If no permissions loaded yet, or all entries have null SCodes (group has no sections configured), allow access
+  const validSections = (LoginUser.SectionAccess || []).filter(a => a.SCode);
+  if (validSections.length === 0) return true;
 
   const hasAccess =
     userPermissionService.isViewSectionAccessible(scode) ||
