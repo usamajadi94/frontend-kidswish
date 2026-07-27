@@ -38,8 +38,15 @@ export class BankAccountFormComponent extends BaseComponent<BankAccount, BankAcc
         this.setFormTitle(componentRegister.bankAccount.Title);
     }
 
+    openingBalanceLocked = false;
+
     public override InitializeObject(): void {
         this.formData = new BankAccount();
+        this.openingBalanceLocked = false;
+    }
+
+    public override async AfterGetData(): Promise<void> {
+        this.openingBalanceLocked = +(this.formData.OpeningBalance || 0) !== 0;
     }
 
     override ValidateBeforeSave(formData: BankAccount): boolean {
