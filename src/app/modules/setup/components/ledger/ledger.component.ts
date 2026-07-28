@@ -44,8 +44,8 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
 
     // Cash In / Cash Out modal
     bankAccounts: any[] = [];
+    vendors: any[] = [];
     paymentTypes = [
-        { ID: 'Cash',            Name: 'Cash' },
         { ID: 'Bank Transfer',   Name: 'Bank Transfer' },
         { ID: 'Cheque',          Name: 'Cheque' },
         { ID: 'Online Transfer', Name: 'Online Transfer' },
@@ -57,8 +57,9 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         amount: number | null;
         paymentType: string | null;
         accountId: number | null;
+        vendorId: number | null;
         notes: string;
-    } = { show: false, type: 'Cash In', date: null, amount: null, paymentType: null, accountId: null, notes: '' };
+    } = { show: false, type: 'Cash In', date: null, amount: null, paymentType: null, accountId: null, vendorId: null, notes: '' };
     isSavingCash = false;
 
     dateRange: Date[] = [];
@@ -166,6 +167,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             },
         });
         this._drpService.getBankAccountDrp().subscribe({ next: (res: any) => { this.bankAccounts = res || []; } });
+        this._drpService.getVendorDrp().subscribe({ next: (res: any) => { this.vendors = res || []; } });
 
         if (!this.isDistributorUser) {
             this.loadAll();
@@ -180,6 +182,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             amount: null,
             paymentType: null,
             accountId: null,
+            vendorId: null,
             notes: '',
         };
     }
@@ -200,6 +203,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             Notes: this.cashModal.notes || null,
             AccountType: this.cashModal.accountId ? 'bank_account' : null,
             AccountID: this.cashModal.accountId || null,
+            VendorID: this.cashModal.vendorId || null,
         };
         this._http.post(
             `${apiUrls.server}${apiUrls.customerLedgerController}/distributor-cash`,

@@ -343,6 +343,12 @@
                     [displayList]="bankAccounts" valueField="ID" displayField="Name"
                     [(ngModel)]="cashModal.accountId" [clearable]="true" />
 
+                @if (cashModal.type === 'Cash Out') {
+                    <bft-select name="cashVendor" label="To (Vendor)"
+                        [displayList]="vendors" valueField="ID" displayField="Name"
+                        [(ngModel)]="cashModal.vendorId" [clearable]="true" />
+                }
+
                 <bft-textarea name="cashNotes" label="Notes" [(ngModel)]="cashModal.notes" />
 
             </div>
