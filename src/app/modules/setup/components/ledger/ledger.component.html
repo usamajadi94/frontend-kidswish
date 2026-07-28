@@ -18,6 +18,19 @@
             </nz-select>
         }
 
+        @if (selectedDistributor) {
+            <div class="flex items-center gap-2 ml-auto">
+                <button (click)="openCashModal('Cash In')"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 transition-colors">
+                    ↓ Cash In
+                </button>
+                <button (click)="openCashModal('Cash Out')"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 transition-colors">
+                    ↑ Cash Out
+                </button>
+            </div>
+        }
+
     </div>
 
 
@@ -74,6 +87,9 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs whitespace-nowrap">Date</th>
+                            @if (!selectedDistributor) {
+                                <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Distributor</th>
+                            }
                             @if (!selectedCustomer) {
                                 <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Customer</th>
                             }
@@ -88,11 +104,11 @@
                     <tbody class="divide-y divide-gray-100">
                         @if (isLoadingFinancial) {
                             <tr>
-                                <td [colSpan]="selectedCustomer ? 7 : 8" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
+                                <td [colSpan]="(selectedCustomer ? 7 : 8) + (selectedDistributor ? 0 : 1)" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
                             </tr>
                         } @else if (filteredFinancialRows.length === 0) {
                             <tr>
-                                <td [colSpan]="selectedCustomer ? 7 : 8" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found</td>
+                                <td [colSpan]="(selectedCustomer ? 7 : 8) + (selectedDistributor ? 0 : 1)" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found</td>
                             </tr>
                         } @else {
                             @for (row of filteredFinancialRows; track row.ID) {
@@ -101,17 +117,20 @@
                                     [class.hover:bg-blue-50]="row.Type === 'Invoice'"
                                     (click)="openInvoiceEdit(row)">
                                     <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
+                                    @if (!selectedDistributor) {
+                                        <td class="px-3 py-1.5 text-xs font-medium text-blue-700">{{ row.DistributorName || '—' }}</td>
+                                    }
                                     @if (!selectedCustomer) {
                                         <td class="px-3 py-1.5 text-xs font-medium text-gray-800">{{ row.CustomerName || '—' }}</td>
                                     }
                                     <td class="px-3 py-1.5 text-xs">
                                         <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-                                              [class.bg-red-100]="row.Type === 'Invoice'"
-                                              [class.text-red-700]="row.Type === 'Invoice'"
-                                              [class.bg-green-100]="row.Type === 'Payment'"
-                                              [class.text-green-700]="row.Type === 'Payment'"
-                                              [class.bg-gray-100]="row.Type !== 'Invoice' && row.Type !== 'Payment'"
-                                              [class.text-gray-600]="row.Type !== 'Invoice' && row.Type !== 'Payment'">
+                                              [class.bg-red-100]="row.Type === 'Invoice' || row.Type === 'Cash Out'"
+                                              [class.text-red-700]="row.Type === 'Invoice' || row.Type === 'Cash Out'"
+                                              [class.bg-green-100]="row.Type === 'Payment' || row.Type === 'Cash In'"
+                                              [class.text-green-700]="row.Type === 'Payment' || row.Type === 'Cash In'"
+                                              [class.bg-gray-100]="row.Type !== 'Invoice' && row.Type !== 'Payment' && row.Type !== 'Cash In' && row.Type !== 'Cash Out'"
+                                              [class.text-gray-600]="row.Type !== 'Invoice' && row.Type !== 'Payment' && row.Type !== 'Cash In' && row.Type !== 'Cash Out'">
                                             {{ row.Type }}
                                         </span>
                                     </td>
@@ -135,7 +154,7 @@
                     @if (!isLoadingFinancial && filteredFinancialRows.length > 0) {
                         <tfoot class="border-t-2 border-gray-300 bg-gray-50">
                             <tr class="font-semibold text-gray-800">
-                                <td [colSpan]="selectedCustomer ? 4 : 5" class="px-3 py-2 text-right text-xs">Total</td>
+                                <td [colSpan]="(selectedCustomer ? 4 : 5) + (selectedDistributor ? 0 : 1)" class="px-3 py-2 text-right text-xs">Total</td>
                                 <td class="px-3 py-2 text-right text-red-700 text-xs">{{ totalInvoiced | currency:'PKR ':'symbol':'1.0-0' }}</td>
                                 <td class="px-3 py-2 text-right text-green-700 text-xs">{{ totalReceived | currency:'PKR ':'symbol':'1.0-0' }}</td>
                                 <td class="px-3 py-2 text-right text-xs"
@@ -276,6 +295,64 @@
     </div>
 
 </div>
+
+<!-- ══ Cash In / Cash Out Modal ══ -->
+@if (cashModal.show) {
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="cashModal.show = false">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm" (click)="$event.stopPropagation()">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <div class="font-semibold text-gray-800 text-base flex items-center gap-2">
+                    @if (cashModal.type === 'Cash In') {
+                        <span class="text-green-700">↓ Cash In</span>
+                    } @else {
+                        <span class="text-red-700">↑ Cash Out</span>
+                    }
+                </div>
+                <button (click)="cashModal.show = false" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            </div>
+            <div class="px-6 py-4 flex flex-col gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Date <span class="text-red-500">*</span></label>
+                    <input type="date" [(ngModel)]="cashModal.date"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Amount (PKR) <span class="text-red-500">*</span></label>
+                    <input type="number" [(ngModel)]="cashModal.amount" min="1" placeholder="0"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Bank Account</label>
+                    <nz-select [(ngModel)]="cashModal.accountId" nzPlaceHolder="Select account (optional)"
+                        [nzAllowClear]="true" [nzShowSearch]="true" class="w-full">
+                        @for (a of bankAccounts; track a.ID) {
+                            <nz-option [nzValue]="a.ID" [nzLabel]="a.Name"></nz-option>
+                        }
+                    </nz-select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+                    <input type="text" [(ngModel)]="cashModal.notes" placeholder="Optional"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+                <button (click)="cashModal.show = false"
+                    class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+                <button (click)="saveCash()" [disabled]="isSavingCash || !cashModal.amount || cashModal.amount <= 0"
+                    class="px-4 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50 transition-colors"
+                    [class.bg-green-600]="cashModal.type === 'Cash In'"
+                    [class.hover:bg-green-700]="cashModal.type === 'Cash In'"
+                    [class.bg-red-600]="cashModal.type === 'Cash Out'"
+                    [class.hover:bg-red-700]="cashModal.type === 'Cash Out'">
+                    {{ isSavingCash ? 'Saving...' : 'Save' }}
+                </button>
+            </div>
+        </div>
+    </div>
+}
 
 <!-- ══ Invoice Edit Modal ══ -->
 @if (editingPtId) {

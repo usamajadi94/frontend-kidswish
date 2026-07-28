@@ -33,6 +33,18 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     customers: any[] = [];
     selectedCustomer: number | null = null;
 
+    // Cash In / Cash Out modal
+    bankAccounts: any[] = [];
+    cashModal: {
+        show: boolean;
+        type: 'Cash In' | 'Cash Out';
+        date: string;
+        amount: number | null;
+        notes: string;
+        accountId: number | null;
+    } = { show: false, type: 'Cash In', date: '', amount: null, notes: '', accountId: null };
+    isSavingCash = false;
+
     dateRange: Date[] = [];
     isLoadingFinancial = false;
     isLoadingOrders    = false;
@@ -137,10 +149,48 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
                 }
             },
         });
+        this._drpService.getBankAccountDrp().subscribe({ next: (res: any) => { this.bankAccounts = res || []; } });
 
         if (!this.isDistributorUser) {
             this.loadAll();
         }
+    }
+
+    openCashModal(type: 'Cash In' | 'Cash Out') {
+        this.cashModal = {
+            show: true,
+            type,
+            date: new Date().toISOString().split('T')[0],
+            amount: null,
+            notes: '',
+            accountId: null,
+        };
+    }
+
+    saveCash() {
+        if (!this.cashModal.amount || this.cashModal.amount <= 0) return;
+        this.isSavingCash = true;
+        const payload = {
+            CashType: this.cashModal.type,
+            DistributorID: this.selectedDistributor,
+            Date: this.cashModal.date,
+            Amount: this.cashModal.amount,
+            Notes: this.cashModal.notes || null,
+            AccountType: this.cashModal.accountId ? 'bank_account' : null,
+            AccountID: this.cashModal.accountId || null,
+        };
+        this._http.post(
+            `${apiUrls.server}${apiUrls.customerLedgerController}/distributor-cash`,
+            payload,
+            { headers: this.headers }
+        ).subscribe({
+            next: () => {
+                this.isSavingCash = false;
+                this.cashModal.show = false;
+                this.loadFinancial();
+            },
+            error: () => { this.isSavingCash = false; },
+        });
     }
 
     onDistributorChange() {
