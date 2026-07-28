@@ -14,7 +14,13 @@
                     <th class="text-left px-3 py-2 font-medium text-gray-600 w-36">Payment Type</th>
                     <th class="text-left px-3 py-2 font-medium text-gray-600 w-44">From (Bank Account)</th>
                     <th class="text-right px-3 py-2 font-medium text-gray-600 w-32">Amount (PKR)</th>
-                    <th class="text-left px-3 py-2 font-medium text-gray-600 w-40">Vendor</th>
+                    <th class="text-left px-3 py-2 font-medium text-gray-600 w-40">
+                        <div class="flex items-center justify-between gap-2">
+                            <span>Vendor</span>
+                            <button type="button" (click)="openNewVendor()"
+                                class="text-blue-600 hover:text-blue-800 text-xs font-medium leading-none whitespace-nowrap">+ Vendor</button>
+                        </div>
+                    </th>
                     <th class="text-left px-3 py-2 font-medium text-gray-600">Notes</th>
                     <th class="w-8"></th>
                 </tr>
@@ -112,9 +118,15 @@
     <bft-select name="FromPartyID" label="From (Bank Account)" [displayList]="bankAccounts" valueField="ID" displayField="Name"
         [(ngModel)]="formData.FromPartyID" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
 
-    <bft-select name="ToPartyID" [label]="isDailyExpense ? 'To (Vendor / Optional)' : 'To (Vendor)'"
-        [displayList]="vendors" valueField="ID" displayField="Name"
-        [(ngModel)]="formData.ToPartyID" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+    <div class="relative">
+        <bft-select name="ToPartyID" [label]="isDailyExpense ? 'To (Vendor / Optional)' : 'To (Vendor)'"
+            [displayList]="vendors" valueField="ID" displayField="Name"
+            [(ngModel)]="formData.ToPartyID" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+        @if (!isView) {
+            <button type="button" (click)="openNewVendor()"
+                class="absolute top-0 right-0 text-blue-600 hover:text-blue-800 text-xs font-medium leading-none">+ Vendor</button>
+        }
+    </div>
 
     @if (isDailyExpense) {
         <bft-select name="DailyExpensePettyCashID" label="Daily Expense Account *" [displayList]="pettyCashList" valueField="ID" displayField="Name"

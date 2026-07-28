@@ -18,6 +18,7 @@ import { apiUrls } from 'app/modules/shared/services/api-url';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { PaymentTransaction } from '../../models/payment-transaction';
 import { DecimalPipe } from '@angular/common';
+import { VendorFormComponent } from '../vendor/vendor-form.component';
 
 interface BulkLine {
     PaymentType: string | null;
@@ -93,6 +94,14 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         this.bulkLines = [
             { PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' },
         ];
+    }
+
+    openNewVendor(): void {
+        this.modalSer.openModal({ component: VendorFormComponent, title: componentRegister.vendor?.Title || 'Vendor' })
+            .afterClose.subscribe((saved: boolean) => {
+                if (!saved) return;
+                this._drpService.getVendorDrp().subscribe({ next: (res: any) => { this.vendors = res || []; } });
+            });
     }
 
     addLine() {
