@@ -53,14 +53,16 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     cashModal: {
         show: boolean;
         type: 'Cash In' | 'Cash Out';
+        editId: number | null;
         date: Date | null;
         amount: number | null;
         paymentType: string | null;
         accountId: number | null;
         vendorId: number | null;
         notes: string;
-    } = { show: false, type: 'Cash In', date: null, amount: null, paymentType: null, accountId: null, vendorId: null, notes: '' };
+    } = { show: false, type: 'Cash In', editId: null, date: null, amount: null, paymentType: null, accountId: null, vendorId: null, notes: '' };
     isSavingCash = false;
+    isDeletingCash = false;
 
     dateRange: Date[] = [];
     isLoadingFinancial = false;
@@ -176,15 +178,48 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
 
     openCashModal(type: 'Cash In' | 'Cash Out') {
         this.cashModal = {
-            show: true,
-            type,
-            date: new Date(),
-            amount: null,
-            paymentType: null,
-            accountId: null,
-            vendorId: null,
-            notes: '',
+            show: true, type, editId: null,
+            date: new Date(), amount: null,
+            paymentType: null, accountId: null, vendorId: null, notes: '',
         };
+    }
+
+    openCashEdit(row: any) {
+        if (row.Type !== 'Cash In' && row.Type !== 'Cash Out') return;
+        this._http.get<any>(
+            `${apiUrls.server}${apiUrls.customerLedgerController}/distributor-cash/${row.ID}`,
+            { headers: this.headers }
+        ).subscribe({
+            next: (res) => {
+                this.cashModal = {
+                    show: true,
+                    type: res.CashType,
+                    editId: res.ID,
+                    date: res.Date ? new Date(res.Date) : new Date(),
+                    amount: +res.Amount,
+                    paymentType: res.PaymentType || null,
+                    accountId: res.AccountID || null,
+                    vendorId: res.VendorID || null,
+                    notes: res.Notes || '',
+                };
+            },
+        });
+    }
+
+    deleteCash() {
+        if (!this.cashModal.editId) return;
+        this.isDeletingCash = true;
+        this._http.delete(
+            `${apiUrls.server}${apiUrls.customerLedgerController}/distributor-cash/${this.cashModal.editId}`,
+            { headers: this.headers }
+        ).subscribe({
+            next: () => {
+                this.isDeletingCash = false;
+                this.cashModal.show = false;
+                this.loadFinancial();
+            },
+            error: () => { this.isDeletingCash = false; },
+        });
     }
 
     get selectedDistributorName(): string {
@@ -205,11 +240,11 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             AccountID: this.cashModal.accountId || null,
             VendorID: this.cashModal.vendorId || null,
         };
-        this._http.post(
-            `${apiUrls.server}${apiUrls.customerLedgerController}/distributor-cash`,
-            payload,
-            { headers: this.headers }
-        ).subscribe({
+        const url = `${apiUrls.server}${apiUrls.customerLedgerController}/distributor-cash`;
+        const req = this.cashModal.editId
+            ? this._http.patch(`${url}/${this.cashModal.editId}`, payload, { headers: this.headers })
+            : this._http.post(url, payload, { headers: this.headers });
+        req.subscribe({
             next: () => {
                 this.isSavingCash = false;
                 this.cashModal.show = false;

@@ -120,9 +120,11 @@
                         } @else {
                             @for (row of filteredFinancialRows; track row.ID) {
                                 <tr class="hover:bg-gray-50 transition-colors"
-                                    [class.cursor-pointer]="row.Type === 'Invoice'"
+                                    [class.cursor-pointer]="row.Type === 'Invoice' || row.Type === 'Cash In' || row.Type === 'Cash Out'"
                                     [class.hover:bg-blue-50]="row.Type === 'Invoice'"
-                                    (click)="openInvoiceEdit(row)">
+                                    [class.hover:bg-green-50]="row.Type === 'Cash In'"
+                                    [class.hover:bg-red-50]="row.Type === 'Cash Out'"
+                                    (click)="row.Type === 'Cash In' || row.Type === 'Cash Out' ? openCashEdit(row) : openInvoiceEdit(row)">
                                     <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
                                     <td class="px-3 py-1.5 text-xs font-medium text-blue-700">{{ row.DistributorName || '—' }}</td>
                                     @if (!selectedCustomer) {
@@ -311,9 +313,9 @@
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                 <div class="font-semibold text-gray-800 text-base">
                     @if (cashModal.type === 'Cash In') {
-                        <span class="text-green-700">↓ Cash In</span>
+                        <span class="text-green-700">↓ {{ cashModal.editId ? 'Edit' : '' }} Cash In</span>
                     } @else {
-                        <span class="text-red-700">↑ Cash Out</span>
+                        <span class="text-red-700">↑ {{ cashModal.editId ? 'Edit' : '' }} Cash Out</span>
                     }
                 </div>
                 <button (click)="cashModal.show = false" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
@@ -356,17 +358,27 @@
             </div>
 
             <!-- Footer -->
-            <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
-                <button (click)="cashModal.show = false"
-                    class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    Cancel
-                </button>
-                <button (click)="saveCash()" [disabled]="isSavingCash || !cashModal.amount || cashModal.amount <= 0"
-                    class="px-5 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50 transition-colors"
-                    [class.bg-green-600]="cashModal.type === 'Cash In'"
-                    [class.bg-red-600]="cashModal.type === 'Cash Out'">
-                    {{ isSavingCash ? 'Saving...' : 'Save' }}
-                </button>
+            <div class="flex justify-between gap-3 px-6 py-4 border-t border-gray-100">
+                <div>
+                    @if (cashModal.editId) {
+                        <button (click)="deleteCash()" [disabled]="isDeletingCash"
+                            class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors">
+                            {{ isDeletingCash ? 'Deleting...' : 'Delete' }}
+                        </button>
+                    }
+                </div>
+                <div class="flex gap-3">
+                    <button (click)="cashModal.show = false"
+                        class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button (click)="saveCash()" [disabled]="isSavingCash || !cashModal.amount || cashModal.amount <= 0"
+                        class="px-5 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50 transition-colors"
+                        [class.bg-green-600]="cashModal.type === 'Cash In'"
+                        [class.bg-red-600]="cashModal.type === 'Cash Out'">
+                        {{ isSavingCash ? 'Saving...' : 'Save' }}
+                    </button>
+                </div>
             </div>
 
         </div>
