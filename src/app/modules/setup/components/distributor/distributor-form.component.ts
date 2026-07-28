@@ -45,7 +45,7 @@ export class DistributorFormComponent extends BaseComponent<Distributor, Distrib
     }
 
     public override async AfterGetData(): Promise<void> {
-        this.savedOpeningBalance = this.formData.OpeningBalance ?? 0;
+        this.savedOpeningBalance = parseFloat(this.formData.OpeningBalance as any) || 0;
     }
 
     override ValidateBeforeSave(formData: Distributor): boolean {
