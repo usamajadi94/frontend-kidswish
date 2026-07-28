@@ -8,6 +8,9 @@ import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { DrpService } from 'app/modules/shared/services/drp.service';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
+import { ModalService } from 'app/modules/shared/services/modal.service';
+import { componentRegister } from 'app/modules/shared/services/component-register';
+import { DistributorFormComponent } from 'app/modules/setup/components/distributor/distributor-form.component';
 import { BftInputDateComponent } from 'app/modules/shared/components/fields/bft-input-date/bft-input-date.component';
 import { BftInputCurrencyComponent } from 'app/modules/shared/components/fields/bft-input-currency/bft-input-currency.component';
 import { BftSelectComponent } from 'app/modules/shared/components/fields/bft-select/bft-select.component';
@@ -25,6 +28,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     private _http         = inject(HttpClient);
     private _localStorage = inject(LocalStorageService);
     private _drpService   = inject(DrpService);
+    private _modal        = inject(ModalService);
 
     title = 'Distributor Ledger';
 
@@ -217,6 +221,18 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         this.selectedProducts = [];
         this.selectedStatuses = [];
         this.loadAll();
+    }
+
+    openDistributor() {
+        if (!this.selectedDistributor) return;
+        this._modal.openModal({
+            component: DistributorFormComponent,
+            title: componentRegister.distributor?.Title || 'Distributor',
+            ID: this.selectedDistributor,
+        }).afterClose.subscribe((saved: boolean) => {
+            if (!saved) return;
+            this._drpService.getDistributorDrp().subscribe({ next: (res: any) => { this.distributors = res || []; } });
+        });
     }
 
     onDateChange(dates: Date[]) {
