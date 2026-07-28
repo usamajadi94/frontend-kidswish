@@ -17,12 +17,6 @@
                         <nz-option [nzValue]="d.ID" [nzLabel]="d.Name"></nz-option>
                     }
                 </nz-select>
-                @if (selectedDistributor) {
-                    <button (click)="openDistributor()"
-                        class="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-400 transition-colors whitespace-nowrap">
-                        ✎ View / Edit
-                    </button>
-                }
             </div>
         }
 
