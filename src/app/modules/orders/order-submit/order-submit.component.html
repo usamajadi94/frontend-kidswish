@@ -81,6 +81,7 @@
                             <div class="flex items-center gap-2">
                                 <nz-select [(ngModel)]="row.ProductID" nzShowSearch nzAllowClear
                                     [nzDisabled]="row.dispatched"
+                                    (ngModelChange)="onProductChange(gi, pi)"
                                     nzPlaceHolder="Select product" class="w-full min-w-[180px]" nzSize="small">
                                     @for (p of products; track p.ID) {
                                         <nz-option [nzValue]="p.ID" [nzLabel]="p.Name" />

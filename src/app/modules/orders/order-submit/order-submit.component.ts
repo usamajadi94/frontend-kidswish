@@ -122,6 +122,17 @@ export class OrderSubmitComponent implements OnInit {
         if (this.groups[gi].products.length > 1) this.groups[gi].products.splice(pi, 1);
     }
 
+    onProductChange(gi: number, pi: number): void {
+        const group = this.groups[gi];
+        const row = group.products[pi];
+        if (!row.ProductID) return;
+        const isDuplicate = group.products.some((p, idx) => idx !== pi && p.ProductID === row.ProductID);
+        if (isDuplicate) {
+            this._msg.warning('This product is already added for this customer.');
+            row.ProductID = null;
+        }
+    }
+
     private emptyProduct(): ProductRow {
         return { ProductID: null, Carton: null as any, Notes: '' };
     }
@@ -146,6 +157,13 @@ export class OrderSubmitComponent implements OnInit {
         if (!this.isValid) {
             this._msg.warning('Customer, Product, and Carton qty are required.');
             return;
+        }
+        for (const g of this.groups) {
+            const ids = g.products.map(p => p.ProductID).filter(Boolean);
+            if (ids.length !== new Set(ids).size) {
+                this._msg.warning('Duplicate products are not allowed for the same customer.');
+                return;
+            }
         }
         this.isSaving = true;
 
