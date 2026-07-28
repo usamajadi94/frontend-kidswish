@@ -27,7 +27,7 @@
                 <div class="flex items-center justify-between">
                     <label class="text-xs font-medium text-gray-600">Customer <span class="text-red-500">*</span></label>
                     <button type="button" (click)="openNewCustomer()"
-                        class="text-blue-600 hover:text-blue-800 text-xs font-medium leading-none">+ New</button>
+                        class="text-blue-600 hover:text-blue-800 text-xs font-medium leading-none">+ Customer</button>
                 </div>
                 <select [(ngModel)]="line.FromPartyID"
                     class="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
@@ -75,7 +75,7 @@
                     <label class="text-xs font-medium text-gray-600">To <span class="text-red-500">*</span></label>
                     @if (line.ToPartyType === 'vendor') {
                         <button type="button" (click)="openNewVendor()"
-                            class="text-blue-600 hover:text-blue-800 text-xs font-medium leading-none">+ New</button>
+                            class="text-blue-600 hover:text-blue-800 text-xs font-medium leading-none">+ Vendor</button>
                     }
                 </div>
                 <select [(ngModel)]="line.ToPartyID"
