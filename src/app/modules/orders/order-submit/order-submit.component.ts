@@ -129,7 +129,7 @@ export class OrderSubmitComponent implements OnInit {
         const isDuplicate = group.products.some((p, idx) => idx !== pi && p.ProductID === row.ProductID);
         if (isDuplicate) {
             this._msg.warning('This product is already added for this customer.');
-            row.ProductID = null;
+            setTimeout(() => { row.ProductID = null; }, 0);
         }
     }
 
