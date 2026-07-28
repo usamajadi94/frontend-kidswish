@@ -168,7 +168,11 @@
                     <!-- Header fields -->
                     <div class="grid grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-gray-600">Vendor *</label>
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs font-medium text-gray-600">Vendor *</label>
+                                <button type="button" (click)="openNewVendor()"
+                                    class="text-blue-600 hover:text-blue-800 text-xs font-medium leading-none">+ Vendor</button>
+                            </div>
                             <nz-select [(ngModel)]="form.VendorID" nzPlaceHolder="Select Vendor"
                                        [nzShowSearch]="true" class="w-full">
                                 @for (v of vendors; track v.ID) {

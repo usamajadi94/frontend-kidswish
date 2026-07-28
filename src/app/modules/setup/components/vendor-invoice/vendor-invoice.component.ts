@@ -7,8 +7,10 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { DrpService } from 'app/modules/shared/services/drp.service';
+import { ModalService } from 'app/modules/shared/services/modal.service';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
 import { componentRegister } from 'app/modules/shared/services/component-register';
+import { VendorFormComponent } from '../vendor/vendor-form.component';
 
 @Component({
     selector: 'app-vendor-invoice',
@@ -21,6 +23,7 @@ export class VendorInvoiceComponent extends BaseRoutedComponent implements OnIni
     private _http         = inject(HttpClient);
     private _localStorage = inject(LocalStorageService);
     private _drpService   = inject(DrpService);
+    private _modalService = inject(ModalService);
 
     title = componentRegister.vendorInvoice.Title;
 
@@ -48,6 +51,14 @@ export class VendorInvoiceComponent extends BaseRoutedComponent implements OnIni
 
     get formTotal(): number {
         return this.form.Items.reduce((s, i) => s + (i.Amount || 0), 0);
+    }
+
+    openNewVendor(): void {
+        this._modalService.openModal({ component: VendorFormComponent, title: componentRegister.vendor?.Title || 'Vendor' })
+            .afterClose.subscribe((saved: boolean) => {
+                if (!saved) return;
+                this._drpService.getVendorDrp().subscribe({ next: (res: any) => { this.vendors = res || []; } });
+            });
     }
 
     ngOnInit() {
