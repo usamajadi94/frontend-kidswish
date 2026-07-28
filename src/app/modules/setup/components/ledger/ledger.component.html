@@ -295,9 +295,11 @@
 <!-- ══ Cash In / Cash Out Modal ══ -->
 @if (cashModal.show) {
     <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" (click)="cashModal.show = false">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm" (click)="$event.stopPropagation()">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md" (click)="$event.stopPropagation()">
+
+            <!-- Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                <div class="font-semibold text-gray-800 text-base flex items-center gap-2">
+                <div class="font-semibold text-gray-800 text-base">
                     @if (cashModal.type === 'Cash In') {
                         <span class="text-green-700">↓ Cash In</span>
                     } @else {
@@ -306,46 +308,51 @@
                 </div>
                 <button (click)="cashModal.show = false" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
             </div>
-            <div class="px-6 py-4 flex flex-col gap-3">
+
+            <!-- Form -->
+            <div class="px-6 py-5 flex flex-col gap-4">
+
+                <!-- Distributor (read-only) -->
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Date <span class="text-red-500">*</span></label>
-                    <input type="date" [(ngModel)]="cashModal.date"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Distributor</label>
+                    <div class="w-full border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-sm text-gray-700 font-medium">
+                        {{ selectedDistributorName }}
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Amount (PKR) <span class="text-red-500">*</span></label>
-                    <input type="number" [(ngModel)]="cashModal.amount" min="1" placeholder="0"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
+                <div class="grid grid-cols-2 gap-4">
+                    <bft-input-date name="cashDate" label="Date" [(ngModel)]="cashModal.date" [required]="true" />
+                    <bft-input-currency name="cashAmount" label="Amount" symbol="PKR" [(ngModel)]="cashModal.amount" />
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Bank Account</label>
-                    <nz-select [(ngModel)]="cashModal.accountId" nzPlaceHolder="Select account (optional)"
-                        [nzAllowClear]="true" [nzShowSearch]="true" class="w-full">
-                        @for (a of bankAccounts; track a.ID) {
-                            <nz-option [nzValue]="a.ID" [nzLabel]="a.Name"></nz-option>
-                        }
-                    </nz-select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
-                    <input type="text" [(ngModel)]="cashModal.notes" placeholder="Optional"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                </div>
+
+                <bft-select name="cashPaymentType" label="Payment Type"
+                    [displayList]="paymentTypes" valueField="ID" displayField="Name"
+                    [(ngModel)]="cashModal.paymentType" [clearable]="true" />
+
+                <bft-select
+                    [name]="cashModal.type === 'Cash In' ? 'cashToAccount' : 'cashFromAccount'"
+                    [label]="cashModal.type === 'Cash In' ? 'To (Bank Account)' : 'From (Bank Account)'"
+                    [displayList]="bankAccounts" valueField="ID" displayField="Name"
+                    [(ngModel)]="cashModal.accountId" [clearable]="true" />
+
+                <bft-textarea name="cashNotes" label="Notes" [(ngModel)]="cashModal.notes" />
+
             </div>
+
+            <!-- Footer -->
             <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
                 <button (click)="cashModal.show = false"
                     class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     Cancel
                 </button>
                 <button (click)="saveCash()" [disabled]="isSavingCash || !cashModal.amount || cashModal.amount <= 0"
-                    class="px-4 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50 transition-colors"
+                    class="px-5 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50 transition-colors"
                     [class.bg-green-600]="cashModal.type === 'Cash In'"
-                    [class.hover:bg-green-700]="cashModal.type === 'Cash In'"
-                    [class.bg-red-600]="cashModal.type === 'Cash Out'"
-                    [class.hover:bg-red-700]="cashModal.type === 'Cash Out'">
+                    [class.bg-red-600]="cashModal.type === 'Cash Out'">
                     {{ isSavingCash ? 'Saving...' : 'Save' }}
                 </button>
             </div>
+
         </div>
     </div>
 }

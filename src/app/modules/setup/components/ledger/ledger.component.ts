@@ -8,11 +8,16 @@ import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { apiUrls } from 'app/modules/shared/services/api-url';
 import { DrpService } from 'app/modules/shared/services/drp.service';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
+import { BftInputDateComponent } from 'app/modules/shared/components/fields/bft-input-date/bft-input-date.component';
+import { BftInputCurrencyComponent } from 'app/modules/shared/components/fields/bft-input-currency/bft-input-currency.component';
+import { BftSelectComponent } from 'app/modules/shared/components/fields/bft-select/bft-select.component';
+import { BftTextareaComponent } from 'app/modules/shared/components/fields/bft-textarea/bft-textarea.component';
 
 @Component({
     selector: 'app-ledger',
     standalone: true,
-    imports: [CommonModule, FormsModule, NzDatePickerModule, NzSelectModule, CurrencyPipe, DatePipe],
+    imports: [CommonModule, FormsModule, NzDatePickerModule, NzSelectModule, CurrencyPipe, DatePipe,
+              BftInputDateComponent, BftInputCurrencyComponent, BftSelectComponent, BftTextareaComponent],
     templateUrl: './ledger.component.html',
     styleUrl: './ledger.component.scss',
 })
@@ -35,14 +40,21 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
 
     // Cash In / Cash Out modal
     bankAccounts: any[] = [];
+    paymentTypes = [
+        { ID: 'Cash',            Name: 'Cash' },
+        { ID: 'Bank Transfer',   Name: 'Bank Transfer' },
+        { ID: 'Cheque',          Name: 'Cheque' },
+        { ID: 'Online Transfer', Name: 'Online Transfer' },
+    ];
     cashModal: {
         show: boolean;
         type: 'Cash In' | 'Cash Out';
-        date: string;
+        date: Date | null;
         amount: number | null;
-        notes: string;
+        paymentType: string | null;
         accountId: number | null;
-    } = { show: false, type: 'Cash In', date: '', amount: null, notes: '', accountId: null };
+        notes: string;
+    } = { show: false, type: 'Cash In', date: null, amount: null, paymentType: null, accountId: null, notes: '' };
     isSavingCash = false;
 
     dateRange: Date[] = [];
@@ -160,11 +172,16 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         this.cashModal = {
             show: true,
             type,
-            date: new Date().toISOString().split('T')[0],
+            date: new Date(),
             amount: null,
-            notes: '',
+            paymentType: null,
             accountId: null,
+            notes: '',
         };
+    }
+
+    get selectedDistributorName(): string {
+        return this.distributors.find(d => d.ID === this.selectedDistributor)?.Name || '';
     }
 
     saveCash() {
@@ -175,6 +192,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             DistributorID: this.selectedDistributor,
             Date: this.cashModal.date,
             Amount: this.cashModal.amount,
+            PaymentType: this.cashModal.paymentType,
             Notes: this.cashModal.notes || null,
             AccountType: this.cashModal.accountId ? 'bank_account' : null,
             AccountID: this.cashModal.accountId || null,
