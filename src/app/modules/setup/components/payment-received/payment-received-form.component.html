@@ -71,7 +71,13 @@
                 </select>
             </div>
             <div class="flex flex-col gap-1">
-                <label class="text-xs font-medium text-gray-600">To <span class="text-red-500">*</span></label>
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-medium text-gray-600">To <span class="text-red-500">*</span></label>
+                    @if (line.ToPartyType === 'vendor') {
+                        <button type="button" (click)="openNewVendor()"
+                            class="text-blue-600 hover:text-blue-800 text-xs font-medium leading-none">+ New</button>
+                    }
+                </div>
                 <select [(ngModel)]="line.ToPartyID"
                     class="border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
                     <option [ngValue]="null">— Select —</option>
@@ -135,8 +141,14 @@
         <bft-select name="ToPartyType" label="To Type" [displayList]="toPartyTypes" valueField="ID" displayField="Name"
             [(ngModel)]="formData.ToPartyType" [required]="true" [clearable]="true" [skeleton]="isDataLoading"
             (ngModelChange)="onToTypeChange()" [disabled]="isView" />
-        <bft-select name="ToPartyID" label="To" [displayList]="toList" valueField="ID" displayField="Name"
-            [(ngModel)]="formData.ToPartyID" [required]="true" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+        <div class="relative">
+            <bft-select name="ToPartyID" label="To" [displayList]="toList" valueField="ID" displayField="Name"
+                [(ngModel)]="formData.ToPartyID" [required]="true" [clearable]="true" [skeleton]="isDataLoading" [disabled]="isView" />
+            @if (formData.ToPartyType === 'vendor' && !isView) {
+                <button type="button" (click)="openNewVendor()"
+                    class="absolute top-0 right-0 text-blue-600 hover:text-blue-800 text-xs font-medium leading-none">+ New</button>
+            }
+        </div>
     </div>
 
     <bft-textarea name="Notes" label="Notes" [(ngModel)]="formData.Notes" [skeleton]="isDataLoading" [disabled]="isView" />

@@ -19,6 +19,7 @@ import { apiUrls } from 'app/modules/shared/services/api-url';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { PaymentTransaction } from '../../models/payment-transaction';
 import { CustomerFormComponent } from '../customer/customer-form.component';
+import { VendorFormComponent } from '../vendor/vendor-form.component';
 
 interface BulkReceivedLine {
     Date: string;
@@ -87,6 +88,14 @@ export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransacti
             .afterClose.subscribe((saved: boolean) => {
                 if (!saved) return;
                 this._drpService.getCustomerInformationDrp().subscribe({ next: (res: any) => { this.customers = res || []; } });
+            });
+    }
+
+    openNewVendor(): void {
+        this.modalSer.openModal({ component: VendorFormComponent, title: componentRegister.vendor?.Title || 'Vendor' })
+            .afterClose.subscribe((saved: boolean) => {
+                if (!saved) return;
+                this._drpService.getVendorDrp().subscribe({ next: (res: any) => { this.vendors = res || []; this.refreshToList(); } });
             });
     }
 
