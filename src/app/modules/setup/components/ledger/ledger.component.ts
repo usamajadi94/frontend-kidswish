@@ -50,6 +50,10 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         { ID: 'Cheque',          Name: 'Cheque' },
         { ID: 'Online Transfer', Name: 'Online Transfer' },
     ];
+    toTypes = [
+        { ID: 'vendor',       Name: 'Vendor' },
+        { ID: 'bank_account', Name: 'Bank Account' },
+    ];
     cashModal: {
         show: boolean;
         type: 'Cash In' | 'Cash Out';
@@ -59,8 +63,9 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         paymentType: string | null;
         accountId: number | null;
         vendorId: number | null;
+        toType: 'vendor' | 'bank_account' | null;
         notes: string;
-    } = { show: false, type: 'Cash In', editId: null, date: null, amount: null, paymentType: null, accountId: null, vendorId: null, notes: '' };
+    } = { show: false, type: 'Cash In', editId: null, date: null, amount: null, paymentType: null, accountId: null, vendorId: null, toType: null, notes: '' };
     isSavingCash = false;
     isDeletingCash = false;
 
@@ -180,8 +185,15 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         this.cashModal = {
             show: true, type, editId: null,
             date: new Date(), amount: null,
-            paymentType: null, accountId: null, vendorId: null, notes: '',
+            paymentType: null, accountId: null, vendorId: null,
+            toType: type === 'Cash Out' ? 'vendor' : null,
+            notes: '',
         };
+    }
+
+    onToTypeChange() {
+        this.cashModal.vendorId  = null;
+        this.cashModal.accountId = null;
     }
 
     openCashEdit(row: any) {
@@ -200,6 +212,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
                     paymentType: res.PaymentType || null,
                     accountId: res.AccountID || null,
                     vendorId: res.VendorID || null,
+                    toType: res.CashType === 'Cash Out' ? (res.VendorID ? 'vendor' : 'bank_account') : null,
                     notes: res.Notes || '',
                 };
             },
