@@ -22,13 +22,13 @@ export class CustomerListComponent extends BaseRoutedComponent implements OnInit
     isVisible = false;
     columns = [
         { header: 'Name', name: 'Name', isSort: true, isFilterList: true, type: 'text' },
+        { header: 'Opening Balance', name: 'OpeningBalance', isSort: true, isFilterList: false, type: 'currency' },
+        { header: 'Current Balance', name: 'CurrentBalance', isSort: true, isFilterList: false, type: 'currency' },
         { header: 'Code', name: 'Code', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Phone No', name: 'PhoneNo', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Email', name: 'Email', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Distributor', name: 'DistributorName', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Active', name: 'IsActive', isSort: true, isFilterList: true, type: 'status' },
-        { header: 'Opening Balance', name: 'OpeningBalance', isSort: true, isFilterList: false, type: 'currency' },
-        { header: 'Current Balance', name: 'CurrentBalance', isSort: true, isFilterList: false, type: 'currency' },
         { header: 'Modified By', name: 'ModifiedBy', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Modified Date', name: 'ModifiedDate', isSort: true, isFilterList: true, type: 'date' },
     ];
