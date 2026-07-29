@@ -113,7 +113,26 @@
                                     {{ row.Description }}
                                 </span>
                             </td>
-                            <td class="px-3 py-1.5 font-medium text-gray-800 text-xs">{{ row.Counterparty || '—' }}</td>
+                            <td class="px-3 py-1.5 text-xs">
+                                <div class="flex flex-col gap-0.5">
+                                    <span class="font-medium text-gray-800">{{ row.Counterparty || '—' }}</span>
+                                    @if (row.CounterpartyType) {
+                                        <span class="inline-flex w-fit items-center rounded-full px-1.5 py-0 text-xs font-medium"
+                                            [class.bg-blue-100]="row.CounterpartyType === 'Customer'"
+                                            [class.text-blue-700]="row.CounterpartyType === 'Customer'"
+                                            [class.bg-purple-100]="row.CounterpartyType === 'Distributor'"
+                                            [class.text-purple-700]="row.CounterpartyType === 'Distributor'"
+                                            [class.bg-orange-100]="row.CounterpartyType === 'Vendor'"
+                                            [class.text-orange-700]="row.CounterpartyType === 'Vendor'"
+                                            [class.bg-gray-100]="row.CounterpartyType === 'Bank Account'"
+                                            [class.text-gray-600]="row.CounterpartyType === 'Bank Account'"
+                                            [class.bg-yellow-100]="row.CounterpartyType === 'Petty Cash'"
+                                            [class.text-yellow-700]="row.CounterpartyType === 'Petty Cash'">
+                                            {{ row.CounterpartyType }}
+                                        </span>
+                                    }
+                                </div>
+                            </td>
                             <td class="px-3 py-1.5 text-gray-500 text-xs">{{ row.PaymentType || '—' }}</td>
                             <td class="px-3 py-1.5 text-gray-500 text-xs">{{ row.Notes || '—' }}</td>
                             <td class="px-3 py-1.5 text-gray-500 text-xs">{{ row.AddedBy || '—' }}</td>
