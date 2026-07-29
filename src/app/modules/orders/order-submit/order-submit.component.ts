@@ -122,6 +122,16 @@ export class OrderSubmitComponent implements OnInit {
         if (this.groups[gi].products.length > 1) this.groups[gi].products.splice(pi, 1);
     }
 
+    onCustomerChange(gi: number): void {
+        const group = this.groups[gi];
+        if (!group.CustomerID) return;
+        const isDuplicate = this.groups.some((g, idx) => idx !== gi && g.CustomerID === group.CustomerID);
+        if (isDuplicate) {
+            this._msg.warning('This customer is already added in another group.');
+            setTimeout(() => { group.CustomerID = null; }, 0);
+        }
+    }
+
     onProductChange(gi: number, pi: number): void {
         const group = this.groups[gi];
         const row = group.products[pi];

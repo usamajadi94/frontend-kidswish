@@ -46,6 +46,7 @@
                 </span>
                 <nz-select [(ngModel)]="group.CustomerID" nzShowSearch nzAllowClear
                     [nzDisabled]="isEditMode && group.hasDispatched"
+                    (ngModelChange)="onCustomerChange(gi)"
                     nzPlaceHolder="Select customer..." class="min-w-[200px]" nzSize="default">
                     @for (c of customers; track c.ID) {
                         <nz-option [nzValue]="c.ID" [nzLabel]="c.Name" />
