@@ -48,6 +48,7 @@ export class BankAccountListComponent extends BaseRoutedComponent implements OnI
     }
 
     onView(row: any) {
+        if (row.Type === 'Cash') return;
         this._router.navigate(['/setup/bank-account-detail', row.ID]);
     }
 
