@@ -26,6 +26,7 @@ export class DistributorListComponent extends BaseRoutedComponent implements OnI
         { header: 'City', name: 'City', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Address', name: 'Address', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Opening Balance', name: 'OpeningBalance', isSort: true, isFilterList: false, type: 'currency' },
+        { header: 'Current Balance', name: 'CurrentBalance', isSort: true, isFilterList: false, type: 'currency' },
         { header: 'Active', name: 'IsActive', isSort: true, isFilterList: true, type: 'status' },
         { header: 'Modified By', name: 'ModifiedBy', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Modified Date', name: 'ModifiedDate', isSort: true, isFilterList: true, type: 'date' },
