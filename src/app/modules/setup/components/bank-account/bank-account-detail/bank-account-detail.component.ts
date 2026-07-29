@@ -37,6 +37,14 @@ export class BankAccountDetailComponent implements OnInit {
         return this.ledger.reduce((s, r) => s + (+r.Debit || 0), 0);
     }
 
+    get ledgerWithBalance(): any[] {
+        let balance = +(this.summary?.OpeningBalance || 0);
+        return this.ledger.map(r => {
+            balance += (+r.Credit || 0) - (+r.Debit || 0);
+            return { ...r, Balance: balance };
+        });
+    }
+
     ngOnInit() {
         this.accountId = +this._route.snapshot.params['id'];
         const today = new Date();
