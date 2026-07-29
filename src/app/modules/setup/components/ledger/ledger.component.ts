@@ -63,9 +63,10 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         paymentType: string | null;
         accountId: number | null;
         vendorId: number | null;
+        toBankId: number | null;
         toType: 'vendor' | 'bank_account' | null;
         notes: string;
-    } = { show: false, type: 'Cash In', editId: null, date: null, amount: null, paymentType: null, accountId: null, vendorId: null, toType: null, notes: '' };
+    } = { show: false, type: 'Cash In', editId: null, date: null, amount: null, paymentType: null, accountId: null, vendorId: null, toBankId: null, toType: null, notes: '' };
     isSavingCash = false;
     isDeletingCash = false;
 
@@ -185,7 +186,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         this.cashModal = {
             show: true, type, editId: null,
             date: new Date(), amount: null,
-            paymentType: null, accountId: null, vendorId: null,
+            paymentType: null, accountId: null, vendorId: null, toBankId: null,
             toType: type === 'Cash Out' ? 'vendor' : null,
             notes: '',
         };
@@ -194,6 +195,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     onToTypeChange() {
         this.cashModal.vendorId  = null;
         this.cashModal.accountId = null;
+        this.cashModal.toBankId  = null;
     }
 
     openCashEdit(row: any) {
@@ -212,6 +214,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
                     paymentType: res.PaymentType || null,
                     accountId: res.AccountID || null,
                     vendorId: res.VendorID || null,
+                    toBankId: res.ToBankID || null,
                     toType: res.CashType === 'Cash Out' ? (res.VendorID ? 'vendor' : 'bank_account') : null,
                     notes: res.Notes || '',
                 };
@@ -252,6 +255,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             AccountType: this.cashModal.accountId ? 'bank_account' : null,
             AccountID: this.cashModal.accountId || null,
             VendorID: this.cashModal.vendorId || null,
+            ToBankID: this.cashModal.toBankId || null,
         };
         const url = `${apiUrls.server}${apiUrls.customerLedgerController}/distributor-cash`;
         const req = this.cashModal.editId

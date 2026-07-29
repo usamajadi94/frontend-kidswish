@@ -352,9 +352,12 @@
                             [displayList]="vendors" valueField="ID" displayField="Name"
                             [(ngModel)]="cashModal.vendorId" [clearable]="true" />
                     } @else if (cashModal.toType === 'bank_account') {
-                        <bft-select name="cashToBankAccount" label="To (Bank Account)"
+                        <bft-select name="cashFromBankAccount" label="From (Bank Account)"
                             [displayList]="bankAccounts" valueField="ID" displayField="Name"
                             [(ngModel)]="cashModal.accountId" [clearable]="true" />
+                        <bft-select name="cashToBankAccount" label="To (Bank Account)"
+                            [displayList]="bankAccounts" valueField="ID" displayField="Name"
+                            [(ngModel)]="cashModal.toBankId" [clearable]="true" />
                     }
                 }
 
