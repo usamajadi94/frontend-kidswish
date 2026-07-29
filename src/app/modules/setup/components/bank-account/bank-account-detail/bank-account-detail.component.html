@@ -152,12 +152,17 @@
             @if (ledger.length > 0) {
                 <tfoot class="border-t-2 border-gray-300 bg-gray-50">
                     <tr class="font-semibold text-gray-800">
-                        <td colspan="6" class="px-3 py-2 text-right text-xs">Total</td>
+                        <td colspan="5" class="px-3 py-2 text-right text-xs">Total</td>
                         <td class="px-3 py-2 text-right text-green-700 text-xs">
                             {{ totalCredits | currency:'PKR ':'symbol':'1.0-0' }}
                         </td>
                         <td class="px-3 py-2 text-right text-red-700 text-xs">
                             {{ totalDebits | currency:'PKR ':'symbol':'1.0-0' }}
+                        </td>
+                        <td class="px-3 py-2 text-right text-xs"
+                            [class.text-green-700]="ledgerWithBalance[ledgerWithBalance.length-1]?.Balance >= 0"
+                            [class.text-red-700]="ledgerWithBalance[ledgerWithBalance.length-1]?.Balance < 0">
+                            {{ ledgerWithBalance[ledgerWithBalance.length-1]?.Balance | currency:'PKR ':'symbol':'1.0-0' }}
                         </td>
                     </tr>
                 </tfoot>
