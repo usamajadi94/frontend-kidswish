@@ -87,6 +87,14 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     isLoadingEdit      = false;
     isSavingEdit       = false;
 
+    get bankAccountsNoCash(): any[] {
+        return this.bankAccounts.filter(b => b.Type !== 'Cash');
+    }
+
+    get toBankAccountsFiltered(): any[] {
+        return this.bankAccounts.filter(b => b.Type !== 'Cash' && b.ID !== this.cashModal.accountId);
+    }
+
     get editTotal(): number {
         return this.editItems.reduce((s, i) => s + ((+i.Carton || 0) * (+i.Rate || 0)), 0);
     }
