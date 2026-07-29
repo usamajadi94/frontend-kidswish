@@ -95,6 +95,7 @@ export class CashInHandListComponent extends BaseRoutedComponent {
     }
 
     onView(row: any) {
+        if (row.Source === 'dist_cash_in') return;
         if (row.Source === 'payment') {
             this._modalService.openModal({
                 component: PaymentReceivedFormComponent,
