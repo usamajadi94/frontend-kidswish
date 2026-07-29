@@ -27,6 +27,8 @@ export class CustomerListComponent extends BaseRoutedComponent implements OnInit
         { header: 'Email', name: 'Email', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Distributor', name: 'DistributorName', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Active', name: 'IsActive', isSort: true, isFilterList: true, type: 'status' },
+        { header: 'Opening Balance', name: 'OpeningBalance', isSort: true, isFilterList: false, type: 'currency' },
+        { header: 'Current Balance', name: 'CurrentBalance', isSort: true, isFilterList: false, type: 'currency' },
         { header: 'Modified By', name: 'ModifiedBy', isSort: true, isFilterList: true, type: 'text' },
         { header: 'Modified Date', name: 'ModifiedDate', isSort: true, isFilterList: true, type: 'date' },
     ];
