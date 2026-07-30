@@ -361,7 +361,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         this.isLoadingFinancial = true;
         const from = this.dateRange?.[0]?.toISOString() || '';
         const to   = this.dateRange?.[1]?.toISOString() || '';
-        let url = `${apiUrls.server}${apiUrls.customerLedgerController}/all/financial?`;
+        let url = `${apiUrls.server}${apiUrls.customerLedgerController}/all/financial?basePricing=true&`;
         if (from) url += `from=${encodeURIComponent(from)}&`;
         if (to)   url += `to=${encodeURIComponent(to)}&`;
         if (this.selectedDistributor) url += `distributorId=${this.selectedDistributor}&`;
