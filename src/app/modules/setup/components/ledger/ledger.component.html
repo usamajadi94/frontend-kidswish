@@ -340,25 +340,9 @@
                         [displayList]="distributorCustomers" valueField="ID" displayField="Name"
                         [(ngModel)]="cashModal.fromCustomerId" [clearable]="true" />
                 } @else {
-                    <bft-select name="cashToType" label="To"
-                        [displayList]="toTypes" valueField="ID" displayField="Name"
-                        [(ngModel)]="cashModal.toType" (ngModelChange)="onToTypeChange()" [clearable]="false" />
-
-                    @if (cashModal.toType === 'vendor') {
-                        <bft-select name="cashFromAccount" label="From (Bank Account)"
-                            [displayList]="bankAccountsNoCash" valueField="ID" displayField="Name"
-                            [(ngModel)]="cashModal.accountId" [clearable]="true" />
-                        <bft-select name="cashVendor" label="To (Vendor)"
-                            [displayList]="vendors" valueField="ID" displayField="Name"
-                            [(ngModel)]="cashModal.vendorId" [clearable]="true" />
-                    } @else if (cashModal.toType === 'bank_account') {
-                        <bft-select name="cashFromBankAccount" label="From (Bank Account)"
-                            [displayList]="bankAccountsNoCash" valueField="ID" displayField="Name"
-                            [(ngModel)]="cashModal.accountId" [clearable]="true" />
-                        <bft-select name="cashToBankAccount" label="To (Bank Account)"
-                            [displayList]="toBankAccountsFiltered" valueField="ID" displayField="Name"
-                            [(ngModel)]="cashModal.toBankId" [clearable]="true" />
-                    }
+                    <bft-select name="cashToBankAccount" label="To (Bank Account)"
+                        [displayList]="bankAccounts" valueField="ID" displayField="Name"
+                        [(ngModel)]="cashModal.toBankId" [clearable]="true" />
                 }
 
                 <bft-textarea name="cashNotes" label="Notes" [(ngModel)]="cashModal.notes" />

@@ -202,7 +202,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             show: true, type, editId: null,
             date: new Date(), amount: null,
             paymentType: null, accountId: null, vendorId: null, toBankId: null,
-            toType: type === 'Cash Out' ? 'vendor' : null,
+            toType: null,
             fromCustomerId: null,
             notes: '',
         };
