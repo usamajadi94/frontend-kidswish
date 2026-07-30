@@ -39,8 +39,13 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     isLoadingCustomers = false;
 
     // Customer select
-    customers: any[] = [];
+    allCustomers: any[] = [];
     selectedCustomer: number | null = null;
+
+    get distributorCustomers(): any[] {
+        if (!this.selectedDistributor) return [];
+        return this.allCustomers.filter(c => c.DistributorID === this.selectedDistributor);
+    }
 
     // Cash In / Cash Out modal
     bankAccounts: any[] = [];
@@ -65,8 +70,9 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         vendorId: number | null;
         toBankId: number | null;
         toType: 'vendor' | 'bank_account' | null;
+        fromCustomerId: number | null;
         notes: string;
-    } = { show: false, type: 'Cash In', editId: null, date: null, amount: null, paymentType: null, accountId: null, vendorId: null, toBankId: null, toType: null, notes: '' };
+    } = { show: false, type: 'Cash In', editId: null, date: null, amount: null, paymentType: null, accountId: null, vendorId: null, toBankId: null, toType: null, fromCustomerId: null, notes: '' };
     isSavingCash = false;
     isDeletingCash = false;
 
@@ -184,6 +190,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         });
         this._drpService.getBankAccountDrp().subscribe({ next: (res: any) => { this.bankAccounts = res || []; } });
         this._drpService.getVendorDrp().subscribe({ next: (res: any) => { this.vendors = res || []; } });
+        this._drpService.getCustomerInformationDrp().subscribe({ next: (res: any) => { this.allCustomers = res || []; } });
 
         if (!this.isDistributorUser) {
             this.loadAll();
@@ -196,6 +203,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             date: new Date(), amount: null,
             paymentType: null, accountId: null, vendorId: null, toBankId: null,
             toType: type === 'Cash Out' ? 'vendor' : null,
+            fromCustomerId: null,
             notes: '',
         };
     }
@@ -224,6 +232,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
                     vendorId: res.VendorID || null,
                     toBankId: res.ToBankID || null,
                     toType: res.CashType === 'Cash Out' ? (res.VendorID ? 'vendor' : 'bank_account') : null,
+                    fromCustomerId: res.CustomerID || null,
                     notes: res.Notes || '',
                 };
             },
@@ -264,6 +273,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             AccountID: this.cashModal.accountId || null,
             VendorID: this.cashModal.vendorId || null,
             ToBankID: this.cashModal.toBankId || null,
+            FromCustomerID: this.cashModal.fromCustomerId || null,
         };
         const url = `${apiUrls.server}${apiUrls.customerLedgerController}/distributor-cash`;
         const req = this.cashModal.editId
