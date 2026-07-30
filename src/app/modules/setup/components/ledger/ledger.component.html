@@ -336,12 +336,9 @@
                     [(ngModel)]="cashModal.paymentType" [clearable]="true" />
 
                 @if (cashModal.type === 'Cash In') {
-                    <bft-select name="cashFromCustomer" label="From (Customer — optional)"
+                    <bft-select name="cashFromCustomer" label="From (Customer)"
                         [displayList]="distributorCustomers" valueField="ID" displayField="Name"
                         [(ngModel)]="cashModal.fromCustomerId" [clearable]="true" />
-                    <bft-select name="cashToAccount" label="To (Bank Account — optional)"
-                        [displayList]="bankAccounts" valueField="ID" displayField="Name"
-                        [(ngModel)]="cashModal.accountId" [clearable]="true" />
                 } @else {
                     <bft-select name="cashToType" label="To"
                         [displayList]="toTypes" valueField="ID" displayField="Name"

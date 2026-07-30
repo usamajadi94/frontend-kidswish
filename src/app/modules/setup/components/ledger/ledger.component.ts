@@ -44,7 +44,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
 
     get distributorCustomers(): any[] {
         if (!this.selectedDistributor) return [];
-        return this.allCustomers.filter(c => c.DistributorID === this.selectedDistributor);
+        return this.allCustomers.filter(c => Number(c.DistributorID) === this.selectedDistributor);
     }
 
     // Cash In / Cash Out modal
