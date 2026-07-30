@@ -44,7 +44,7 @@
 
             <!-- Right: actions -->
             <div class="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
-                @if (order.Status === 'Submitted' || (order.Status === 'In Process' && isAdmin)) {
+                @if (order.Status === 'Submitted' || isAdmin) {
                     <button mat-stroked-button (click)="editOrder()">
                         <mat-icon class="text-base mr-1">edit</mat-icon> Edit Order
                     </button>

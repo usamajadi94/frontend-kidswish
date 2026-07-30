@@ -90,6 +90,11 @@ export class OrderListComponent implements OnInit {
         this._router.navigate(['/orders/order-detail', row.ID]);
     }
 
+    editOrder(row: any, event: Event) {
+        event.stopPropagation();
+        this._router.navigate(['/orders/order-edit', row.ID]);
+    }
+
     deleteOrder(row: any, event: Event) {
         event.stopPropagation();
         if (!confirm(`Delete order ${row.InvoiceNo}? This cannot be undone.`)) return;

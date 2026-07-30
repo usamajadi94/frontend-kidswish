@@ -91,6 +91,10 @@
                                         <mat-icon class="text-sm mr-0.5">print</mat-icon> Invoice
                                     </button>
                                 }
+                                <button mat-stroked-button class="text-xs !min-h-7 !h-7 !px-2"
+                                    title="Edit order" (click)="editOrder(row, $event)">
+                                    <mat-icon class="text-sm mr-0.5">edit</mat-icon> Edit
+                                </button>
                                 <button mat-icon-button class="!w-7 !h-7 text-gray-400 hover:text-red-500"
                                     title="Delete order" (click)="deleteOrder(row, $event)">
                                     <mat-icon class="text-base">delete</mat-icon>
