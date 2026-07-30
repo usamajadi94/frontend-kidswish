@@ -214,6 +214,17 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         this.cashModal.toBankId  = null;
     }
 
+    onRowClick(row: any) {
+        if (row.Type === 'Cash In' || row.Type === 'Cash Out') {
+            this.openCashEdit(row);
+        } else if (row.Type === 'Invoice') {
+            this.openInvoiceEdit(row);
+        } else if (row.Type === 'Payment') {
+            this.openPaymentEdit(row);
+        }
+        // Opening Balance: not editable inline
+    }
+
     openCashEdit(row: any) {
         if (row.Type !== 'Cash In' && row.Type !== 'Cash Out') return;
         this._http.get<any>(
@@ -236,6 +247,33 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
                     notes: res.Notes || '',
                 };
             },
+            error: () => { alert('Could not load entry for editing.'); },
+        });
+    }
+
+    openPaymentEdit(row: any) {
+        if (!row.ID) return;
+        this._http.get<any>(
+            `${apiUrls.server}${apiUrls.customerLedgerController}/distributor-cash/${row.ID}`,
+            { headers: this.headers }
+        ).subscribe({
+            next: (res) => {
+                this.cashModal = {
+                    show: true,
+                    type: res.CashType,
+                    editId: res.ID,
+                    date: res.Date ? new Date(res.Date) : new Date(),
+                    amount: +res.Amount,
+                    paymentType: res.PaymentType || null,
+                    accountId: res.AccountID || null,
+                    vendorId: res.VendorID || null,
+                    toBankId: res.ToBankID || null,
+                    toType: res.CashType === 'Cash Out' ? (res.VendorID ? 'vendor' : 'bank_account') : null,
+                    fromCustomerId: res.CustomerID || null,
+                    notes: res.Notes || '',
+                };
+            },
+            error: () => { /* Payment entries from customer side are managed in Customer Ledger */ },
         });
     }
 

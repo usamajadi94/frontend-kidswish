@@ -114,11 +114,11 @@
                         } @else {
                             @for (row of filteredFinancialRows; track row.ID) {
                                 <tr class="hover:bg-gray-50 transition-colors"
-                                    [class.cursor-pointer]="row.Type === 'Invoice' || row.Type === 'Cash In' || row.Type === 'Cash Out'"
+                                    [class.cursor-pointer]="row.Type !== 'Opening Balance'"
                                     [class.hover:bg-blue-50]="row.Type === 'Invoice'"
-                                    [class.hover:bg-green-50]="row.Type === 'Cash In'"
+                                    [class.hover:bg-green-50]="row.Type === 'Cash In' || row.Type === 'Payment'"
                                     [class.hover:bg-red-50]="row.Type === 'Cash Out'"
-                                    (click)="row.Type === 'Cash In' || row.Type === 'Cash Out' ? openCashEdit(row) : openInvoiceEdit(row)">
+                                    (click)="onRowClick(row)">
                                     <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
                                     <td class="px-3 py-1.5 text-xs font-medium text-blue-700">{{ row.DistributorName || '—' }}</td>
                                     @if (!selectedCustomer) {
