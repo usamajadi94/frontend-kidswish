@@ -29,14 +29,26 @@ export class VehicleDispatchComponent implements OnInit {
     isLoadingDetail = false;
     isConfirming    = false;
 
+    fromDate: string = (() => { const d = new Date(); d.setDate(1); return d.toISOString().split('T')[0]; })();
+    toDate: string   = new Date().toISOString().split('T')[0];
+
+    private get _dateFilteredList(): any[] {
+        return this.list.filter(v => {
+            const d = v.DispatchDate ? v.DispatchDate.split('T')[0] : '';
+            return (!this.fromDate || d >= this.fromDate) && (!this.toDate || d <= this.toDate);
+        });
+    }
+
     get filteredList(): any[] {
-        if (this.listTab === 'All') return this.list;
-        return this.list.filter(v => v.Status === this.listTab);
+        const base = this._dateFilteredList;
+        if (this.listTab === 'All') return base;
+        return base.filter(v => v.Status === this.listTab);
     }
 
     tabCount(tab: string): number {
-        if (tab === 'All') return this.list.length;
-        return this.list.filter(v => v.Status === tab).length;
+        const base = this._dateFilteredList;
+        if (tab === 'All') return base.length;
+        return base.filter(v => v.Status === tab).length;
     }
 
     // ── Create form ───────────────────────────────────────────────────────────
