@@ -120,7 +120,7 @@ export class StockMasterComponent implements OnInit, OnDestroy {
     }
 
     openAdd() {
-        this.addForm = { ProductID: null, Qty: 0, Notes: '', Date: new Date().toISOString().split('T')[0] };
+        this.addForm = { ProductID: null, Qty: 0, Notes: '', Date: StockMasterComponent._today() };
         this.errorMsg = '';
         this.showAddForm = true;
         this.showEditForm = false;
@@ -285,4 +285,9 @@ export class StockMasterComponent implements OnInit, OnDestroy {
 
     stockColor(status: string) { return status === 'low' ? 'text-orange-500' : 'text-green-500'; }
     stockLabel(status: string) { return status === 'low' ? 'Low Stock' : 'In Stock'; }
+
+    private static _today(): string {
+        const d = new Date();
+        return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
+    }
 }

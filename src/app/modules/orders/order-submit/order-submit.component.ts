@@ -44,7 +44,7 @@ export class OrderSubmitComponent implements OnInit {
     private _modal = inject(ModalService);
 
     invoiceNo = '';
-    orderDate: string = new Date().toISOString().split('T')[0];
+    orderDate: string = OrderSubmitComponent._localDateStr();
     notes = '';
     groups: CustomerGroup[] = [];
     products: any[] = [];
@@ -81,7 +81,7 @@ export class OrderSubmitComponent implements OnInit {
         this._http.get<any>(`${apiUrls.server}${apiUrls.distributorOrderController}/${id}`, { headers }).subscribe({
             next: (order) => {
                 this.invoiceNo = order.InvoiceNo || '';
-                this.orderDate = order.OrderDate ? order.OrderDate.split('T')[0] : new Date().toISOString().split('T')[0];
+                this.orderDate = order.OrderDate ? OrderSubmitComponent._localDateStr(new Date(order.OrderDate)) : OrderSubmitComponent._localDateStr();
                 this.notes = order.Notes || '';
 
                 const groupMap = new Map<number, CustomerGroup>();
@@ -223,9 +223,13 @@ export class OrderSubmitComponent implements OnInit {
 
     reset() {
         this.invoiceNo = '';
-        this.orderDate = new Date().toISOString().split('T')[0];
+        this.orderDate = OrderSubmitComponent._localDateStr();
         this.notes = '';
         this.groups = [];
         this.addCustomer();
+    }
+
+    private static _localDateStr(d = new Date()): string {
+        return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
     }
 }

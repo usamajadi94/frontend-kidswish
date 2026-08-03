@@ -26,7 +26,7 @@ export class DispatchPlanningComponent implements OnInit {
     errorMsg = '';
 
     // dispatch date for all entries in this plan batch
-    dispatchDate: string = new Date().toISOString().split('T')[0];
+    dispatchDate: string = DispatchPlanningComponent._today();
 
     // per-item planned qty (keyed by ItemID)
     plannedQtys: { [itemId: number]: number } = {};
@@ -100,5 +100,10 @@ export class DispatchPlanningComponent implements OnInit {
             },
             error: (e) => { this.isSaving = false; this.errorMsg = e?.error?.message || 'Failed to save plan'; },
         });
+    }
+
+    private static _today(): string {
+        const d = new Date();
+        return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
     }
 }

@@ -45,7 +45,8 @@ export class AdminDashboardComponent implements OnInit {
     }
 
     private fmtDate(d: Date): string {
-        return d.toISOString().split('T')[0];
+        // Send full ISO so the backend gets the exact Pakistan-midnight boundary (UTC+5)
+        return d.toISOString();
     }
 
     onDateRangeChange(dates: [Date, Date] | null) {

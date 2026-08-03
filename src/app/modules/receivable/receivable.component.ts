@@ -27,7 +27,7 @@ export class ReceivableComponent implements OnInit {
     errorMsg = '';
     successMsg = '';
 
-    payForm = { CustomerID: null as any, Amount: null as any, PaymentType: 'Cash', Date: new Date().toISOString().split('T')[0], Notes: '' };
+    payForm = { CustomerID: null as any, Amount: null as any, PaymentType: 'Cash', Date: ReceivableComponent._today(), Notes: '' };
 
     get authHeaders() {
         return new HttpHeaders({ uid: this._localStorage.uid, cid: this._localStorage.cid, eid: this._localStorage.eid });
@@ -57,7 +57,7 @@ export class ReceivableComponent implements OnInit {
     openPayment(c?: any) {
         this.errorMsg = '';
         this.successMsg = '';
-        this.payForm = { CustomerID: c?.CustomerID || null, Amount: 0, PaymentType: 'Cash', Date: new Date().toISOString().split('T')[0], Notes: '' };
+        this.payForm = { CustomerID: c?.CustomerID || null, Amount: 0, PaymentType: 'Cash', Date: ReceivableComponent._today(), Notes: '' };
         this.showPaymentForm = true;
     }
 
@@ -74,5 +74,10 @@ export class ReceivableComponent implements OnInit {
             },
             error: (e) => { this.isSaving = false; this.errorMsg = e?.error?.message || 'Failed'; },
         });
+    }
+
+    private static _today(): string {
+        const d = new Date();
+        return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
     }
 }

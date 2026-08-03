@@ -100,7 +100,7 @@ export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransacti
     }
 
     private emptyLine(): BulkReceivedLine {
-        return { Date: new Date().toISOString().split('T')[0], Amount: null, DistributorID: null, FromPartyID: null, PaymentType: null, ToPartyType: 'bank_account', ToPartyID: null, Notes: '' };
+        return { Date: (() => { const d = new Date(); return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`; })(), Amount: null, DistributorID: null, FromPartyID: null, PaymentType: null, ToPartyType: 'bank_account', ToPartyID: null, Notes: '' };
     }
     addLine() { this.bulkLines.push(this.emptyLine()); }
     removeLine(i: number) { this.bulkLines.splice(i, 1); }

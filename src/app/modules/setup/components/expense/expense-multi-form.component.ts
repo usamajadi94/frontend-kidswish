@@ -168,7 +168,8 @@ export class ExpenseMultiFormComponent implements OnInit {
     }
 
     addRow() {
-        const today = new Date().toISOString().split('T')[0];
+        const d = new Date();
+        const today = `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
         this.rows.push({ Date: today, ExpenseCategoryID: null, VendorID: null, Amount: null, Notes: '' });
     }
 

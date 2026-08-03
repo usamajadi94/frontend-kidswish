@@ -29,12 +29,16 @@ export class VehicleDispatchComponent implements OnInit {
     isLoadingDetail = false;
     isConfirming    = false;
 
-    fromDate: string = (() => { const d = new Date(); d.setDate(1); return d.toISOString().split('T')[0]; })();
-    toDate: string   = new Date().toISOString().split('T')[0];
+    fromDate: string = (() => { const d = new Date(); return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-01`; })();
+    toDate: string   = VehicleDispatchComponent._localDateStr();
+
+    private static _localDateStr(d = new Date()): string {
+        return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
+    }
 
     private get _dateFilteredList(): any[] {
         return this.list.filter(v => {
-            const d = v.DispatchDate ? v.DispatchDate.split('T')[0] : '';
+            const d = v.DispatchDate ? VehicleDispatchComponent._localDateStr(new Date(v.DispatchDate)) : '';
             return (!this.fromDate || d >= this.fromDate) && (!this.toDate || d <= this.toDate);
         });
     }

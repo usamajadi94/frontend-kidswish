@@ -41,6 +41,7 @@ export class CashInHandListComponent extends BaseRoutedComponent {
     isLoading = false;
     dateRange: Date[] = [];
     selectedCategories: string[] = [];
+    selectedSubCategories: string[] = [];
 
     private _colorMap = new Map<string, (typeof CATEGORY_COLORS)[0]>();
     private _colorIndex = 0;
@@ -58,9 +59,17 @@ export class CashInHandListComponent extends BaseRoutedComponent {
         return [...new Set(this.ledger.map(r => r.Category).filter(Boolean))];
     }
 
+    get uniqueSubCategories(): string[] {
+        return [...new Set(this.ledger.map(r => r.SubCategory).filter(Boolean))];
+    }
+
     get filteredLedger(): any[] {
-        if (!this.selectedCategories?.length) return this.ledger;
-        return this.ledger.filter(r => this.selectedCategories.includes(r.Category));
+        let rows = this.ledger;
+        if (this.selectedCategories?.length)
+            rows = rows.filter(r => this.selectedCategories.includes(r.Category));
+        if (this.selectedSubCategories?.length)
+            rows = rows.filter(r => this.selectedSubCategories.includes(r.SubCategory));
+        return rows;
     }
 
     get totalCashIn(): number  { return this.filteredLedger.reduce((s, r) => s + (+r.CashIn  || 0), 0); }
@@ -130,6 +139,14 @@ export class CashInHandListComponent extends BaseRoutedComponent {
             this.selectedCategories = this.selectedCategories.filter(c => c !== cat);
         } else {
             this.selectedCategories = [...this.selectedCategories, cat];
+        }
+    }
+
+    toggleSubCategory(sub: string) {
+        if (this.selectedSubCategories.includes(sub)) {
+            this.selectedSubCategories = this.selectedSubCategories.filter(s => s !== sub);
+        } else {
+            this.selectedSubCategories = [...this.selectedSubCategories, sub];
         }
     }
 

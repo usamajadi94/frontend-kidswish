@@ -22,7 +22,7 @@ export class DispatchListComponent implements OnInit {
     groups: any[] = [];
     isLoading = false;
     isConfirmingAll = false;
-    selectedDate: string = new Date().toISOString().split('T')[0];
+    selectedDate: string = DispatchListComponent._today();
     busyId: number | null = null;
     busyInvoiceId: number | null = null;
     errorMsg = '';
@@ -332,5 +332,10 @@ export class DispatchListComponent implements OnInit {
     get totalPlanned(): number { return this.groups.flatMap(g => g.items).filter(i => i.Status === 'Planned').length; }
     get totalConfirmed(): number { return this.groups.flatMap(g => g.items).filter(i => i.Status === 'Confirmed').length; }
 
-    today() { this.selectedDate = new Date().toISOString().split('T')[0]; this.load(); }
+    today() { this.selectedDate = DispatchListComponent._today(); this.load(); }
+
+    private static _today(): string {
+        const d = new Date();
+        return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
+    }
 }

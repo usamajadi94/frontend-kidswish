@@ -87,7 +87,7 @@ export class CustomerLedgerComponent implements OnInit {
             CustomerID: this.selectedCustomer?.CustomerID,
             Amount: null,
             PaymentType: 'Cash',
-            Date: new Date().toISOString().split('T')[0],
+            Date: CustomerLedgerComponent._today(),
             Notes: '',
         };
         this.errorMsg = '';
@@ -115,4 +115,9 @@ export class CustomerLedgerComponent implements OnInit {
     }
 
     back() { this.selectedCustomer = null; this.ledger = []; this.filterOrder = ''; this.showPaymentForm = false; }
+
+    private static _today(): string {
+        const d = new Date();
+        return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
+    }
 }

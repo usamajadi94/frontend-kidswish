@@ -42,24 +42,48 @@
 
     <!-- Ledger Header + Filters -->
     <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-3">
-            <h2 class="text-lg font-semibold text-gray-800">Transaction Ledger</h2>
-            <!-- Category filter chips -->
-            @if (uniqueCategories.length > 0) {
-                <div class="flex flex-wrap gap-1.5">
-                    @for (cat of uniqueCategories; track cat) {
+        <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-3">
+                <h2 class="text-lg font-semibold text-gray-800">Transaction Ledger</h2>
+                <!-- Category filter chips -->
+                @if (uniqueCategories.length > 0) {
+                    <div class="flex flex-wrap gap-1.5">
+                        @for (cat of uniqueCategories; track cat) {
+                            <button
+                                class="rounded-full px-3 py-0.5 text-xs font-medium border transition-all"
+                                [ngClass]="selectedCategories.includes(cat)
+                                    ? [getCategoryColor(cat).bg, getCategoryColor(cat).text, 'border-transparent', 'ring-2', 'ring-offset-1']
+                                    : ['bg-white', 'text-gray-500', 'border-gray-300', 'hover:border-gray-400']"
+                                (click)="toggleCategory(cat)">
+                                {{ cat }}
+                            </button>
+                        }
+                        @if (selectedCategories.length > 0) {
+                            <button class="rounded-full px-3 py-0.5 text-xs font-medium text-gray-400 hover:text-gray-600 border border-dashed border-gray-300"
+                                    (click)="selectedCategories = []">
+                                Clear
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+            <!-- Sub-category filter chips -->
+            @if (uniqueSubCategories.length > 0) {
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-xs text-gray-400 whitespace-nowrap">Sub:</span>
+                    @for (sub of uniqueSubCategories; track sub) {
                         <button
-                            class="rounded-full px-3 py-0.5 text-xs font-medium border transition-all"
-                            [ngClass]="selectedCategories.includes(cat)
-                                ? [getCategoryColor(cat).bg, getCategoryColor(cat).text, 'border-transparent', 'ring-2', 'ring-offset-1']
+                            class="rounded-full px-2.5 py-0.5 text-xs font-medium border transition-all"
+                            [ngClass]="selectedSubCategories.includes(sub)
+                                ? ['bg-indigo-100', 'text-indigo-700', 'border-transparent', 'ring-2', 'ring-offset-1', 'ring-indigo-300']
                                 : ['bg-white', 'text-gray-500', 'border-gray-300', 'hover:border-gray-400']"
-                            (click)="toggleCategory(cat)">
-                            {{ cat }}
+                            (click)="toggleSubCategory(sub)">
+                            {{ sub }}
                         </button>
                     }
-                    @if (selectedCategories.length > 0) {
-                        <button class="rounded-full px-3 py-0.5 text-xs font-medium text-gray-400 hover:text-gray-600 border border-dashed border-gray-300"
-                                (click)="selectedCategories = []">
+                    @if (selectedSubCategories.length > 0) {
+                        <button class="rounded-full px-2.5 py-0.5 text-xs font-medium text-gray-400 hover:text-gray-600 border border-dashed border-gray-300"
+                                (click)="selectedSubCategories = []">
                             Clear
                         </button>
                     }
@@ -79,6 +103,7 @@
                     <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Date</th>
                     <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Party</th>
                     <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Category</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Sub Category</th>
                     <th class="px-3 py-2 text-left font-semibold text-gray-600 text-xs">Notes</th>
                     <th class="px-3 py-2 text-right font-semibold text-green-700 text-xs">Cash In (+)</th>
                     <th class="px-3 py-2 text-right font-semibold text-red-700 text-xs">Cash Out (−)</th>
@@ -88,11 +113,11 @@
             <tbody class="divide-y divide-gray-100">
                 @if (isLoading) {
                     <tr>
-                        <td colspan="7" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
+                        <td colspan="8" class="px-3 py-10 text-center text-gray-400 text-sm">Loading...</td>
                     </tr>
                 } @else if (filteredLedger.length === 0) {
                     <tr>
-                        <td colspan="7" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found for selected period</td>
+                        <td colspan="8" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found for selected period</td>
                     </tr>
                 } @else {
                     @for (row of filteredLedger; track row.ID) {
@@ -127,6 +152,9 @@
                                     </span>
                                 } @else { — }
                             </td>
+                            <td class="px-3 py-1.5 text-xs text-gray-500">
+                                {{ row.SubCategory || '—' }}
+                            </td>
                             <td class="px-3 py-1.5 text-xs text-gray-500">{{ row.Notes || '—' }}</td>
                             <td class="px-3 py-1.5 text-right font-semibold text-green-700 text-xs">
                                 @if (row.CashIn > 0) { {{ row.CashIn | currency:'PKR ':'symbol':'1.0-0' }} }
@@ -146,7 +174,7 @@
             @if (filteredLedger.length > 0) {
                 <tfoot class="border-t-2 border-gray-300 bg-gray-50">
                     <tr class="font-semibold text-gray-800">
-                        <td colspan="4" class="px-3 py-2 text-right text-xs">Total</td>
+                        <td colspan="5" class="px-3 py-2 text-right text-xs">Total</td>
                         <td class="px-3 py-2 text-right text-green-700 text-xs">
                             {{ totalCashIn | currency:'PKR ':'symbol':'1.0-0' }}
                         </td>

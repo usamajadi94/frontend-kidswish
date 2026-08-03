@@ -68,7 +68,9 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
     }
 
     private emptyLine(): BulkCashLine {
-        return { Date: new Date().toISOString().split('T')[0], Type: 'out', PaymentCategoryID: null, ExpenseCategoryID: null, Amount: null, ToPartyID: null, Notes: '' };
+        const d = new Date();
+        const today = `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
+        return { Date: today, Type: 'out', PaymentCategoryID: null, ExpenseCategoryID: null, Amount: null, ToPartyID: null, Notes: '' };
     }
     addLine() { this.bulkLines.push(this.emptyLine()); }
     removeLine(i: number) { this.bulkLines.splice(i, 1); }

@@ -55,8 +55,8 @@ export class PettyCashDetailComponent implements OnInit {
     }
 
     loadExpenses() {
-        const from = this.dateRange?.[0] ? this.dateRange[0].toISOString().split('T')[0] : '';
-        const to   = this.dateRange?.[1] ? this.dateRange[1].toISOString().split('T')[0] : '';
+        const from = this.dateRange?.[0] ? this.dateRange[0].toISOString() : '';
+        const to   = this.dateRange?.[1] ? this.dateRange[1].toISOString() : '';
         this._listService.getPettyCashExpenses(this.pettyCashId, from, to).subscribe({
             next: (res: any[]) => { this.expenses = res || []; },
         });
