@@ -399,7 +399,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         this.editItems = [];
         this.isLoadingEdit = true;
         this._http.get<any[]>(
-            `${apiUrls.server}${apiUrls.customerLedgerController}/invoice/${row.ID}/items`,
+            `${apiUrls.server}${apiUrls.customerLedgerController}/invoice/${row.ID}/items?base=true`,
             { headers: this.headers }
         ).subscribe({
             next: (res) => { this.editItems = res || []; this.isLoadingEdit = false; },
@@ -412,7 +412,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     saveEdit() {
         this.isSavingEdit = true;
         this._http.patch(
-            `${apiUrls.server}${apiUrls.customerLedgerController}/invoice/${this.editingPtId}/items`,
+            `${apiUrls.server}${apiUrls.customerLedgerController}/invoice/${this.editingPtId}/items?base=true`,
             { Items: this.editItems },
             { headers: this.headers }
         ).subscribe({
