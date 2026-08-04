@@ -112,10 +112,11 @@ export class CashInHandListComponent extends BaseRoutedComponent {
                 ID: row.ID - 3000000000,
             }).afterClose.subscribe((res: boolean) => { if (res) this.loadAll(); });
         } else if (row.Source === 'transfer') {
+            const transferId = row.ID >= 5000000000 ? row.ID - 5000000000 : row.ID - 4000000000;
             this._modalService.openModal({
                 component: AccountTransferFormComponent,
                 title: 'Account Transfer',
-                ID: row.ID - 4000000000,
+                ID: transferId,
             }).afterClose.subscribe((res: boolean) => { if (res) this.loadAll(); });
         } else {
             this._modalService.openModal({
