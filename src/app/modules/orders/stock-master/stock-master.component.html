@@ -231,7 +231,7 @@
                             <th class="text-right px-4 py-2 font-medium text-gray-600">Total</th>
                             <th class="text-right px-4 py-2 font-medium text-gray-600">Available</th>
                             <th class="text-right px-4 py-2 font-medium text-gray-600">Threshold</th>
-                            <th class="text-right px-4 py-2 font-medium text-gray-600">Updated</th>
+                            <th class="text-right px-4 py-2 font-medium text-gray-600">Last Added</th>
                             <th class="px-4 py-2"></th>
                         </tr>
                     </thead>
@@ -256,7 +256,7 @@
                                 {{ row.AvailableStock | number:'1.0-0' }}
                             </td>
                             <td class="px-4 py-2 text-right text-gray-400 font-mono">{{ row.LowStockThreshold | number:'1.0-0' }}</td>
-                            <td class="px-4 py-2 text-right text-gray-400 text-xs">{{ row.ModifiedDate | date:'dd MMM yy' }}</td>
+                            <td class="px-4 py-2 text-right text-gray-400 text-xs">{{ row.LastAddedDate | date:'dd MMM yy' }}</td>
                             <td class="px-4 py-2"></td>
                         </tr>
                         <!-- Expanded History Row -->
