@@ -96,7 +96,8 @@ export class CashInHandListComponent extends BaseRoutedComponent {
         const today = new Date();
         this._listService.getSystemConfig().subscribe({
             next: (cfg) => {
-                const raw = cfg[`cih_start_date_${cid}`];
+                const raw = cfg[`cih_start_date_${cid}`]
+                    || (String(cid) === '24' ? '2026-08-01' : null);
                 if (raw) {
                     this.minDate = new Date(raw);
                     this.dateRange = [this.minDate, today];
@@ -106,7 +107,12 @@ export class CashInHandListComponent extends BaseRoutedComponent {
                 this.loadAll();
             },
             error: () => {
-                this.dateRange = [new Date(today.getFullYear(), today.getMonth(), 1), today];
+                if (String(cid) === '24') {
+                    this.minDate = new Date('2026-08-01');
+                    this.dateRange = [this.minDate, today];
+                } else {
+                    this.dateRange = [new Date(today.getFullYear(), today.getMonth(), 1), today];
+                }
                 this.loadAll();
             },
         });
