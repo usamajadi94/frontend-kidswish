@@ -29,6 +29,10 @@ export class StockMasterComponent implements OnInit, OnDestroy {
     isSaving = false;
     showAddForm = false;
     showTxn = false;
+    showMonthly = false;
+    monthlyRaw: any[] = [];
+    monthlyProducts: string[] = [];
+    monthlyRows: { month: string; label: string; data: Record<string, { in: number; out: number }> }[] = [];
     showEditForm = false;
     editingId: number | null = null;
     errorMsg = '';
@@ -158,6 +162,29 @@ export class StockMasterComponent implements OnInit, OnDestroy {
             next: () => { this.isSaving = false; this.showEditForm = false; this.loadAll(); },
             error: (e) => { this.isSaving = false; this.errorMsg = e?.error?.message || 'Failed'; },
         });
+    }
+
+    openMonthly() {
+        this.showMonthly = true;
+        this.showTxn = false;
+        if (this.monthlyRaw.length) return;
+        this._http.get<any[]>(
+            `${apiUrls.server}${apiUrls.stockMasterController}/monthly-summary`,
+            { headers: this.authHeaders }
+        ).subscribe({ next: (res) => {
+            this.monthlyRaw = res || [];
+            const productSet = new Set<string>();
+            const monthMap = new Map<string, { label: string; data: Record<string, { in: number; out: number }> }>();
+            for (const r of this.monthlyRaw) {
+                productSet.add(r.ProductName);
+                if (!monthMap.has(r.Month)) monthMap.set(r.Month, { label: r.MonthLabel, data: {} });
+                monthMap.get(r.Month)!.data[r.ProductName] = { in: +r.In, out: +r.Out };
+            }
+            this.monthlyProducts = [...productSet].sort();
+            this.monthlyRows = [...monthMap.entries()]
+                .sort((a, b) => b[0].localeCompare(a[0]))
+                .map(([month, v]) => ({ month, label: v.label, data: v.data }));
+        }});
     }
 
     openTxn(row?: any) {

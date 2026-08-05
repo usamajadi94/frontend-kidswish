@@ -3,6 +3,9 @@
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-semibold">Stock Master</h2>
             <div class="flex gap-2">
+                <button mat-stroked-button (click)="openMonthly()">
+                    <mat-icon class="mr-1 text-base">calendar_month</mat-icon> Monthly View
+                </button>
                 <button mat-stroked-button (click)="openTxn()">
                     <mat-icon class="mr-1 text-base">history</mat-icon> Transactions
                 </button>
@@ -129,6 +132,60 @@
                 <button mat-flat-button color="primary" (click)="save()" [disabled]="isSaving">{{ isSaving ? 'Saving...' : 'Save' }}</button>
                 <button mat-stroked-button (click)="showEditForm = false">Cancel</button>
             </div>
+        </div>
+        }
+
+        <!-- Monthly Summary Panel -->
+        @if (showMonthly) {
+        <div class="bg-white border rounded-lg p-4 mb-4 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-semibold text-gray-800">Monthly Stock Summary — Product Wise</h3>
+                <button mat-icon-button (click)="showMonthly = false"><mat-icon>close</mat-icon></button>
+            </div>
+            @if (!monthlyRows.length) {
+                <div class="text-center text-gray-400 py-8 text-sm">Loading...</div>
+            } @else {
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="border border-gray-200 px-3 py-2 text-left font-semibold text-gray-600 sticky left-0 bg-gray-50 z-10">Month</th>
+                            @for (p of monthlyProducts; track p) {
+                            <th class="border border-gray-200 px-2 py-2 text-center font-semibold text-gray-700" colspan="3">{{ p }}</th>
+                            }
+                        </tr>
+                        <tr class="bg-gray-50 text-[10px]">
+                            <th class="border border-gray-200 px-3 py-1 sticky left-0 bg-gray-50 z-10"></th>
+                            @for (p of monthlyProducts; track p) {
+                            <th class="border border-gray-200 px-2 py-1 text-center text-green-700 font-medium">In</th>
+                            <th class="border border-gray-200 px-2 py-1 text-center text-red-600 font-medium">Out</th>
+                            <th class="border border-gray-200 px-2 py-1 text-center text-blue-600 font-medium">Net</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (row of monthlyRows; track row.month) {
+                        <tr class="hover:bg-gray-50">
+                            <td class="border border-gray-200 px-3 py-2 font-semibold text-gray-700 sticky left-0 bg-white z-10 whitespace-nowrap">{{ row.label }}</td>
+                            @for (p of monthlyProducts; track p) {
+                            <td class="border border-gray-200 px-2 py-2 text-center text-green-700 font-medium">
+                                {{ (row.data[p]?.in || 0) | number }}
+                            </td>
+                            <td class="border border-gray-200 px-2 py-2 text-center text-red-600 font-medium">
+                                {{ (row.data[p]?.out || 0) | number }}
+                            </td>
+                            <td class="border border-gray-200 px-2 py-2 text-center font-semibold"
+                                [class.text-blue-700]="(row.data[p]?.in || 0) - (row.data[p]?.out || 0) >= 0"
+                                [class.text-red-700]="(row.data[p]?.in || 0) - (row.data[p]?.out || 0) < 0">
+                                {{ (row.data[p]?.in || 0) - (row.data[p]?.out || 0) | number }}
+                            </td>
+                            }
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            }
         </div>
         }
 
