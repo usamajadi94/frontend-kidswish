@@ -5,6 +5,7 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { ListService } from 'app/modules/shared/services/list.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
+import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-button/bft-button.component';
 import { WrapperAddComponent } from 'app/modules/shared/permission-wrapper/wrapper-add/wrapper-add.component';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
@@ -35,6 +36,7 @@ const CATEGORY_COLORS = [
 export class CashInHandListComponent extends BaseRoutedComponent {
     private _listService = inject(ListService);
     private _modalService = inject(ModalService);
+    private _localStorage = inject(LocalStorageService);
     title = componentRegister.cashInHand.Title;
     summary: any = null;
     ledger: any[] = [];
@@ -42,6 +44,9 @@ export class CashInHandListComponent extends BaseRoutedComponent {
     dateRange: Date[] = [];
     selectedCategories: string[] = [];
     selectedSubCategories: string[] = [];
+    minDate: Date | null = null;
+
+    disabledDate = (d: Date): boolean => !!this.minDate && d < this.minDate;
 
     private _colorMap = new Map<string, (typeof CATEGORY_COLORS)[0]>();
     private _colorIndex = 0;
@@ -87,6 +92,14 @@ export class CashInHandListComponent extends BaseRoutedComponent {
     }
 
     ngOnInit() {
+        const cid = this._localStorage.cid;
+        this._listService.getSystemConfig().subscribe({
+            next: (cfg) => {
+                const raw = cfg[`cih_start_date_${cid}`];
+                if (raw) this.minDate = new Date(raw);
+            },
+        });
+
         const today = new Date();
         const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
         this.dateRange = [firstDay, today];

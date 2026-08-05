@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { QueryService } from 'app/core/Base/services/query.service';
 
 @Injectable({
@@ -6,6 +7,11 @@ import { QueryService } from 'app/core/Base/services/query.service';
 })
 export class ListService {
     private _QueryService = inject(QueryService);
+    private _http = inject(HttpClient);
+
+    getSystemConfig() {
+        return this._http.get<Record<string, string>>('api/system-config');
+    }
 
     getDepartment() {
         return this._QueryService.getQuery('getDepartment');
