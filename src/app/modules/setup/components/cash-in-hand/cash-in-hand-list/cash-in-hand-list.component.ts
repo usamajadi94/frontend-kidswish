@@ -72,6 +72,14 @@ export class CashInHandListComponent extends BaseRoutedComponent {
         return rows;
     }
 
+    get openingAsOf(): string {
+        const d = this.dateRange?.[0];
+        if (!d) return '';
+        const prev = new Date(d);
+        prev.setDate(prev.getDate() - 1);
+        return `${('0'+prev.getDate()).slice(-2)}/${('0'+(prev.getMonth()+1)).slice(-2)}/${prev.getFullYear()}`;
+    }
+
     get totalCashIn(): number  { return this.filteredLedger.reduce((s, r) => s + (+r.CashIn  || 0), 0); }
     get totalCashOut(): number { return this.filteredLedger.reduce((s, r) => s + (+r.CashOut || 0), 0); }
     get currentBalance(): number {
