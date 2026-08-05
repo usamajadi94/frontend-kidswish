@@ -93,17 +93,25 @@ export class CashInHandListComponent extends BaseRoutedComponent {
 
     ngOnInit() {
         const cid = this._localStorage.cid;
+        const today = new Date();
         this._listService.getSystemConfig().subscribe({
             next: (cfg) => {
                 const raw = cfg[`cih_start_date_${cid}`];
-                if (raw) this.minDate = new Date(raw);
+                if (raw) {
+                    this.minDate = new Date(raw);
+                    const from = new Date(this.minDate);
+                    from.setMonth(from.getMonth() - 1);
+                    this.dateRange = [from, today];
+                } else {
+                    this.dateRange = [new Date(today.getFullYear(), today.getMonth(), 1), today];
+                }
+                this.loadAll();
+            },
+            error: () => {
+                this.dateRange = [new Date(today.getFullYear(), today.getMonth(), 1), today];
+                this.loadAll();
             },
         });
-
-        const today = new Date();
-        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-        this.dateRange = [firstDay, today];
-        this.loadAll();
     }
 
     loadAll() {
