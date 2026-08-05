@@ -99,9 +99,7 @@ export class CashInHandListComponent extends BaseRoutedComponent {
                 const raw = cfg[`cih_start_date_${cid}`];
                 if (raw) {
                     this.minDate = new Date(raw);
-                    const from = new Date(this.minDate);
-                    from.setMonth(from.getMonth() - 1);
-                    this.dateRange = [from, today];
+                    this.dateRange = [this.minDate, today];
                 } else {
                     this.dateRange = [new Date(today.getFullYear(), today.getMonth(), 1), today];
                 }

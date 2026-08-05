@@ -98,7 +98,8 @@
             }
         </div>
         <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onDateChange($event)"
-            nzFormat="dd/MM/yyyy" [nzPlaceHolder]="['From Date', 'To Date']">
+            nzFormat="dd/MM/yyyy" [nzPlaceHolder]="['From Date', 'To Date']"
+            [nzDisabledDate]="disabledDate">
         </nz-range-picker>
     </div>
 
