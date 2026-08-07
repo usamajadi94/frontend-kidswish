@@ -96,6 +96,12 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             ? this.selectedTypes.filter(x => x !== t)
             : [...this.selectedTypes, t];
     }
+
+    toggleProduct(id: number) {
+        this.selectedProducts = this.selectedProducts.includes(id)
+            ? this.selectedProducts.filter(x => x !== id)
+            : [...this.selectedProducts, id];
+    }
     selectedOrderID: number | null = null;
 
     // Invoice edit modal
