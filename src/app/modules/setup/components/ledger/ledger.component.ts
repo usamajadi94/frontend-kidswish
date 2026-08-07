@@ -138,12 +138,15 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         }
 
         if (this.selectedProducts.length) {
-            const matchingOrderIds = new Set(
+            const selectedNames = new Set<string>(
                 this.orderItems
                     .filter(i => this.selectedProducts.includes(i.ProductID))
-                    .map(i => i.OrderID)
+                    .map(i => i.ProductName as string)
             );
-            rows = rows.filter(r => r.Type !== 'Invoice' || matchingOrderIds.has(r.OrderID));
+            rows = rows.filter(r => {
+                if (r.Type !== 'Invoice') return true;
+                return [...selectedNames].some(name => (r.Notes || '').includes(name));
+            });
         }
 
         let balance = 0;
