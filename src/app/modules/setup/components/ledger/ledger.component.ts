@@ -85,6 +85,17 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     orderItems:    any[] = [];
     selectedProducts: number[] = [];
     selectedStatuses: string[] = [];
+    selectedTypes: string[] = [];
+
+    get uniqueTypes(): string[] {
+        return [...new Set(this.financialRows.map(r => r.Type).filter(Boolean))];
+    }
+
+    toggleType(t: string) {
+        this.selectedTypes = this.selectedTypes.includes(t)
+            ? this.selectedTypes.filter(x => x !== t)
+            : [...this.selectedTypes, t];
+    }
     selectedOrderID: number | null = null;
 
     // Invoice edit modal
@@ -110,15 +121,23 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     }
 
     get filteredFinancialRows(): any[] {
-        if (!this.selectedStatuses.length) return this.financialRows;
-        const matchingIds = new Set(
-            this.orderItems.filter(i => this.selectedStatuses.includes(i.Status)).map(i => i.OrderID)
-        );
-        const filtered = this.financialRows.filter(r =>
-            r.Type === 'Payment' || r.Type === 'Opening Balance' || matchingIds.has(r.OrderID)
-        );
+        let rows = this.financialRows;
+
+        if (this.selectedStatuses.length) {
+            const matchingIds = new Set(
+                this.orderItems.filter(i => this.selectedStatuses.includes(i.Status)).map(i => i.OrderID)
+            );
+            rows = rows.filter(r =>
+                r.Type === 'Payment' || r.Type === 'Opening Balance' || matchingIds.has(r.OrderID)
+            );
+        }
+
+        if (this.selectedTypes.length) {
+            rows = rows.filter(r => this.selectedTypes.includes(r.Type));
+        }
+
         let balance = 0;
-        return filtered.map(r => {
+        return rows.map(r => {
             balance += (+r.Debit || 0) - (+r.Credit || 0);
             return { ...r, Balance: balance };
         });

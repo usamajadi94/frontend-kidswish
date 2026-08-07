@@ -72,9 +72,29 @@
                 </div>
             </div>
 
-            <!-- Date Filter Bar -->
-            <div class="mb-3 flex items-center justify-between shrink-0">
-                <h2 class="text-sm font-semibold text-gray-700">Financial Ledger</h2>
+            <!-- Date Filter Bar + Type Chips -->
+            <div class="mb-3 flex flex-wrap items-center justify-between gap-2 shrink-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h2 class="text-sm font-semibold text-gray-700 mr-1">Financial Ledger</h2>
+                    @for (t of uniqueTypes; track t) {
+                        <button
+                            class="rounded-full px-3 py-0.5 text-xs font-medium border transition-all"
+                            [ngClass]="selectedTypes.includes(t)
+                                ? (t === 'Invoice'
+                                    ? 'bg-red-100 text-red-700 border-red-300'
+                                    : t === 'Payment'
+                                    ? 'bg-green-100 text-green-700 border-green-300'
+                                    : 'bg-blue-100 text-blue-700 border-blue-300')
+                                : 'bg-white text-gray-500 border-gray-300 hover:border-gray-400'"
+                            (click)="toggleType(t)">
+                            {{ t }}
+                        </button>
+                    }
+                    @if (selectedTypes.length > 0) {
+                        <button class="rounded-full px-3 py-0.5 text-xs font-medium text-gray-400 hover:text-gray-600 border border-dashed border-gray-300"
+                                (click)="selectedTypes = []">Clear</button>
+                    }
+                </div>
                 <nz-range-picker
                     [(ngModel)]="dateRange"
                     (ngModelChange)="onDateChange($event)"
