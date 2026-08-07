@@ -136,6 +136,15 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             rows = rows.filter(r => this.selectedTypes.includes(r.Type));
         }
 
+        if (this.selectedProducts.length) {
+            const matchingOrderIds = new Set(
+                this.orderItems
+                    .filter(i => this.selectedProducts.includes(i.ProductID))
+                    .map(i => i.OrderID)
+            );
+            rows = rows.filter(r => r.Type !== 'Invoice' || matchingOrderIds.has(r.OrderID));
+        }
+
         let balance = 0;
         return rows.map(r => {
             balance += (+r.Debit || 0) - (+r.Credit || 0);
