@@ -310,6 +310,13 @@ export class StockMasterComponent implements OnInit, OnDestroy {
         ]).then(([list, cards]) => { this.stockList = list; this.productCards = cards; });
     }
 
+    getMonthDays(month: string): number {
+        const [y, m] = month.split('-').map(Number);
+        const now = new Date();
+        if (y === now.getFullYear() && m === now.getMonth() + 1) return now.getDate();
+        return new Date(y, m, 0).getDate();
+    }
+
     stockColor(status: string) { return status === 'low' ? 'text-orange-500' : 'text-green-500'; }
     stockLabel(status: string) { return status === 'low' ? 'Low Stock' : 'In Stock'; }
 

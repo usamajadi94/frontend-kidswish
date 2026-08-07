@@ -157,9 +157,9 @@
                         <tr class="bg-gray-50 text-[10px]">
                             <th class="border border-gray-200 px-3 py-1 sticky left-0 bg-gray-50 z-10"></th>
                             @for (p of monthlyProducts; track p) {
-                            <th class="border border-gray-200 px-2 py-1 text-center text-green-700 font-medium">In</th>
-                            <th class="border border-gray-200 px-2 py-1 text-center text-red-600 font-medium">Out</th>
+                            <th class="border border-gray-200 px-2 py-1 text-center text-gray-600 font-medium">In / Out</th>
                             <th class="border border-gray-200 px-2 py-1 text-center text-blue-600 font-medium">Net</th>
+                            <th class="border border-gray-200 px-2 py-1 text-center text-purple-600 font-medium">Avg/day</th>
                             }
                         </tr>
                     </thead>
@@ -168,16 +168,18 @@
                         <tr class="hover:bg-gray-50">
                             <td class="border border-gray-200 px-3 py-2 font-semibold text-gray-700 sticky left-0 bg-white z-10 whitespace-nowrap">{{ row.label }}</td>
                             @for (p of monthlyProducts; track p) {
-                            <td class="border border-gray-200 px-2 py-2 text-center text-green-700 font-medium">
-                                {{ (row.data[p]?.in || 0) | number }}
+                            <td class="border border-gray-200 px-2 py-2 text-center text-xs whitespace-nowrap">
+                                <span class="text-green-700 font-medium">{{ (row.data[p]?.in || 0) | number }}</span>
+                                <span class="text-gray-400 mx-0.5">/</span>
+                                <span class="text-red-600 font-medium">{{ (row.data[p]?.out || 0) | number }}</span>
                             </td>
-                            <td class="border border-gray-200 px-2 py-2 text-center text-red-600 font-medium">
-                                {{ (row.data[p]?.out || 0) | number }}
-                            </td>
-                            <td class="border border-gray-200 px-2 py-2 text-center font-semibold"
+                            <td class="border border-gray-200 px-2 py-2 text-center font-semibold text-xs"
                                 [class.text-blue-700]="(row.data[p]?.in || 0) - (row.data[p]?.out || 0) >= 0"
                                 [class.text-red-700]="(row.data[p]?.in || 0) - (row.data[p]?.out || 0) < 0">
                                 {{ (row.data[p]?.in || 0) - (row.data[p]?.out || 0) | number }}
+                            </td>
+                            <td class="border border-gray-200 px-2 py-2 text-center text-purple-700 font-medium text-xs">
+                                {{ ((row.data[p]?.out || 0) / getMonthDays(row.month)) | number:'1.0-0' }}
                             </td>
                             }
                         </tr>
