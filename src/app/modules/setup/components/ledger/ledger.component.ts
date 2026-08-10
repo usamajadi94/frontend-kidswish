@@ -93,7 +93,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     }
 
     get uniqueFinancialCustomers(): string[] {
-        return [...new Set(this.financialRows.map(r => r.Customer).filter(Boolean))].sort();
+        return [...new Set(this.financialRows.map(r => r.CustomerName).filter(Boolean))].sort();
     }
 
     toggleType(t: string) {
@@ -143,7 +143,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         }
 
         if (this.selectedCustomerName) {
-            rows = rows.filter(r => r.Customer === this.selectedCustomerName);
+            rows = rows.filter(r => r.CustomerName === this.selectedCustomerName);
         }
 
         if (this.selectedProducts.length) {
