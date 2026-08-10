@@ -17,6 +17,18 @@
                         <nz-option [nzValue]="d.ID" [nzLabel]="d.Name"></nz-option>
                     }
                 </nz-select>
+                @if (uniqueFinancialCustomers.length > 0) {
+                    <nz-select
+                        [(ngModel)]="selectedCustomerName"
+                        nzShowSearch
+                        nzAllowClear
+                        nzPlaceHolder="All Customers"
+                        style="min-width: 200px;">
+                        @for (c of uniqueFinancialCustomers; track c) {
+                            <nz-option [nzValue]="c" [nzLabel]="c"></nz-option>
+                        }
+                    </nz-select>
+                }
             </div>
         }
 
@@ -113,22 +125,6 @@
                             <button class="rounded-full px-2.5 py-0.5 text-[11px] font-medium text-gray-400 hover:text-gray-600 border border-dashed border-gray-300"
                                     (click)="selectedProducts = []">Clear</button>
                         }
-                    </div>
-                    }
-                    @if (uniqueFinancialCustomers.length > 0) {
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-[10px] text-gray-400 font-medium shrink-0">Customer:</span>
-                        <nz-select
-                            [(ngModel)]="selectedCustomerName"
-                            nzShowSearch
-                            nzAllowClear
-                            nzPlaceHolder="All Customers"
-                            nzSize="small"
-                            style="min-width:200px;">
-                            @for (c of uniqueFinancialCustomers; track c) {
-                                <nz-option [nzValue]="c" [nzLabel]="c"></nz-option>
-                            }
-                        </nz-select>
                     </div>
                     }
                 </div>
