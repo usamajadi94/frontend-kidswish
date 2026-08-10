@@ -86,9 +86,14 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     selectedProducts: number[] = [];
     selectedStatuses: string[] = [];
     selectedTypes: string[] = [];
+    selectedCustomerName: string = '';
 
     get uniqueTypes(): string[] {
         return [...new Set(this.financialRows.map(r => r.Type).filter(Boolean))];
+    }
+
+    get uniqueFinancialCustomers(): string[] {
+        return [...new Set(this.financialRows.map(r => r.Customer).filter(Boolean))].sort();
     }
 
     toggleType(t: string) {
@@ -135,6 +140,10 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
 
         if (this.selectedTypes.length) {
             rows = rows.filter(r => this.selectedTypes.includes(r.Type));
+        }
+
+        if (this.selectedCustomerName) {
+            rows = rows.filter(r => r.Customer === this.selectedCustomerName);
         }
 
         if (this.selectedProducts.length) {
@@ -364,6 +373,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         this.orderItems = [];
         this.selectedProducts = [];
         this.selectedStatuses = [];
+        this.selectedCustomerName = '';
         this.loadAll();
     }
 
