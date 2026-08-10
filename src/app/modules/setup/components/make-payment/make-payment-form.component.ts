@@ -21,6 +21,7 @@ import { DecimalPipe } from '@angular/common';
 import { VendorFormComponent } from '../vendor/vendor-form.component';
 
 interface BulkLine {
+    Date: string;
     PaymentType: string | null;
     FromPartyID: number | null;
     Amount: number | null;
@@ -91,8 +92,9 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         this.formData.FromPartyType = 'bank_account';
         this.formData.ToPartyType = 'vendor';
         this.formData.SCode = 'pay_02';
+        const today = new Date().toISOString().substring(0, 10);
         this.bulkLines = [
-            { PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' },
+            { Date: today, PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' },
         ];
     }
 
@@ -105,7 +107,8 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
     }
 
     addLine() {
-        this.bulkLines.push({ PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' });
+        const lastDate = this.bulkLines.length ? this.bulkLines[this.bulkLines.length - 1].Date : new Date().toISOString().substring(0, 10);
+        this.bulkLines.push({ Date: lastDate, PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' });
     }
 
     removeLine(i: number) {
@@ -120,9 +123,9 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         // Bulk add path
         const validLines = this.bulkLines.filter(l => (parseFloat(l.Amount as any) || 0) > 0);
         this.validation = [];
-        if (!this.formData.Date) this.validation.push('Date is required.');
         if (validLines.length === 0) this.validation.push('At least one line with an amount is required.');
         validLines.forEach((l, i) => {
+            if (!l.Date) this.validation.push(`Row ${i + 1}: Date is required.`);
             if (!l.PaymentType) this.validation.push(`Row ${i + 1}: Payment Type is required.`);
             if (!l.FromPartyID) this.validation.push(`Row ${i + 1}: Bank Account is required.`);
         });
@@ -142,7 +145,7 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
             for (const line of validLines) {
                 await firstValueFrom(
                     this._http.post(`${apiUrls.server}${apiUrls.paymentTransactionController}`, {
-                        Date: this.formData.Date,
+                        Date: line.Date,
                         Amount: parseFloat(line.Amount as any),
                         PaymentType: line.PaymentType,
                         FromPartyType: 'bank_account',
