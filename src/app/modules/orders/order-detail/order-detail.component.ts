@@ -93,20 +93,14 @@ export class OrderDetailComponent implements OnInit {
     }
 
     generateInvoice() {
-        if (!confirm('Generate invoice? This will create receivable entries per customer based on carton price.')) return;
         this.isGeneratingInvoice = true;
         this.invoiceMsg = '';
-        this._http.post<any>(
-            `${apiUrls.server}${apiUrls.distributorOrderController}/${this.order.ID}/invoice`,
-            {},
+        this._http.get<any>(
+            `${apiUrls.server}${apiUrls.dispatchController}/order-invoice/${this.order.ID}`,
             { headers: this.authHeaders }
         ).subscribe({
-            next: () => {
-                this.isGeneratingInvoice = false;
-                this.invoiceMsg = 'Invoice generated!';
-                this.loadOrder(this.order.ID);
-            },
-            error: (e) => { this.isGeneratingInvoice = false; this.invoiceMsg = e?.error?.message || 'Failed'; },
+            next: (d) => { this.isGeneratingInvoice = false; this.openInvoiceWindow(d); },
+            error: () => { this.isGeneratingInvoice = false; this.invoiceMsg = 'No invoice data available yet'; },
         });
     }
 
