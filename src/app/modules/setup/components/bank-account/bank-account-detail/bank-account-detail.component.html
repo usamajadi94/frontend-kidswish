@@ -77,9 +77,23 @@
     <!-- Ledger Table -->
     <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
         <h2 class="text-lg font-semibold text-gray-800">Transaction Ledger</h2>
-        <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onDateChange($event)"
-            nzFormat="dd/MM/yyyy" [nzPlaceHolder]="['From Date', 'To Date']">
-        </nz-range-picker>
+        <div class="flex items-center gap-2">
+            @if (uniqueCounterparties.length > 0) {
+                <nz-select
+                    [(ngModel)]="selectedCounterparty"
+                    nzShowSearch
+                    nzAllowClear
+                    nzPlaceHolder="All Counterparties"
+                    style="min-width: 200px">
+                    @for (c of uniqueCounterparties; track c) {
+                        <nz-option [nzValue]="c" [nzLabel]="c"></nz-option>
+                    }
+                </nz-select>
+            }
+            <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onDateChange($event)"
+                nzFormat="dd/MM/yyyy" [nzPlaceHolder]="['From Date', 'To Date']">
+            </nz-range-picker>
+        </div>
     </div>
 
     <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -97,12 +111,12 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                @if (ledger.length === 0) {
+                @if (filteredLedger.length === 0) {
                     <tr>
                         <td colspan="8" class="px-3 py-10 text-center text-gray-400 text-sm">No transactions found for selected period</td>
                     </tr>
                 } @else {
-                    @for (row of ledgerWithBalance; track row.ID) {
+                    @for (row of filteredLedger; track row.ID) {
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-3 py-1.5 whitespace-nowrap text-gray-700 text-xs">{{ row.Date | date:'dd/MM/yyyy' }}</td>
                             <td class="px-3 py-1.5 text-xs">
@@ -149,7 +163,7 @@
                     }
                 }
             </tbody>
-            @if (ledger.length > 0) {
+            @if (filteredLedger.length > 0) {
                 <tfoot class="border-t-2 border-gray-300 bg-gray-50">
                     <tr class="font-semibold text-gray-800">
                         <td colspan="5" class="px-3 py-2 text-right text-xs">Total</td>

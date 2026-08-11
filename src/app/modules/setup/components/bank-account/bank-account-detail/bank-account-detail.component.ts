@@ -4,6 +4,7 @@ import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { ListService } from 'app/modules/shared/services/list.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-button/bft-button.component';
@@ -13,7 +14,7 @@ import { AccountTransferFormComponent } from '../account-transfer-form.component
 @Component({
     selector: 'app-bank-account-detail',
     standalone: true,
-    imports: [CommonModule, FormsModule, NzDatePickerModule, NzTabsModule, CurrencyPipe, DatePipe, BftButtonComponent],
+    imports: [CommonModule, FormsModule, NzDatePickerModule, NzTabsModule, NzSelectModule, CurrencyPipe, DatePipe, BftButtonComponent],
     templateUrl: './bank-account-detail.component.html',
     styleUrl: './bank-account-detail.component.scss',
 })
@@ -28,13 +29,10 @@ export class BankAccountDetailComponent implements OnInit {
     ledger: any[] = [];
     isLoading = false;
     dateRange: Date[] = [];
+    selectedCounterparty: string | null = null;
 
-    get totalCredits(): number {
-        return this.ledger.reduce((s, r) => s + (+r.Credit || 0), 0);
-    }
-
-    get totalDebits(): number {
-        return this.ledger.reduce((s, r) => s + (+r.Debit || 0), 0);
+    get uniqueCounterparties(): string[] {
+        return [...new Set(this.ledger.map(r => r.Counterparty).filter(Boolean))].sort();
     }
 
     get ledgerWithBalance(): any[] {
@@ -43,6 +41,20 @@ export class BankAccountDetailComponent implements OnInit {
             balance += (+r.Credit || 0) - (+r.Debit || 0);
             return { ...r, Balance: balance };
         });
+    }
+
+    get filteredLedger(): any[] {
+        return this.selectedCounterparty
+            ? this.ledgerWithBalance.filter(r => r.Counterparty === this.selectedCounterparty)
+            : this.ledgerWithBalance;
+    }
+
+    get totalCredits(): number {
+        return this.filteredLedger.reduce((s, r) => s + (+r.Credit || 0), 0);
+    }
+
+    get totalDebits(): number {
+        return this.filteredLedger.reduce((s, r) => s + (+r.Debit || 0), 0);
     }
 
     ngOnInit() {
