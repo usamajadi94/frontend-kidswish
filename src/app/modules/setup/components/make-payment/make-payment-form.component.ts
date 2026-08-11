@@ -169,6 +169,9 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
     }
 
     override BeforeUpSert(): void {
+        if (this.formData.Date) {
+            this.formData.Date = this.toDateOnlyString(this.formData.Date) as any;
+        }
         if (this.isDailyExpense) {
             this.formData.TransactionType = 'topup';
             this.formData.FromPartyType = 'bank_account';
@@ -208,6 +211,14 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         this._http.post(`${apiUrls.server}${apiUrls.expenseController}`, expense, { headers }).subscribe({
             error: (e) => console.error('Failed to create expense entry:', e),
         });
+    }
+
+    private toDateOnlyString(value: any): string {
+        const d = value instanceof Date ? value : new Date(value);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
     }
 
     override ValidateBeforeSave(formData: PaymentTransaction): boolean {
