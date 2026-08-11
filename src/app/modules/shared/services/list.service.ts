@@ -68,6 +68,10 @@ export class ListService {
         return this._QueryService.getQuery('getBankAccountLedger', { id, fromdate, todate });
     }
 
+    getAccountTransfer() {
+        return this._QueryService.getQuery('getAccountTransfer');
+    }
+
     getLegalEntity() {
         return this._QueryService.getQuery('getLegalEntity');
     }

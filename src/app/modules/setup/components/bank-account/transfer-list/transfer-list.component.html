@@ -2,16 +2,14 @@
     <div class="flex-0">
         <div class="mb-2">
             <div class="text-3xl font-semibold leading-8 tracking-tight">
-                {{ title }} List
+                {{ title }}
             </div>
         </div>
 
         <bft-table [dataSource]="data" [(isVisible)]="isVisible" [columns]="columns" (view)="onView($event)">
             <wrapper-add [SCode]="SCode">
-                <bft-button name="New" accessKey="n" svgIcon="mat_solid:add" (onClick)="addBankAccount()" />
+                <bft-button name="New" accessKey="n" svgIcon="mat_solid:add" (onClick)="add()" />
             </wrapper-add>
-            <bft-button class="ml-3" name="Transfer" svgIcon="mat_solid:swap_horiz" (onClick)="openTransfer()" />
-            <bft-button class="ml-3" name="Transfers List" svgIcon="mat_solid:list" (onClick)="viewTransfers()" />
             <bft-button class="ml-3" name="Setting" svgIcon="mat_solid:settings" (onClick)="isVisible = true" />
             <bft-button class="ml-3" name="Export" svgIcon="feather:file" />
         </bft-table>

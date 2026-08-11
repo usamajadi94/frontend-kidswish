@@ -19,6 +19,7 @@ import { VendorInvoiceComponent } from './components/vendor-invoice/vendor-invoi
 import { PettyCashListComponent } from './components/petty-cash/petty-cash-list/petty-cash-list.component';
 import { PettyCashDetailComponent } from './components/petty-cash/petty-cash-detail/petty-cash-detail.component';
 import { BankAccountDetailComponent } from './components/bank-account/bank-account-detail/bank-account-detail.component';
+import { TransferListComponent } from './components/bank-account/transfer-list/transfer-list.component';
 import { permissionGuard } from 'app/core/auth/guards/permission.guard';
 import { componentRegister } from '../shared/services/component-register';
 
@@ -81,6 +82,12 @@ export default [
         path: 'bank-account-detail/:id',
         component: BankAccountDetailComponent,
         data: { SCode: componentRegister.bankAccount.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'transfer-list',
+        component: TransferListComponent,
+        data: { SCode: componentRegister.accountTransfer.SCode },
         canActivate: [permissionGuard],
     },
     {
