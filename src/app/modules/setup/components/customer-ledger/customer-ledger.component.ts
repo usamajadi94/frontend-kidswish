@@ -130,7 +130,12 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     }
 
     exportToExcel() {
-        this._exportService.exportToExcel(this.exportColumns, this.filteredFinancialRows, this.title);
+        const customerName = this.customers.find(c => c.ID === this.selectedCustomer)?.Name;
+        const fileName = customerName ? `${this.title} - ${customerName}` : this.title;
+        const rows = customerName
+            ? this.filteredFinancialRows.map(r => ({ ...r, CustomerName: r.CustomerName || customerName }))
+            : this.filteredFinancialRows;
+        this._exportService.exportToExcel(this.exportColumns, rows, fileName);
     }
 
     // ── Order ledger helpers ──────────────────────────────────────────────────

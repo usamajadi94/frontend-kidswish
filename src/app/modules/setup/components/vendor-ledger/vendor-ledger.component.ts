@@ -61,7 +61,12 @@ export class VendorLedgerComponent extends BaseRoutedComponent implements OnInit
     }
 
     exportToExcel() {
-        this._exportService.exportToExcel(this.exportColumns, this.financialRows, this.title);
+        const vendorName = this.vendors.find(v => v.ID === this.selectedVendor)?.Name;
+        const fileName = vendorName ? `${this.title} - ${vendorName}` : this.title;
+        const rows = vendorName
+            ? this.financialRows.map(r => ({ ...r, VendorName: r.VendorName || vendorName }))
+            : this.financialRows;
+        this._exportService.exportToExcel(this.exportColumns, rows, fileName);
     }
 
     ngOnInit() {

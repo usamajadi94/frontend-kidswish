@@ -193,7 +193,9 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     }
 
     exportToExcel() {
-        this._exportService.exportToExcel(this.exportColumns, this.filteredFinancialRows, this.title);
+        const distributorName = this.distributors.find(d => d.ID === this.selectedDistributor)?.Name;
+        const fileName = distributorName ? `${this.title} - ${distributorName}` : this.title;
+        this._exportService.exportToExcel(this.exportColumns, this.filteredFinancialRows, fileName);
     }
 
     get uniqueStatuses(): string[] {
