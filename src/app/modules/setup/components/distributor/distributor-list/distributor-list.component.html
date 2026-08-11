@@ -11,7 +11,7 @@
                 <bft-button name="New" accessKey="n" svgIcon="mat_solid:add" (onClick)="addDistributor()" />
             </wrapper-add>
             <bft-button class="ml-3" name="Setting" svgIcon="mat_solid:settings" (onClick)="isVisible = true" />
-            <bft-button class="ml-3" name="Export" svgIcon="feather:file" />
+            <bft-button class="ml-3" name="Export" svgIcon="feather:file" (onClick)="exportToExcel()" />
         </bft-table>
     </div>
 </div>

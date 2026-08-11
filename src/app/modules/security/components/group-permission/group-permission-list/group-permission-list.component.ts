@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { ListService } from 'app/modules/shared/services/list.service';
+import { ExportService } from 'app/modules/shared/services/export.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { BftTableComponent } from "../../../../shared/components/tables/bft-table/bft-table.component";
 import { BftButtonComponent } from "../../../../shared/components/buttons/bft-button/bft-button.component";
@@ -16,6 +17,7 @@ import { GroupPermissionComponent } from '../group-permission.component';
 export class GroupPermissionListComponent{
 private modalService = inject(ModalService);
     private _listService = inject(ListService);
+    private _exportService = inject(ExportService);
     title: string = componentRegister.groupPermission;
 
     isVisible: boolean = false;
@@ -75,7 +77,11 @@ private modalService = inject(ModalService);
     }
 
     onView(row) {
-   
+
+    }
+
+    exportToExcel() {
+        this._exportService.exportToExcel(this.columns, this.data, this.title);
     }
 }
 

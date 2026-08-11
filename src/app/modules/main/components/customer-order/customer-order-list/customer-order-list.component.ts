@@ -3,6 +3,7 @@ import { CustomerOrderComponent } from '../customer-order.component';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { ListService } from 'app/modules/shared/services/list.service';
+import { ExportService } from 'app/modules/shared/services/export.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-button/bft-button.component';
 import { BftTableComponent } from 'app/modules/shared/components/tables/bft-table/bft-table.component';
@@ -18,6 +19,7 @@ import { WrapperAddComponent } from 'app/modules/shared/permission-wrapper/wrapp
 export class CustomerOrderListComponent extends BaseRoutedComponent {
   private modalService = inject(ModalService);
   private _listService = inject(ListService);
+  private _exportService = inject(ExportService);
   title: string = componentRegister.customerOrder.Title;
   isVisible: boolean = false;
   columns = [
@@ -93,6 +95,8 @@ export class CustomerOrderListComponent extends BaseRoutedComponent {
       });
   }
 
- 
+  exportToExcel() {
+    this._exportService.exportToExcel(this.columns, this.data, this.title);
+  }
 }
 

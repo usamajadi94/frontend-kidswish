@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-button/bft-button.component';
 import { BftTableComponent } from 'app/modules/shared/components/tables/bft-table/bft-table.component';
 import { ListService } from 'app/modules/shared/services/list.service';
+import { ExportService } from 'app/modules/shared/services/export.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { AccountTransferFormComponent } from '../account-transfer-form.component';
 import { componentRegister } from 'app/modules/shared/services/component-register';
@@ -17,6 +18,7 @@ import { WrapperAddComponent } from 'app/modules/shared/permission-wrapper/wrapp
 export class TransferListComponent extends BaseRoutedComponent implements OnInit {
     private modalService = inject(ModalService);
     private _listService = inject(ListService);
+    private _exportService = inject(ExportService);
     title = componentRegister.accountTransfer.Title;
     isVisible = false;
     columns = [
@@ -49,5 +51,9 @@ export class TransferListComponent extends BaseRoutedComponent implements OnInit
     add() {
         this.modalService.openModal({ component: AccountTransferFormComponent, title: 'Account Transfer' }, 700)
             .afterClose.subscribe((res: boolean) => { if (res) this.getData(); });
+    }
+
+    exportToExcel() {
+        this._exportService.exportToExcel(this.columns, this.data, this.title);
     }
 }

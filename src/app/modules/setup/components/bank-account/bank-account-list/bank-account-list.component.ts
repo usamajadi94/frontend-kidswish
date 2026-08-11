@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-button/bft-button.component';
 import { BftTableComponent } from 'app/modules/shared/components/tables/bft-table/bft-table.component';
 import { ListService } from 'app/modules/shared/services/list.service';
+import { ExportService } from 'app/modules/shared/services/export.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { BankAccountFormComponent } from '../bank-account-form.component';
 import { AccountTransferFormComponent } from '../account-transfer-form.component';
@@ -21,6 +22,7 @@ import { ToastService } from 'app/core/toaster/toast.service';
 export class BankAccountListComponent extends BaseRoutedComponent implements OnInit {
     private modalService = inject(ModalService);
     private _listService = inject(ListService);
+    private _exportService = inject(ExportService);
     private _toastService = inject(ToastService);
     private _router = inject(Router);
     title = componentRegister.bankAccount.Title;
@@ -64,5 +66,9 @@ export class BankAccountListComponent extends BaseRoutedComponent implements OnI
 
     viewTransfers() {
         this._router.navigate(['/setup/transfer-list']);
+    }
+
+    exportToExcel() {
+        this._exportService.exportToExcel(this.columns, this.data, this.title);
     }
 }

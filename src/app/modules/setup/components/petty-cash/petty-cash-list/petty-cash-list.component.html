@@ -12,7 +12,7 @@
             </wrapper-add>
             <bft-button class="ml-3" name="Add Funds" svgIcon="mat_solid:account_balance_wallet" (onClick)="openAddFunds()" />
             <bft-button class="ml-3" name="Setting" svgIcon="mat_solid:settings" (onClick)="isVisible = true" />
-            <bft-button class="ml-3" name="Export" svgIcon="feather:file" />
+            <bft-button class="ml-3" name="Export" svgIcon="feather:file" (onClick)="exportToExcel()" />
         </bft-table>
     </div>
 </div>

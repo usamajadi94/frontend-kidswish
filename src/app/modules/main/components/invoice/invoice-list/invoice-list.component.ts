@@ -5,6 +5,7 @@ import { BftTableComponent } from 'app/modules/shared/components/tables/bft-tabl
 import { WrapperAddComponent } from 'app/modules/shared/permission-wrapper/wrapper-add/wrapper-add.component';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { ListService } from 'app/modules/shared/services/list.service';
+import { ExportService } from 'app/modules/shared/services/export.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { InvoiceComponent } from '../invoice.component';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
@@ -21,6 +22,7 @@ export class InvoiceListComponent  extends BaseRoutedComponent {
   date = null;
   private modalService = inject(ModalService);
   private _listService = inject(ListService);
+  private _exportService = inject(ExportService);
   title: string = componentRegister.invoice.Title;
   isVisible: boolean = false;
   columns = [
@@ -146,6 +148,10 @@ export class InvoiceListComponent  extends BaseRoutedComponent {
   const day = ('0' + date.getDate()).slice(-2);
   return `${year}-${month}-${day}`;
 }
+
+  exportToExcel() {
+    this._exportService.exportToExcel(this.columns, this.data, this.title);
+  }
 }
 
 

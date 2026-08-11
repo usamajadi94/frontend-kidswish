@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 // import { UsersFormComponent } from '../../users/users-form.component';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { ListService } from 'app/modules/shared/services/list.service';
+import { ExportService } from 'app/modules/shared/services/export.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { BftTableComponent } from "../../../../shared/components/tables/bft-table/bft-table.component";
 import { BftButtonComponent } from "../../../../shared/components/buttons/bft-button/bft-button.component";
@@ -20,6 +21,7 @@ export class GroupListComponent extends BaseRoutedComponent {
 
   private modalService = inject(ModalService);
     private _listService = inject(ListService);
+    private _exportService = inject(ExportService);
     title: string = componentRegister.group.Title;
 
     isVisible: boolean = false;
@@ -96,6 +98,10 @@ export class GroupListComponent extends BaseRoutedComponent {
                 }
             });
         }
+    }
+
+    exportToExcel() {
+        this._exportService.exportToExcel(this.columns, this.data, this.title);
     }
 }
 

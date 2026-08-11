@@ -6,6 +6,7 @@ import { ModalService } from 'app/modules/shared/services/modal.service';
 import { ExpenseFormComponent } from '../expense-form.component';
 import { componentRegister } from 'app/modules/shared/services/component-register';
 import { ListService } from 'app/modules/shared/services/list.service';
+import { ExportService } from 'app/modules/shared/services/export.service';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { FormsModule } from '@angular/forms';
@@ -20,6 +21,7 @@ import { FormsModule } from '@angular/forms';
 export class ExpenseListComponent extends BaseRoutedComponent {
   private modalService = inject(ModalService);
   private _listService = inject(ListService);
+  private _exportService = inject(ExportService);
   title: string = componentRegister.expense.Title;
   isVisible: boolean = false;
   columns = [
@@ -154,7 +156,9 @@ export class ExpenseListComponent extends BaseRoutedComponent {
   return `${year}-${month}-${day}`;
 }
 
-
+  exportToExcel() {
+    this._exportService.exportToExcel(this.columns, this.data, this.title);
+  }
 }
 
 
