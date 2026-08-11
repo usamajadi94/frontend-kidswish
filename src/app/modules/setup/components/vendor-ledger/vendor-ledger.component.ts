@@ -9,6 +9,7 @@ import { apiUrls } from 'app/modules/shared/services/api-url';
 import { DrpService } from 'app/modules/shared/services/drp.service';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
 import { componentRegister } from 'app/modules/shared/services/component-register';
+import { ExportService } from 'app/modules/shared/services/export.service';
 
 @Component({
     selector: 'app-vendor-ledger',
@@ -21,6 +22,7 @@ export class VendorLedgerComponent extends BaseRoutedComponent implements OnInit
     private _http         = inject(HttpClient);
     private _localStorage = inject(LocalStorageService);
     private _drpService   = inject(DrpService);
+    private _exportService = inject(ExportService);
 
     title = componentRegister.vendorLedger.Title;
 
@@ -44,6 +46,23 @@ export class VendorLedgerComponent extends BaseRoutedComponent implements OnInit
     get totalPaid(): number      { return this.financialRows.reduce((s, r) => s + (+r.Credit || 0), 0); }
     get outstanding(): number    { return this.totalExpenses - this.totalPaid; }
     get balanceTotalOutstanding(): number { return this.vendorBalances.reduce((s, v) => s + (+v.Outstanding || 0), 0); }
+
+    get exportColumns() {
+        return [
+            { header: 'Date', name: 'Date', type: 'date' },
+            { header: 'Vendor', name: 'VendorName', type: 'text' },
+            { header: 'Type', name: 'Type', type: 'text' },
+            { header: 'Notes', name: 'Notes', type: 'text' },
+            { header: 'Account', name: 'AccountName', type: 'text' },
+            { header: 'Expense (Dr)', name: 'Debit', type: 'currency' },
+            { header: 'Payment (Cr)', name: 'Credit', type: 'currency' },
+            { header: 'Balance', name: 'Balance', type: 'currency' },
+        ];
+    }
+
+    exportToExcel() {
+        this._exportService.exportToExcel(this.exportColumns, this.financialRows, this.title);
+    }
 
     ngOnInit() {
         const now = new Date();

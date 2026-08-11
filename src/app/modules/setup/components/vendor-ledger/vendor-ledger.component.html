@@ -55,12 +55,18 @@
             <!-- Date Filter Bar -->
             <div class="mb-3 flex items-center justify-between shrink-0">
                 <h2 class="text-sm font-semibold text-gray-700">Financial Ledger</h2>
-                <nz-range-picker
-                    [(ngModel)]="dateRange"
-                    (ngModelChange)="onDateChange($event)"
-                    nzFormat="dd/MM/yyyy"
-                    [nzPlaceHolder]="['From Date', 'To Date']">
-                </nz-range-picker>
+                <div class="flex items-center gap-2">
+                    <button (click)="exportToExcel()"
+                        class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+                        Export
+                    </button>
+                    <nz-range-picker
+                        [(ngModel)]="dateRange"
+                        (ngModelChange)="onDateChange($event)"
+                        nzFormat="dd/MM/yyyy"
+                        [nzPlaceHolder]="['From Date', 'To Date']">
+                    </nz-range-picker>
+                </div>
             </div>
 
             <!-- Financial Table -->

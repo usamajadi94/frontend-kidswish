@@ -9,6 +9,7 @@ import { apiUrls } from 'app/modules/shared/services/api-url';
 import { DrpService } from 'app/modules/shared/services/drp.service';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
 import { componentRegister } from 'app/modules/shared/services/component-register';
+import { ExportService } from 'app/modules/shared/services/export.service';
 
 @Component({
     selector: 'app-customer-ledger',
@@ -21,6 +22,7 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     private _http         = inject(HttpClient);
     private _localStorage = inject(LocalStorageService);
     private _drpService   = inject(DrpService);
+    private _exportService = inject(ExportService);
 
     title = componentRegister.customerLedger.Title;
 
@@ -112,6 +114,24 @@ export class CustomerLedgerComponent extends BaseRoutedComponent implements OnIn
     get totalInvoiced(): number  { return this.filteredFinancialRows.reduce((s, r) => s + (+r.Debit   || 0), 0); }
     get totalReceived(): number  { return this.filteredFinancialRows.reduce((s, r) => s + (+r.Credit  || 0), 0); }
     get closingBalance(): number { return this.totalInvoiced - this.totalReceived; }
+
+    get exportColumns() {
+        return [
+            { header: 'Date', name: 'Date', type: 'date' },
+            { header: 'Customer', name: 'CustomerName', type: 'text' },
+            { header: 'Type', name: 'Type', type: 'text' },
+            { header: 'Notes', name: 'Notes', type: 'text' },
+            { header: 'Invoice No', name: 'InvoiceNo', type: 'text' },
+            { header: 'Account', name: 'AccountName', type: 'text' },
+            { header: 'Invoice (Dr)', name: 'Debit', type: 'currency' },
+            { header: 'Payment (Cr)', name: 'Credit', type: 'currency' },
+            { header: 'Balance', name: 'Balance', type: 'currency' },
+        ];
+    }
+
+    exportToExcel() {
+        this._exportService.exportToExcel(this.exportColumns, this.filteredFinancialRows, this.title);
+    }
 
     // ── Order ledger helpers ──────────────────────────────────────────────────
     get uniqueProducts(): { id: number; name: string }[] {

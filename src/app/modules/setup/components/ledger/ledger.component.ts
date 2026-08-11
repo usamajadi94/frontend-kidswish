@@ -15,6 +15,7 @@ import { BftInputDateComponent } from 'app/modules/shared/components/fields/bft-
 import { BftInputCurrencyComponent } from 'app/modules/shared/components/fields/bft-input-currency/bft-input-currency.component';
 import { BftSelectComponent } from 'app/modules/shared/components/fields/bft-select/bft-select.component';
 import { BftTextareaComponent } from 'app/modules/shared/components/fields/bft-textarea/bft-textarea.component';
+import { ExportService } from 'app/modules/shared/services/export.service';
 
 @Component({
     selector: 'app-ledger',
@@ -29,6 +30,7 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
     private _localStorage = inject(LocalStorageService);
     private _drpService   = inject(DrpService);
     private _modal        = inject(ModalService);
+    private _exportService = inject(ExportService);
 
     title = 'Distributor Ledger';
 
@@ -173,6 +175,25 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
         const map = new Map<number, string>();
         this.orderItems.forEach(i => map.set(i.ProductID, i.ProductName));
         return [...map.entries()].map(([id, name]) => ({ id, name }));
+    }
+
+    get exportColumns() {
+        return [
+            { header: 'Date', name: 'Date', type: 'date' },
+            { header: 'Distributor', name: 'DistributorName', type: 'text' },
+            { header: 'Customer', name: 'CustomerName', type: 'text' },
+            { header: 'Type', name: 'Type', type: 'text' },
+            { header: 'Notes', name: 'Notes', type: 'text' },
+            { header: 'Account', name: 'AccountName', type: 'text' },
+            { header: 'Vendor', name: 'VendorName', type: 'text' },
+            { header: 'Invoice (Dr)', name: 'Debit', type: 'currency' },
+            { header: 'Payment (Cr)', name: 'Credit', type: 'currency' },
+            { header: 'Balance', name: 'Balance', type: 'currency' },
+        ];
+    }
+
+    exportToExcel() {
+        this._exportService.exportToExcel(this.exportColumns, this.filteredFinancialRows, this.title);
     }
 
     get uniqueStatuses(): string[] {
