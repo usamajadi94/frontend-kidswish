@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { ListService } from 'app/modules/shared/services/list.service';
+import { ExportService } from 'app/modules/shared/services/export.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { LocalStorageService } from 'app/core/auth/localStorage.service';
 import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-button/bft-button.component';
@@ -36,6 +37,7 @@ const CATEGORY_COLORS = [
 export class CashInHandListComponent extends BaseRoutedComponent {
     private _listService = inject(ListService);
     private _modalService = inject(ModalService);
+    private _exportService = inject(ExportService);
     private _localStorage = inject(LocalStorageService);
     title = componentRegister.cashInHand.Title;
     summary: any = null;
@@ -75,6 +77,23 @@ export class CashInHandListComponent extends BaseRoutedComponent {
         if (this.selectedSubCategories?.length)
             rows = rows.filter(r => this.selectedSubCategories.includes(r.SubCategory));
         return rows;
+    }
+
+    get exportColumns() {
+        return [
+            { header: 'Date', name: 'Date', type: 'date' },
+            { header: 'Party', name: 'Vendor', type: 'text' },
+            { header: 'Category', name: 'Category', type: 'text' },
+            { header: 'Sub Category', name: 'SubCategory', type: 'text' },
+            { header: 'Notes', name: 'Notes', type: 'text' },
+            { header: 'Cash In', name: 'CashIn', type: 'currency' },
+            { header: 'Cash Out', name: 'CashOut', type: 'currency' },
+            { header: 'Balance', name: 'Balance', type: 'currency' },
+        ];
+    }
+
+    exportToExcel() {
+        this._exportService.exportToExcel(this.exportColumns, this.filteredLedger, this.title);
     }
 
     get openingAsOf(): string {

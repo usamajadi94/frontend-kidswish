@@ -97,10 +97,13 @@
                 </div>
             }
         </div>
-        <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onDateChange($event)"
-            nzFormat="dd/MM/yyyy" [nzPlaceHolder]="['From Date', 'To Date']"
-            [nzDisabledDate]="disabledDate">
-        </nz-range-picker>
+        <div class="flex items-center gap-2">
+            <bft-button name="Export" svgIcon="feather:file" (onClick)="exportToExcel()" />
+            <nz-range-picker [(ngModel)]="dateRange" (ngModelChange)="onDateChange($event)"
+                nzFormat="dd/MM/yyyy" [nzPlaceHolder]="['From Date', 'To Date']"
+                [nzDisabledDate]="disabledDate">
+            </nz-range-picker>
+        </div>
     </div>
 
     <!-- Table -->
