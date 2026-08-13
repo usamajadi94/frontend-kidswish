@@ -160,16 +160,17 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
             });
         }
 
-        let balance = 0;
-        return rows.map(r => {
-            balance += (+r.Debit || 0) - (+r.Credit || 0);
-            return { ...r, Balance: balance };
-        });
+        return rows;
     }
 
     get totalInvoiced(): number  { return this.filteredFinancialRows.reduce((s, r) => s + (+r.Debit  || 0), 0); }
     get totalReceived(): number  { return this.filteredFinancialRows.reduce((s, r) => s + (+r.Credit || 0), 0); }
-    get closingBalance(): number { return this.totalInvoiced - this.totalReceived; }
+    get closingBalance(): number {
+        // filteredFinancialRows is newest-first; its Balance already carries the true
+        // running total (including anything before the selected date range), so use
+        // it directly instead of summing just the visible window's debit/credit.
+        return this.filteredFinancialRows.length > 0 ? (+this.filteredFinancialRows[0].Balance || 0) : this.totalInvoiced - this.totalReceived;
+    }
 
     get uniqueProducts(): { id: number; name: string }[] {
         const map = new Map<number, string>();
