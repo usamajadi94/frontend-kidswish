@@ -123,18 +123,19 @@ export class CashInHandFormComponent extends BaseComponent<CashInHand, CashInHan
         this.isSubmitLoading = true;
         const headers = new HttpHeaders({ uid: this._localStorage.uid, cid: this._localStorage.cid, eid: this._localStorage.eid });
         try {
-            for (const line of validLines) {
-                await firstValueFrom(this._http.post(`${apiUrls.server}${apiUrls.cashInHandController}`, {
-                    Date: line.Date,
-                    Type: line.Type,
-                    PaymentCategoryID: line.PaymentCategoryID,
-                    ExpenseCategoryID: line.ExpenseCategoryID || null,
-                    Amount: parseFloat(line.Amount as any),
-                    ToPartyID: line.ToPartyID || null,
-                    Notes: line.Notes || null,
-                    SCode: componentRegister.cashInHand.SCode,
-                }, { headers }));
-            }
+            const items = validLines.map(line => ({
+                Date: line.Date,
+                Type: line.Type,
+                PaymentCategoryID: line.PaymentCategoryID,
+                ExpenseCategoryID: line.ExpenseCategoryID || null,
+                Amount: parseFloat(line.Amount as any),
+                ToPartyID: line.ToPartyID || null,
+                Notes: line.Notes || null,
+                SCode: componentRegister.cashInHand.SCode,
+            }));
+            await firstValueFrom(
+                this._http.post(`${apiUrls.server}${apiUrls.cashInHandController}/bulk`, { Items: items }, { headers })
+            );
             this.msgSer.success(`${validLines.length} entr${validLines.length === 1 ? 'y' : 'ies'} saved!`);
             this.isCreated = true;
             this.isSubmitLoading = false;

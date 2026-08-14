@@ -142,22 +142,21 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         });
 
         try {
-            for (const line of validLines) {
-                await firstValueFrom(
-                    this._http.post(`${apiUrls.server}${apiUrls.paymentTransactionController}`, {
-                        Date: line.Date,
-                        Amount: parseFloat(line.Amount as any),
-                        PaymentType: line.PaymentType,
-                        FromPartyType: 'bank_account',
-                        FromPartyID: line.FromPartyID,
-                        ToPartyType: line.ToPartyID ? 'vendor' : null,
-                        ToPartyID: line.ToPartyID || null,
-                        TransactionType: 'payment',
-                        Notes: line.Notes || null,
-                        SCode: 'pay_02',
-                    }, { headers })
-                );
-            }
+            const items = validLines.map(line => ({
+                Date: line.Date,
+                Amount: parseFloat(line.Amount as any),
+                PaymentType: line.PaymentType,
+                FromPartyType: 'bank_account',
+                FromPartyID: line.FromPartyID,
+                ToPartyType: line.ToPartyID ? 'vendor' : null,
+                ToPartyID: line.ToPartyID || null,
+                TransactionType: 'payment',
+                Notes: line.Notes || null,
+                SCode: 'pay_02',
+            }));
+            await firstValueFrom(
+                this._http.post(`${apiUrls.server}${apiUrls.paymentTransactionController}/bulk`, { Items: items }, { headers })
+            );
             this.msgSer.success(`${validLines.length} payment(s) saved successfully!`);
             this.isCreated = true;
             this.isSubmitLoading = false;

@@ -150,20 +150,21 @@ export class PaymentReceivedFormComponent extends BaseComponent<PaymentTransacti
         this.isSubmitLoading = true;
         const headers = new HttpHeaders({ uid: this._localStorage.uid, cid: this._localStorage.cid, eid: this._localStorage.eid });
         try {
-            for (const line of validLines) {
-                await firstValueFrom(this._http.post(`${apiUrls.server}${apiUrls.paymentTransactionController}`, {
-                    Date: line.Date,
-                    Amount: parseFloat(line.Amount as any),
-                    PaymentType: line.PaymentType,
-                    FromPartyType: 'customer',
-                    FromPartyID: line.FromPartyID,
-                    ToPartyType: line.ToPartyType,
-                    ToPartyID: line.ToPartyID,
-                    TransactionType: 'received',
-                    Notes: line.Notes || null,
-                    SCode: 'pay_01',
-                }, { headers }));
-            }
+            const items = validLines.map(line => ({
+                Date: line.Date,
+                Amount: parseFloat(line.Amount as any),
+                PaymentType: line.PaymentType,
+                FromPartyType: 'customer',
+                FromPartyID: line.FromPartyID,
+                ToPartyType: line.ToPartyType,
+                ToPartyID: line.ToPartyID,
+                TransactionType: 'received',
+                Notes: line.Notes || null,
+                SCode: 'pay_01',
+            }));
+            await firstValueFrom(
+                this._http.post(`${apiUrls.server}${apiUrls.paymentTransactionController}/bulk`, { Items: items }, { headers })
+            );
             this.msgSer.success(`${validLines.length} entr${validLines.length === 1 ? 'y' : 'ies'} saved!`);
             this.isCreated = true;
             this.isSubmitLoading = false;
