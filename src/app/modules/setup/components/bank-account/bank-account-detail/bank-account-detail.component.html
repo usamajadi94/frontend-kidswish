@@ -78,6 +78,7 @@
     <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
         <h2 class="text-lg font-semibold text-gray-800">Transaction Ledger</h2>
         <div class="flex items-center gap-2">
+            <bft-button name="Export" svgIcon="feather:file" (onClick)="exportToExcel()" />
             @if (uniqueCounterparties.length > 0) {
                 <nz-select
                     [(ngModel)]="selectedCounterparty"

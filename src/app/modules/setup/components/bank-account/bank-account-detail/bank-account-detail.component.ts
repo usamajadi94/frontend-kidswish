@@ -6,6 +6,7 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { ListService } from 'app/modules/shared/services/list.service';
+import { ExportService } from 'app/modules/shared/services/export.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { BftButtonComponent } from 'app/modules/shared/components/buttons/bft-button/bft-button.component';
 import { BankAccountFormComponent } from '../bank-account-form.component';
@@ -21,6 +22,7 @@ import { AccountTransferFormComponent } from '../account-transfer-form.component
 export class BankAccountDetailComponent implements OnInit {
     private _listService = inject(ListService);
     private _modalService = inject(ModalService);
+    private _exportService = inject(ExportService);
     private _route = inject(ActivatedRoute);
     private _router = inject(Router);
 
@@ -55,6 +57,25 @@ export class BankAccountDetailComponent implements OnInit {
 
     get totalDebits(): number {
         return this.filteredLedger.reduce((s, r) => s + (+r.Debit || 0), 0);
+    }
+
+    get exportColumns() {
+        return [
+            { header: 'Date', name: 'Date', type: 'date' },
+            { header: 'Description', name: 'Description', type: 'text' },
+            { header: 'Counterparty', name: 'Counterparty', type: 'text' },
+            { header: 'Payment Type', name: 'PaymentType', type: 'text' },
+            { header: 'Notes', name: 'Notes', type: 'text' },
+            { header: 'Credit', name: 'Credit', type: 'currency' },
+            { header: 'Debit', name: 'Debit', type: 'currency' },
+            { header: 'Balance', name: 'Balance', type: 'currency' },
+        ];
+    }
+
+    exportToExcel() {
+        const accountName = this.summary?.Name;
+        const fileName = [accountName, this.selectedCounterparty].filter(Boolean).join(' - ') || 'Bank Account Ledger';
+        this._exportService.exportToExcel(this.exportColumns, this.filteredLedger, fileName);
     }
 
     ngOnInit() {
