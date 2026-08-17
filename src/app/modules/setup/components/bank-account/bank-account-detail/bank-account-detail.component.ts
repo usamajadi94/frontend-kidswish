@@ -88,10 +88,15 @@ export class BankAccountDetailComponent implements OnInit {
 
     loadAll() {
         this.isLoading = true;
-        this._listService.getBankAccountSummary(this.accountId).subscribe({
+        this.loadSummary();
+        this.loadLedger();
+    }
+
+    loadSummary() {
+        const from = this.dateRange?.[0]?.toISOString() || '';
+        this._listService.getBankAccountSummary(this.accountId, from).subscribe({
             next: (res: any[]) => { this.summary = res?.[0] || null; },
         });
-        this.loadLedger();
     }
 
     loadLedger() {
@@ -105,6 +110,7 @@ export class BankAccountDetailComponent implements OnInit {
 
     onDateChange(dates: Date[]) {
         this.dateRange = dates || [];
+        this.loadSummary();
         this.loadLedger();
     }
 

@@ -60,8 +60,8 @@ export class ListService {
         return this._QueryService.getQuery('getBankAccount');
     }
 
-    getBankAccountSummary(id: number) {
-        return this._QueryService.getQuery('getBankAccountSummary', { id });
+    getBankAccountSummary(id: number, fromdate: string = '') {
+        return this._QueryService.getQuery('getBankAccountSummary', { id, fromdate });
     }
 
     getBankAccountLedger(id: number, fromdate: string = '', todate: string = '') {
