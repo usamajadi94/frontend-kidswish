@@ -94,7 +94,8 @@ export class BankAccountDetailComponent implements OnInit {
 
     loadSummary() {
         const from = this.dateRange?.[0]?.toISOString() || '';
-        this._listService.getBankAccountSummary(this.accountId, from).subscribe({
+        const to   = this.dateRange?.[1]?.toISOString() || '';
+        this._listService.getBankAccountSummary(this.accountId, from, to).subscribe({
             next: (res: any[]) => { this.summary = res?.[0] || null; },
         });
     }
