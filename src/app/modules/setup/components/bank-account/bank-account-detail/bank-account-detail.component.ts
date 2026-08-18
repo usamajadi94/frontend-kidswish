@@ -38,11 +38,15 @@ export class BankAccountDetailComponent implements OnInit {
     }
 
     get ledgerWithBalance(): any[] {
+        // this.ledger is newest-first (as returned by the API); accumulate chronologically
+        // (oldest -> newest) so each row's Balance is the true running total, then restore
+        // the newest-first display order.
         let balance = +(this.summary?.OpeningBalance || 0);
-        return this.ledger.map(r => {
+        const chronological = [...this.ledger].reverse().map(r => {
             balance += (+r.Credit || 0) - (+r.Debit || 0);
             return { ...r, Balance: balance };
         });
+        return chronological.reverse();
     }
 
     get filteredLedger(): any[] {
