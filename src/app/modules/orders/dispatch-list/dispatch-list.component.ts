@@ -71,17 +71,14 @@ export class DispatchListComponent implements OnInit {
             if (!result) return;
             this.isConfirmingAll = true;
             this.errorMsg = '';
-            for (const item of planned) {
-                try {
-                    await this._http.post<any>(
-                        `${apiUrls.server}${apiUrls.dispatchController}/confirm/${item.ID}`, {},
-                        { headers: this.authHeaders }
-                    ).toPromise();
-                    item.Status = 'Confirmed';
-                } catch (e: any) {
-                    this.errorMsg = `Failed on ${item.ProductName}: ${e?.error?.message || 'Unknown error'}`;
-                    break;
-                }
+            try {
+                await this._http.post<any>(
+                    `${apiUrls.server}${apiUrls.dispatchController}/confirm-bulk`,
+                    { Ids: planned.map(i => i.ID) },
+                    { headers: this.authHeaders }
+                ).toPromise();
+            } catch (e: any) {
+                this.errorMsg = e?.error?.message || 'Failed to confirm dispatches';
             }
             this.isConfirmingAll = false;
             this.load();
