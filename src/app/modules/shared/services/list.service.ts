@@ -44,6 +44,10 @@ export class ListService {
         return this._QueryService.getQuery('getPaymentCategory');
     }
 
+    getUnit() {
+        return this._QueryService.getQuery('getUnit');
+    }
+
     getCustomerInformation() {
         return this._QueryService.getQuery('getCustomerInformation');
     }
