@@ -6,7 +6,7 @@
     @for (line of bulkLines; track $index; let i = $index) {
     <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
 
-        <div class="mb-1.5 text-xs font-bold text-gray-400">Row {{ i + 1 }}</div>
+        <div class="flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white text-xs font-bold mb-1.5">{{ i + 1 }}</div>
 
         <!-- Line 1: Date | Distributor | Customer | Amount -->
         <div class="grid grid-cols-4 gap-2 mb-2 items-end">
