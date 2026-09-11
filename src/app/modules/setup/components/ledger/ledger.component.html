@@ -215,7 +215,12 @@
                     @if (!isLoadingFinancial && filteredFinancialRows.length > 0) {
                         <tfoot class="border-t-2 border-gray-300 bg-gray-50">
                             <tr class="font-semibold text-gray-800">
-                                <td [colSpan]="selectedCustomer ? 6 : 7" class="px-3 py-2 text-right text-xs">Total</td>
+                                <td [colSpan]="selectedCustomer ? 6 : 7" class="px-3 py-2 text-right text-xs">
+                                    @if (totalCartons > 0) {
+                                        <span class="text-gray-400 font-normal mr-2">{{ totalCartons | number:'1.0-2' }} ctns</span>
+                                    }
+                                    Total
+                                </td>
                                 <td class="px-3 py-2 text-right text-red-700 text-xs">{{ totalInvoiced | currency:'PKR ':'symbol':'1.0-0' }}</td>
                                 <td class="px-3 py-2 text-right text-green-700 text-xs">{{ totalReceived | currency:'PKR ':'symbol':'1.0-0' }}</td>
                                 <td class="px-3 py-2 text-right text-xs"

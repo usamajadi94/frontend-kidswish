@@ -165,6 +165,19 @@ export class LedgerComponent extends BaseRoutedComponent implements OnInit {
 
     get totalInvoiced(): number  { return this.filteredFinancialRows.reduce((s, r) => s + (+r.Debit  || 0), 0); }
     get totalReceived(): number  { return this.filteredFinancialRows.reduce((s, r) => s + (+r.Credit || 0), 0); }
+
+    // Invoice notes are formatted as "<Product> × <Qty> ctns" (see vehicle-dispatch.service.ts);
+    // there's no separate numeric carton column on the financial row, so parse it out of Notes.
+    get totalCartons(): number {
+        return this.filteredFinancialRows
+            .filter(r => r.Type === 'Invoice')
+            .reduce((sum, r) => {
+                const matches = (r.Notes || '').matchAll(/([\d,]+(?:\.\d+)?)\s*ctns/gi);
+                let rowTotal = 0;
+                for (const m of matches) rowTotal += parseFloat(m[1].replace(/,/g, ''));
+                return sum + rowTotal;
+            }, 0);
+    }
     get closingBalance(): number {
         // filteredFinancialRows is newest-first; its Balance already carries the true
         // running total (including anything before the selected date range), so use
