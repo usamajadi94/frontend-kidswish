@@ -6,6 +6,8 @@
     @for (line of bulkLines; track $index; let i = $index) {
     <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
 
+        <div class="mb-1.5 text-xs font-bold text-gray-400">Row {{ i + 1 }}</div>
+
         <!-- Line 1: Date | Distributor | Customer | Amount -->
         <div class="grid grid-cols-4 gap-2 mb-2 items-end">
             <div class="flex flex-col gap-1">
@@ -103,7 +105,7 @@
             <span class="text-base font-bold">+</span> Add Line
         </button>
         <div class="text-sm font-semibold text-gray-700">
-            Total: PKR {{ bulkTotal | number:'1.2-2' }}
+            {{ bulkLines.length }} row{{ bulkLines.length === 1 ? '' : 's' }} &nbsp;·&nbsp; Total: PKR {{ bulkTotal | number:'1.2-2' }}
         </div>
     </div>
 
