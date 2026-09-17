@@ -190,7 +190,14 @@ export class VehicleDispatchComponent implements OnInit {
     saveDelivery() {
         if (!this.stagedItems.length || this.isSaving) return;
         this.isSaving = true;
-        this._http.post<any>(this.base, this.form, { headers: this.headers }).subscribe({
+        // form.DispatchDate is a local-midnight Date from nz-date-picker; JSON.stringify()
+        // calls .toISOString(), which shifts it back a day in UTC for PKT users. Send a
+        // plain local yyyy-MM-dd string instead so the backend saves the intended date.
+        const payload = {
+            ...this.form,
+            DispatchDate: VehicleDispatchComponent._localDateStr(new Date(this.form.DispatchDate)),
+        };
+        this._http.post<any>(this.base, payload, { headers: this.headers }).subscribe({
             next: (vd) => {
                 const items = this.stagedItems.map(i => ({ planId: i.PlanID, qty: i.Qty }));
                 this._http.post<any>(`${this.base}/${vd.ID}/items`, { items }, { headers: this.headers }).subscribe({
