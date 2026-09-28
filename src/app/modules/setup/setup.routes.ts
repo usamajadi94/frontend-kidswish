@@ -23,6 +23,7 @@ import { TransferListComponent } from './components/bank-account/transfer-list/t
 import { UnitListComponent } from './components/unit/unit-list/unit-list.component';
 import { SupplierListComponent } from './components/supplier/supplier-list/supplier-list.component';
 import { RawMaterialListComponent } from './components/raw-material/raw-material-list/raw-material-list.component';
+import { PurchaseOrderComponent } from './components/purchase-order/purchase-order.component';
 import { permissionGuard } from 'app/core/auth/guards/permission.guard';
 import { componentRegister } from '../shared/services/component-register';
 
@@ -109,6 +110,12 @@ export default [
         path: 'raw-material-list',
         component: RawMaterialListComponent,
         data: { SCode: componentRegister.rawMaterial.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'purchase-order',
+        component: PurchaseOrderComponent,
+        data: { SCode: componentRegister.purchaseOrder.SCode },
         canActivate: [permissionGuard],
     },
     {
