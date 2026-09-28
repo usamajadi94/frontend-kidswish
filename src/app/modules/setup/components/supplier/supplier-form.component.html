@@ -1,0 +1,10 @@
+<div class="flex flex-col gap-4">
+    <bft-input-text name="Name" label="Supplier Name" [(ngModel)]="formData.Name" [required]="true" [skeleton]="isDataLoading" />
+    <div class="grid grid-cols-2 gap-4">
+        <bft-input-text name="ContactName" label="Contact Name" [(ngModel)]="formData.ContactName" [skeleton]="isDataLoading" />
+        <bft-input-text name="PhoneNo" label="Phone No" [(ngModel)]="formData.PhoneNo" [skeleton]="isDataLoading" />
+    </div>
+    <bft-input-text name="Address" label="Address" [(ngModel)]="formData.Address" [skeleton]="isDataLoading" />
+    <bft-input-text name="OpeningBalance" label="Opening Balance" type="number" [(ngModel)]="formData.OpeningBalance" [skeleton]="isDataLoading" />
+    <bft-checkbox name="IsActive" label="Active" [(ngModel)]="formData.IsActive" [skeleton]="isDataLoading" />
+</div>

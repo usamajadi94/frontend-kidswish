@@ -21,6 +21,7 @@ import { PettyCashDetailComponent } from './components/petty-cash/petty-cash-det
 import { BankAccountDetailComponent } from './components/bank-account/bank-account-detail/bank-account-detail.component';
 import { TransferListComponent } from './components/bank-account/transfer-list/transfer-list.component';
 import { UnitListComponent } from './components/unit/unit-list/unit-list.component';
+import { SupplierListComponent } from './components/supplier/supplier-list/supplier-list.component';
 import { permissionGuard } from 'app/core/auth/guards/permission.guard';
 import { componentRegister } from '../shared/services/component-register';
 
@@ -95,6 +96,12 @@ export default [
         path: 'unit-list',
         component: UnitListComponent,
         data: { SCode: componentRegister.unit.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'supplier-list',
+        component: SupplierListComponent,
+        data: { SCode: componentRegister.supplier.SCode },
         canActivate: [permissionGuard],
     },
     {

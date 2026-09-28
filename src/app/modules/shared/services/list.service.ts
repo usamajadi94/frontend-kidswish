@@ -48,6 +48,10 @@ export class ListService {
         return this._QueryService.getQuery('getUnit');
     }
 
+    getSupplier() {
+        return this._QueryService.getQuery('getSupplier');
+    }
+
     getCustomerInformation() {
         return this._QueryService.getQuery('getCustomerInformation');
     }
