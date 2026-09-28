@@ -24,6 +24,7 @@ import { UnitListComponent } from './components/unit/unit-list/unit-list.compone
 import { SupplierListComponent } from './components/supplier/supplier-list/supplier-list.component';
 import { RawMaterialListComponent } from './components/raw-material/raw-material-list/raw-material-list.component';
 import { PurchaseOrderComponent } from './components/purchase-order/purchase-order.component';
+import { SupplierLedgerComponent } from './components/supplier-ledger/supplier-ledger.component';
 import { permissionGuard } from 'app/core/auth/guards/permission.guard';
 import { componentRegister } from '../shared/services/component-register';
 
@@ -116,6 +117,12 @@ export default [
         path: 'purchase-order',
         component: PurchaseOrderComponent,
         data: { SCode: componentRegister.purchaseOrder.SCode },
+        canActivate: [permissionGuard],
+    },
+    {
+        path: 'supplier-ledger',
+        component: SupplierLedgerComponent,
+        data: { SCode: componentRegister.supplierLedger.SCode },
         canActivate: [permissionGuard],
     },
     {

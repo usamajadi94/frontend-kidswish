@@ -27,6 +27,7 @@ export class componentRegister {
     static readonly supplier: IComponentRegister = { Title: 'Supplier', SCode: 'set_11' };
     static readonly rawMaterial: IComponentRegister = { Title: 'Raw Material', SCode: 'set_12' };
     static readonly purchaseOrder: IComponentRegister = { Title: 'Purchase Order', SCode: 'set_13' };
+    static readonly supplierLedger: IComponentRegister = { Title: 'Supplier Ledger', SCode: 'set_14' };
     static readonly cashInHand: IComponentRegister = { Title: 'Cash In Hand', SCode: 'pay_05' };
 
     // Security
