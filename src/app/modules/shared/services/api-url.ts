@@ -35,6 +35,7 @@ static readonly navigation = `${apiUrls.server}api/GetNavigation`;
     static readonly paymentCategoryController = `api/paymentcategory`;
     static readonly unitController = `api/unit`;
     static readonly supplierController = `api/supplier`;
+    static readonly rawMaterialController = `api/raw-material`;
     static readonly pettyCashController = `api/pettycash`;
     // DMS
     static readonly invoiceController = `api/invoicemaster`;
