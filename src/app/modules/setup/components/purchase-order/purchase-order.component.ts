@@ -10,7 +10,7 @@ import { DrpService } from 'app/modules/shared/services/drp.service';
 import { ModalService } from 'app/modules/shared/services/modal.service';
 import { BaseRoutedComponent } from 'app/core/Base/base-routed/base-routed.component';
 import { componentRegister } from 'app/modules/shared/services/component-register';
-import { SupplierFormComponent } from '../supplier/supplier-form.component';
+import { VendorFormComponent } from '../vendor/vendor-form.component';
 import { RawMaterialFormComponent } from '../raw-material/raw-material-form.component';
 
 @Component({
@@ -28,7 +28,7 @@ export class PurchaseOrderComponent extends BaseRoutedComponent implements OnIni
 
     title = componentRegister.purchaseOrder.Title;
 
-    suppliers: any[]     = [];
+    vendors: any[]      = [];
     rawMaterials: any[]  = [];
     orders: any[]        = [];
     selected: any        = null;
@@ -42,10 +42,10 @@ export class PurchaseOrderComponent extends BaseRoutedComponent implements OnIni
     errorMsg             = '';
 
     form: {
-        SupplierID: number | null;
+        VendorID: number | null;
         PODate: Date | null;
         Items: { RawMaterialID: number | null; Qty: number; Rate: number; Amount: number }[];
-    } = { SupplierID: null, PODate: new Date(), Items: [] };
+    } = { VendorID: null, PODate: new Date(), Items: [] };
 
     get headers() {
         return new HttpHeaders({ uid: this._localStorage.uid, cid: this._localStorage.cid, eid: this._localStorage.eid });
@@ -59,11 +59,11 @@ export class PurchaseOrderComponent extends BaseRoutedComponent implements OnIni
         return this.rawMaterials.find(r => r.ID === rawMaterialId)?.UnitSymbol || '';
     }
 
-    openNewSupplier(): void {
-        this._modalService.openModal({ component: SupplierFormComponent, title: componentRegister.supplier?.Title || 'Supplier' })
+    openNewVendor(): void {
+        this._modalService.openModal({ component: VendorFormComponent, title: componentRegister.vendor?.Title || 'Vendor' })
             .afterClose.subscribe((saved: boolean) => {
                 if (!saved) return;
-                this._drpService.getSupplierDrp().subscribe({ next: (res: any) => { this.suppliers = res || []; } });
+                this._drpService.getVendorDrp().subscribe({ next: (res: any) => { this.vendors = res || []; } });
             });
     }
 
@@ -76,7 +76,7 @@ export class PurchaseOrderComponent extends BaseRoutedComponent implements OnIni
     }
 
     ngOnInit() {
-        this._drpService.getSupplierDrp().subscribe({ next: (res: any) => { this.suppliers = res || []; } });
+        this._drpService.getVendorDrp().subscribe({ next: (res: any) => { this.vendors = res || []; } });
         this._drpService.getRawMaterialDrp().subscribe({ next: (res: any) => { this.rawMaterials = res || []; } });
         this.loadList();
     }
@@ -105,7 +105,7 @@ export class PurchaseOrderComponent extends BaseRoutedComponent implements OnIni
         this.selected = null;
         this.isNew = true;
         this.errorMsg = '';
-        this.form = { SupplierID: null, PODate: new Date(), Items: [] };
+        this.form = { VendorID: null, PODate: new Date(), Items: [] };
         this.addItem();
     }
 
@@ -123,7 +123,7 @@ export class PurchaseOrderComponent extends BaseRoutedComponent implements OnIni
 
     editSelected() {
         this.form = {
-            SupplierID: this.selected.SupplierID,
+            VendorID: this.selected.VendorID,
             PODate: this.selected.PODate ? new Date(this.selected.PODate) : new Date(),
             Items: (this.selected.Items || []).map((i: any) => ({
                 RawMaterialID: i.RawMaterialID, Qty: +i.Qty, Rate: +i.Rate, Amount: +i.Amount,
@@ -133,13 +133,13 @@ export class PurchaseOrderComponent extends BaseRoutedComponent implements OnIni
     }
 
     save() {
-        if (!this.form.SupplierID) { this.errorMsg = 'Please select a supplier'; return; }
+        if (!this.form.VendorID) { this.errorMsg = 'Please select a vendor'; return; }
         if (!this.form.Items.length) { this.errorMsg = 'Add at least one item'; return; }
         if (this.form.Items.some(i => !i.RawMaterialID)) { this.errorMsg = 'All items need a raw material selected'; return; }
         this.errorMsg = '';
         this.isSaving = true;
         const payload = {
-            SupplierID: this.form.SupplierID,
+            VendorID: this.form.VendorID,
             PODate: this.form.PODate,
             Items: this.form.Items,
         };
@@ -190,6 +190,6 @@ export class PurchaseOrderComponent extends BaseRoutedComponent implements OnIni
     cancelEdit() {
         this.isNew = false;
         this.errorMsg = '';
-        if (!this.selected) this.form = { SupplierID: null, PODate: new Date(), Items: [] };
+        if (!this.selected) this.form = { VendorID: null, PODate: new Date(), Items: [] };
     }
 }

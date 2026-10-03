@@ -48,9 +48,6 @@ export class ListService {
         return this._QueryService.getQuery('getUnit');
     }
 
-    getSupplier() {
-        return this._QueryService.getQuery('getSupplier');
-    }
 
     getRawMaterial() {
         return this._QueryService.getQuery('getRawMaterial');

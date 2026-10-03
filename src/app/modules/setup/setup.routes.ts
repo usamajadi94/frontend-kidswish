@@ -21,10 +21,8 @@ import { PettyCashDetailComponent } from './components/petty-cash/petty-cash-det
 import { BankAccountDetailComponent } from './components/bank-account/bank-account-detail/bank-account-detail.component';
 import { TransferListComponent } from './components/bank-account/transfer-list/transfer-list.component';
 import { UnitListComponent } from './components/unit/unit-list/unit-list.component';
-import { SupplierListComponent } from './components/supplier/supplier-list/supplier-list.component';
 import { RawMaterialListComponent } from './components/raw-material/raw-material-list/raw-material-list.component';
 import { PurchaseOrderComponent } from './components/purchase-order/purchase-order.component';
-import { SupplierLedgerComponent } from './components/supplier-ledger/supplier-ledger.component';
 import { permissionGuard } from 'app/core/auth/guards/permission.guard';
 import { componentRegister } from '../shared/services/component-register';
 
@@ -102,12 +100,6 @@ export default [
         canActivate: [permissionGuard],
     },
     {
-        path: 'supplier-list',
-        component: SupplierListComponent,
-        data: { SCode: componentRegister.supplier.SCode },
-        canActivate: [permissionGuard],
-    },
-    {
         path: 'raw-material-list',
         component: RawMaterialListComponent,
         data: { SCode: componentRegister.rawMaterial.SCode },
@@ -117,12 +109,6 @@ export default [
         path: 'purchase-order',
         component: PurchaseOrderComponent,
         data: { SCode: componentRegister.purchaseOrder.SCode },
-        canActivate: [permissionGuard],
-    },
-    {
-        path: 'supplier-ledger',
-        component: SupplierLedgerComponent,
-        data: { SCode: componentRegister.supplierLedger.SCode },
         canActivate: [permissionGuard],
     },
     {
