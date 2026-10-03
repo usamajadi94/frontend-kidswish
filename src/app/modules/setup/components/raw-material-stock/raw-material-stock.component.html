@@ -1,192 +1,204 @@
-<div class="absolute inset-0 flex min-w-0 flex-col overflow-hidden px-6 pt-3 pb-5 md:px-8 md:pt-4">
+<div class="absolute inset-0 overflow-y-auto">
+    <div class="min-h-full p-6">
 
-    <div class="mb-4 flex items-center justify-between shrink-0">
-        <div class="text-3xl font-semibold leading-8 tracking-tight">{{ title }}</div>
-    </div>
-
-    <div class="flex flex-1 gap-4 min-h-0 overflow-hidden">
-
-        <!-- LEFT: stock summary -->
-        <div class="flex flex-col overflow-hidden" style="flex: 40; min-width: 0;">
-            <div class="overflow-auto rounded-xl border border-gray-200 bg-white shadow-sm flex-1">
-                @if (isLoadingSummary) {
-                    <div class="flex items-center justify-center py-16 text-gray-400 text-sm">Loading...</div>
-                } @else if (summary.length === 0) {
-                    <div class="flex items-center justify-center py-16 text-gray-400 text-sm">No raw materials yet</div>
-                } @else {
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-gray-50 sticky top-0">
-                            <tr>
-                                <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">Raw Material</th>
-                                <th class="px-3 py-2 text-right text-xs font-semibold text-green-700">In</th>
-                                <th class="px-3 py-2 text-right text-xs font-semibold text-red-700">Out</th>
-                                <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700">Remaining</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @for (row of summary; track row.RawMaterialID) {
-                                <tr class="cursor-pointer hover:bg-blue-50 transition-colors"
-                                    [class.bg-blue-50]="selected?.RawMaterialID === row.RawMaterialID"
-                                    (click)="selectMaterial(row)">
-                                    <td class="px-3 py-2 text-xs font-medium text-gray-800">{{ row.RawMaterialName }}</td>
-                                    <td class="px-3 py-2 text-xs text-right text-green-700">{{ row.InQty }} {{ row.UnitSymbol }}</td>
-                                    <td class="px-3 py-2 text-xs text-right text-red-700">{{ row.OutQty }} {{ row.UnitSymbol }}</td>
-                                    <td class="px-3 py-2 text-xs text-right font-semibold"
-                                        [class.text-red-700]="+row.Remaining <= 0"
-                                        [class.text-gray-800]="+row.Remaining > 0">
-                                        {{ row.Remaining }} {{ row.UnitSymbol }}
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold">{{ title }}</h2>
+            <div class="flex gap-2">
+                <button (click)="showTxn = !showTxn"
+                        class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    {{ showTxn ? 'Hide Transactions' : 'Transactions' }}
+                </button>
+                <button (click)="openAdd()"
+                        class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">
+                    + Add Stock
+                </button>
             </div>
         </div>
 
-        <!-- RIGHT: movements + add form -->
-        <div class="flex flex-col overflow-hidden" style="flex: 60; min-width: 0;">
-
-            @if (!selected) {
-                <div class="flex flex-1 items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 text-gray-400 text-sm">
-                    Select a raw material to see its stock
+        <!-- Per raw material cards -->
+        @if (productCards.length > 0) {
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 mb-6">
+            @for (c of productCards; track c.RawMaterialID) {
+            <div class="rounded-lg border shadow-sm overflow-hidden"
+                [class]="c.Low ? 'bg-red-50 border-red-200' : 'bg-white border-gray-200'">
+                <div class="px-3 pt-2.5 pb-1 flex items-start justify-between gap-2">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[9px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">Raw Material</p>
+                        <p class="text-xs font-bold text-gray-800 truncate">{{ c.RawMaterialName }}</p>
+                    </div>
+                    <span class="shrink-0 inline-flex items-center gap-1 text-[9px] font-semibold rounded-full px-1.5 py-0.5"
+                        [class]="c.Low ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-green-100 text-green-700 border border-green-200'">
+                        <span class="w-1 h-1 rounded-full inline-block" [class]="c.Low ? 'bg-red-500' : 'bg-green-500'"></span>
+                        {{ c.Low ? 'Low Stock' : 'In Stock' }}
+                    </span>
                 </div>
-            } @else {
-                <div class="flex flex-col flex-1 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-sm p-5 gap-4">
-
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <div class="text-lg font-bold text-gray-900">{{ selected.RawMaterialName }}</div>
-                            <div class="text-xs text-gray-500">Unit: {{ selected.UnitSymbol }}</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-xs text-gray-500">Remaining</div>
-                            <div class="text-lg font-bold" [class.text-red-700]="+selected.Remaining <= 0" [class.text-gray-900]="+selected.Remaining > 0">
-                                {{ selected.Remaining }} {{ selected.UnitSymbol }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Add IN / OUT -->
-                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 flex flex-col gap-3">
-                        <div class="flex gap-2">
-                            <button (click)="form.Type = 'IN'"
-                                    class="flex-1 rounded-lg px-3 py-1.5 text-xs font-semibold border"
-                                    [class.bg-green-600]="form.Type === 'IN'" [class.text-white]="form.Type === 'IN'" [class.border-green-600]="form.Type === 'IN'"
-                                    [class.bg-white]="form.Type !== 'IN'" [class.text-gray-600]="form.Type !== 'IN'" [class.border-gray-300]="form.Type !== 'IN'">
-                                Stock In
-                            </button>
-                            <button (click)="form.Type = 'OUT'"
-                                    class="flex-1 rounded-lg px-3 py-1.5 text-xs font-semibold border"
-                                    [class.bg-red-600]="form.Type === 'OUT'" [class.text-white]="form.Type === 'OUT'" [class.border-red-600]="form.Type === 'OUT'"
-                                    [class.bg-white]="form.Type !== 'OUT'" [class.text-gray-600]="form.Type !== 'OUT'" [class.border-gray-300]="form.Type !== 'OUT'">
-                                Stock Out
-                            </button>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="flex flex-col gap-1">
-                                <label class="text-xs font-medium text-gray-600">Date *</label>
-                                <nz-date-picker [(ngModel)]="form.Date" nzFormat="dd/MM/yyyy" class="w-full"></nz-date-picker>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <label class="text-xs font-medium text-gray-600">Qty ({{ selected.UnitSymbol }}) *</label>
-                                <input [(ngModel)]="form.Qty" type="number" min="0"
-                                       class="rounded border border-gray-300 px-2 py-1.5 text-xs text-right focus:border-blue-400 focus:outline-none" />
-                            </div>
-                            @if (form.Type === 'OUT') {
-                                <div class="flex flex-col gap-1">
-                                    <label class="text-xs font-medium text-gray-600">Used for Product</label>
-                                    <nz-select [(ngModel)]="form.ProductID" nzPlaceHolder="Select product (optional)"
-                                               [nzAllowClear]="true" [nzShowSearch]="true" class="w-full">
-                                        @for (p of products; track p.ID) {
-                                            <nz-option [nzValue]="p.ID" [nzLabel]="p.Name"></nz-option>
-                                        }
-                                    </nz-select>
-                                </div>
-                            }
-                            <div class="flex flex-col gap-1" [class.col-span-2]="form.Type === 'IN'">
-                                <label class="text-xs font-medium text-gray-600">Notes</label>
-                                <input [(ngModel)]="form.Notes" type="text" placeholder="Optional"
-                                       class="rounded border border-gray-300 px-2 py-1.5 text-xs focus:border-blue-400 focus:outline-none" />
-                            </div>
-                        </div>
-
-                        @if (errorMsg) {
-                            <div class="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">{{ errorMsg }}</div>
-                        }
-
-                        <div>
-                            <button (click)="save()" [disabled]="isSaving"
-                                    class="rounded-lg bg-blue-600 px-5 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors">
-                                {{ isSaving ? 'Saving...' : (form.Type === 'IN' ? 'Add Stock In' : 'Record Stock Out') }}
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Movements -->
-                    <div class="overflow-auto rounded-lg border border-gray-200">
-                        @if (isLoadingMovements) {
-                            <div class="flex items-center justify-center py-10 text-gray-400 text-sm">Loading...</div>
-                        } @else if (movements.length === 0) {
-                            <div class="flex items-center justify-center py-10 text-gray-400 text-sm">No stock movements yet</div>
-                        } @else {
-                            <table class="min-w-full divide-y divide-gray-200 text-sm">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">Date</th>
-                                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">Type</th>
-                                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">Product / Notes</th>
-                                        <th class="px-3 py-2 text-right text-xs font-semibold text-gray-600">Qty</th>
-                                        <th class="px-3 py-2 text-right text-xs font-semibold text-gray-600">Balance</th>
-                                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">History</th>
-                                        <th class="px-2 py-2"></th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-100">
-                                    @for (m of movements; track m.ID) {
-                                        <tr [class.opacity-50]="m.IsDeleted">
-                                            <td class="px-3 py-2 text-xs text-gray-700 whitespace-nowrap">{{ m.Date | date:'dd/MM/yyyy' }}</td>
-                                            <td class="px-3 py-2 text-xs">
-                                                <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
-                                                      [class.bg-green-100]="m.Type === 'IN'" [class.text-green-700]="m.Type === 'IN'"
-                                                      [class.bg-red-100]="m.Type === 'OUT'" [class.text-red-700]="m.Type === 'OUT'">
-                                                    {{ m.Type === 'IN' ? 'In' : 'Out' }}
-                                                </span>
-                                            </td>
-                                            <td class="px-3 py-2 text-xs text-gray-600">
-                                                {{ m.ProductName || '' }}{{ m.ProductName && m.Notes ? ' · ' : '' }}{{ m.Notes || '' }}
-                                                @if (!m.ProductName && !m.Notes) { — }
-                                            </td>
-                                            <td class="px-3 py-2 text-xs text-right text-gray-800">{{ m.Qty }}</td>
-                                            <td class="px-3 py-2 text-xs text-right font-semibold"
-                                                [class.text-red-700]="+m.Balance <= 0" [class.text-gray-800]="+m.Balance > 0">
-                                                {{ m.IsDeleted ? '—' : m.Balance }}
-                                            </td>
-                                            <td class="px-3 py-2 text-xs text-gray-500 whitespace-nowrap">
-                                                <div>Added by {{ m.CreatedBy || '—' }} · {{ m.CreatedDate | date:'dd/MM/yyyy HH:mm' }}</div>
-                                                @if (m.ModifiedDate && m.ModifiedDate !== m.CreatedDate) {
-                                                    <div>Edited by {{ m.ModifiedBy || '—' }} · {{ m.ModifiedDate | date:'dd/MM/yyyy HH:mm' }}</div>
-                                                }
-                                                @if (m.IsDeleted) {
-                                                    <div class="text-red-600 font-medium">Deleted by {{ m.DeletedBy || '—' }} · {{ m.DeletedDate | date:'dd/MM/yyyy HH:mm' }}</div>
-                                                }
-                                            </td>
-                                            <td class="px-2 py-2 text-center">
-                                                @if (!m.IsDeleted) {
-                                                    <button (click)="remove(m)" class="text-red-400 hover:text-red-600 text-xs">✕</button>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                    </div>
-
+                <div class="px-3 pb-2 flex items-baseline gap-2">
+                    <p class="text-xl font-bold tracking-tight" [class]="c.Low ? 'text-red-600' : 'text-gray-900'">
+                        {{ c.Remaining | number:'1.0-2' }}
+                    </p>
+                    <p class="text-[9px] text-gray-400">{{ c.UnitSymbol }} remaining</p>
                 </div>
+                <div class="border-t px-3 py-1 flex items-center justify-between"
+                    [class]="c.Low ? 'border-red-100 bg-red-50/60' : 'border-gray-100 bg-gray-50'">
+                    <div class="text-[9px] text-gray-500">
+                        In: <span class="font-semibold text-green-700">{{ c.InQty | number:'1.0-2' }}</span>
+                        · Out: <span class="font-semibold text-red-700">{{ c.OutQty | number:'1.0-2' }}</span>
+                    </div>
+                    <button (click)="openAdd('OUT', c.RawMaterialID)" class="text-[9px] font-medium text-blue-600 hover:underline">Stock Out</button>
+                </div>
+            </div>
             }
-
         </div>
+        }
+
+        <!-- Add stock form -->
+        @if (showAddForm) {
+        <div class="bg-white border rounded-lg p-4 mb-4 shadow-sm">
+            <h3 class="font-medium mb-3">{{ addForm.Type === 'IN' ? 'Add Stock In' : 'Record Stock Out' }}</h3>
+            <div class="flex gap-2 mb-3">
+                <button (click)="addForm.Type = 'IN'"
+                        class="rounded-lg px-3 py-1.5 text-xs font-semibold border"
+                        [class]="addForm.Type === 'IN' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-600 border-gray-300'">Stock In</button>
+                <button (click)="addForm.Type = 'OUT'"
+                        class="rounded-lg px-3 py-1.5 text-xs font-semibold border"
+                        [class]="addForm.Type === 'OUT' ? 'bg-red-600 text-white border-red-600' : 'bg-white text-gray-600 border-gray-300'">Stock Out</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Date *</label>
+                    <nz-date-picker [(ngModel)]="addForm.Date" nzFormat="dd/MM/yyyy" class="w-full"></nz-date-picker>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Raw Material *</label>
+                    <select [(ngModel)]="addForm.RawMaterialID" class="w-full border rounded px-2 py-1.5 text-sm">
+                        <option [ngValue]="null">-- Select --</option>
+                        @for (r of rawMaterials; track r.ID) {
+                            <option [ngValue]="r.ID">{{ r.Name }} ({{ r.UnitSymbol }})</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Qty *</label>
+                    <input type="number" [(ngModel)]="addForm.Qty" min="0" placeholder="0" class="w-full border rounded px-2 py-1.5 text-sm" />
+                </div>
+                @if (addForm.Type === 'OUT') {
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Used for Product</label>
+                    <select [(ngModel)]="addForm.ProductID" class="w-full border rounded px-2 py-1.5 text-sm">
+                        <option [ngValue]="null">-- Optional --</option>
+                        @for (p of products; track p.ID) {
+                            <option [ngValue]="p.ID">{{ p.Name }}</option>
+                        }
+                    </select>
+                </div>
+                }
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+                    <input type="text" [(ngModel)]="addForm.Notes" placeholder="Optional" class="w-full border rounded px-2 py-1.5 text-sm" />
+                </div>
+            </div>
+            @if (errorMsg) { <p class="text-red-500 text-xs mt-2">{{ errorMsg }}</p> }
+            <div class="flex gap-2 mt-3">
+                <button (click)="save()" [disabled]="isSaving"
+                        class="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
+                    {{ isSaving ? 'Saving...' : 'Save' }}
+                </button>
+                <button (click)="showAddForm = false"
+                        class="rounded-lg border border-gray-300 bg-white px-4 py-1.5 text-sm text-gray-600 hover:bg-gray-50">Cancel</button>
+            </div>
+        </div>
+        }
+
+        <!-- Transactions -->
+        @if (showTxn) {
+        <div class="bg-white border rounded-lg p-4 mb-4 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-medium">Stock Transactions</h3>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+                <label class="text-xs font-medium text-gray-600">From</label>
+                <input type="date" [(ngModel)]="txnFrom" class="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                <label class="text-xs font-medium text-gray-600">To</label>
+                <input type="date" [(ngModel)]="txnTo" class="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                <select [(ngModel)]="txnRawMaterial" class="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <option [ngValue]="null">All Raw Materials</option>
+                    @for (r of rawMaterials; track r.ID) {
+                        <option [ngValue]="r.ID">{{ r.Name }}</option>
+                    }
+                </select>
+                @if (txnFrom || txnTo || txnRawMaterial) {
+                    <button class="text-xs text-gray-500 hover:text-red-500 underline" (click)="clearTxnFilter()">Clear</button>
+                }
+                <span class="text-xs text-gray-400 ml-1">{{ filteredTransactions.length }} record(s)</span>
+            </div>
+
+            @if (filteredTransactions.length === 0) {
+                <p class="text-gray-400 text-sm text-center py-4">No transactions found.</p>
+            } @else {
+            <div class="overflow-auto max-h-[520px]">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b sticky top-0">
+                    <tr>
+                        <th class="text-left px-4 py-2.5 text-sm font-semibold text-gray-700">Date</th>
+                        <th class="text-left px-4 py-2.5 text-sm font-semibold text-gray-700">Raw Material</th>
+                        <th class="text-center px-4 py-2.5 text-sm font-semibold text-gray-700">Type</th>
+                        <th class="text-left px-4 py-2.5 text-sm font-semibold text-gray-700">Source</th>
+                        <th class="text-right px-4 py-2.5 text-sm font-semibold text-gray-700">Qty</th>
+                        <th class="text-right px-4 py-2.5 text-sm font-semibold text-gray-700">Before</th>
+                        <th class="text-right px-4 py-2.5 text-sm font-semibold text-gray-700">After</th>
+                        <th class="text-left px-4 py-2.5 text-sm font-semibold text-gray-700">History</th>
+                        <th class="px-2 py-2.5"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (t of filteredTransactions; track t.ID) {
+                    <tr class="border-b hover:bg-gray-50" [class.opacity-50]="t.IsDeleted">
+                        <td class="px-4 py-2.5 text-sm text-gray-500 whitespace-nowrap">{{ t.Date | date:'dd MMM yyyy' }}</td>
+                        <td class="px-4 py-2.5 text-sm font-medium text-gray-800">{{ t.RawMaterialName }}</td>
+                        <td class="px-4 py-2.5 text-center">
+                            <span class="px-2.5 py-1 rounded text-xs font-semibold"
+                                  [class]="t.Type === 'IN' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">{{ t.Type }}</span>
+                        </td>
+                        <td class="px-4 py-2.5 text-xs text-gray-500">
+                            {{ t.ProductName || (t.Notes || 'Manual') }}
+                        </td>
+                        <td class="px-4 py-2.5 text-right text-sm font-mono font-semibold">{{ t.Qty }} {{ t.UnitSymbol }}</td>
+                        <td class="px-4 py-2.5 text-right text-sm text-gray-500 font-mono">{{ t.IsDeleted ? '—' : t.Before }}</td>
+                        <td class="px-4 py-2.5 text-right text-sm font-mono">{{ t.IsDeleted ? '—' : t.After }}</td>
+                        <td class="px-4 py-2.5 text-xs text-gray-500 whitespace-nowrap">
+                            <div>By {{ t.CreatedBy || '—' }} · {{ t.CreatedDate | date:'dd/MM HH:mm' }}</div>
+                            @if (t.ModifiedDate && t.ModifiedDate !== t.CreatedDate) {
+                                <div>Edited by {{ t.ModifiedBy || '—' }} · {{ t.ModifiedDate | date:'dd/MM HH:mm' }}</div>
+                            }
+                            @if (t.IsDeleted) {
+                                <div class="text-red-600 font-medium">Deleted by {{ t.DeletedBy || '—' }} · {{ t.DeletedDate | date:'dd/MM HH:mm' }}</div>
+                            }
+                        </td>
+                        <td class="px-2 py-2.5 text-center">
+                            @if (!t.IsDeleted) {
+                                <button (click)="remove(t)" class="text-red-400 hover:text-red-600 text-xs">✕</button>
+                            }
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+                <tfoot class="bg-gray-50 border-t-2 border-gray-300 sticky bottom-0">
+                    <tr>
+                        <td colspan="4" class="px-4 py-2.5 text-sm font-semibold text-gray-600 text-right">Total IN</td>
+                        <td class="px-4 py-2.5 text-right font-mono font-bold text-green-700 text-sm">{{ txnTotalIn | number:'1.0-2' }}</td>
+                        <td colspan="4"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="px-4 py-2.5 text-sm font-semibold text-gray-600 text-right">Total OUT</td>
+                        <td class="px-4 py-2.5 text-right font-mono font-bold text-red-600 text-sm">{{ txnTotalOut | number:'1.0-2' }}</td>
+                        <td colspan="4"></td>
+                    </tr>
+                </tfoot>
+            </table>
+            </div>
+            }
+        </div>
+        }
+
     </div>
 </div>
