@@ -35,6 +35,10 @@ export class DrpService {
         return this._QueryService.getQuery('getRawMaterialDrp');
     }
 
+    getProductDrp() {
+        return this._QueryService.getQuery('getProductDrp');
+    }
+
     getOrdersByCustomerDrp(customerId: number) {
         return this._QueryService.getQuery('getOrdersByCustomerDrp', { customerId });
     }
