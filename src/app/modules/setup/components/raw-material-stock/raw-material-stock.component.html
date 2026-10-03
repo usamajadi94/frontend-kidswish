@@ -139,12 +139,13 @@
                                         <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">Product / Notes</th>
                                         <th class="px-3 py-2 text-right text-xs font-semibold text-gray-600">Qty</th>
                                         <th class="px-3 py-2 text-right text-xs font-semibold text-gray-600">Balance</th>
+                                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">History</th>
                                         <th class="px-2 py-2"></th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
                                     @for (m of movements; track m.ID) {
-                                        <tr>
+                                        <tr [class.opacity-50]="m.IsDeleted">
                                             <td class="px-3 py-2 text-xs text-gray-700 whitespace-nowrap">{{ m.Date | date:'dd/MM/yyyy' }}</td>
                                             <td class="px-3 py-2 text-xs">
                                                 <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
@@ -159,9 +160,22 @@
                                             </td>
                                             <td class="px-3 py-2 text-xs text-right text-gray-800">{{ m.Qty }}</td>
                                             <td class="px-3 py-2 text-xs text-right font-semibold"
-                                                [class.text-red-700]="+m.Balance <= 0" [class.text-gray-800]="+m.Balance > 0">{{ m.Balance }}</td>
+                                                [class.text-red-700]="+m.Balance <= 0" [class.text-gray-800]="+m.Balance > 0">
+                                                {{ m.IsDeleted ? '—' : m.Balance }}
+                                            </td>
+                                            <td class="px-3 py-2 text-xs text-gray-500 whitespace-nowrap">
+                                                <div>Added by {{ m.CreatedBy || '—' }} · {{ m.CreatedDate | date:'dd/MM/yyyy HH:mm' }}</div>
+                                                @if (m.ModifiedDate && m.ModifiedDate !== m.CreatedDate) {
+                                                    <div>Edited by {{ m.ModifiedBy || '—' }} · {{ m.ModifiedDate | date:'dd/MM/yyyy HH:mm' }}</div>
+                                                }
+                                                @if (m.IsDeleted) {
+                                                    <div class="text-red-600 font-medium">Deleted by {{ m.DeletedBy || '—' }} · {{ m.DeletedDate | date:'dd/MM/yyyy HH:mm' }}</div>
+                                                }
+                                            </td>
                                             <td class="px-2 py-2 text-center">
-                                                <button (click)="remove(m)" class="text-red-400 hover:text-red-600 text-xs">✕</button>
+                                                @if (!m.IsDeleted) {
+                                                    <button (click)="remove(m)" class="text-red-400 hover:text-red-600 text-xs">✕</button>
+                                                }
                                             </td>
                                         </tr>
                                     }
