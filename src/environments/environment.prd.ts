@@ -2,7 +2,7 @@ import { IEnvironmentalVariables } from '../app/EnvironmentalVariables';
 
 export const environment: IEnvironmentalVariables = {
     production: true,
-    apiRoot: 'https://kidswish-api-production-c561.up.railway.app/',
+    apiRoot: 'https://cloudfusion-001-site26.ktempurl.com/',
     env: 'prd',
     site: {
         baseUrl: '',
