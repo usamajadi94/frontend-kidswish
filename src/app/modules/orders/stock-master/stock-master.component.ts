@@ -56,12 +56,22 @@ export class StockMasterComponent implements OnInit, OnDestroy {
 
     applyTxnFilter() {
         this.filteredTransactions = this.transactions.filter(t => {
-            const d = t.Date ? t.Date.substring(0, 10) : '';
+            const d = t.Date ? StockMasterComponent._localDateStr(t.Date) : '';
             if (this.txnFrom && d < this.txnFrom) return false;
             if (this.txnTo && d > this.txnTo) return false;
             if (this.txnProduct && t.ProductName !== this.txnProduct) return false;
             return true;
         });
+    }
+
+    // t.Date is a UTC ISO string (server stores PKT-local time, re-interpreted as a true
+    // instant). Taking .substring(0,10) on that reads the UTC calendar date, which rolls
+    // back a day for any PKT time before 05:00 — e.g. midnight-stamped entries always
+    // shifted to the previous day. Use the browser's local date instead, matching what
+    // the table's date pipe already displays.
+    private static _localDateStr(dateStr: string): string {
+        const d = new Date(dateStr);
+        return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
     }
 
     clearTxnFilter() { this.txnFrom = ''; this.txnTo = ''; this.txnProduct = ''; this.applyTxnFilter(); }
@@ -241,7 +251,7 @@ export class StockMasterComponent implements OnInit, OnDestroy {
         this.editingTxnId = t.ID;
         this.editTxnForm = {
             Qty: +t.Qty,
-            Date: t.Date ? t.Date.substring(0, 10) : '',
+            Date: t.Date ? StockMasterComponent._localDateStr(t.Date) : '',
             Notes: t.Notes || '',
         };
     }

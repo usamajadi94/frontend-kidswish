@@ -92,10 +92,16 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
         this.formData.FromPartyType = 'bank_account';
         this.formData.ToPartyType = 'vendor';
         this.formData.SCode = 'pay_02';
-        const today = new Date().toISOString().substring(0, 10);
         this.bulkLines = [
-            { Date: today, PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' },
+            { Date: MakePaymentFormComponent._today(), PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' },
         ];
+    }
+
+    // new Date().toISOString() reads the UTC calendar date, which rolls back a day for
+    // any PKT time before 05:00 — build the date string from local getters instead.
+    private static _today(): string {
+        const d = new Date();
+        return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
     }
 
     openNewVendor(): void {
@@ -107,7 +113,7 @@ export class MakePaymentFormComponent extends BaseComponent<PaymentTransaction, 
     }
 
     addLine() {
-        const lastDate = this.bulkLines.length ? this.bulkLines[this.bulkLines.length - 1].Date : new Date().toISOString().substring(0, 10);
+        const lastDate = this.bulkLines.length ? this.bulkLines[this.bulkLines.length - 1].Date : MakePaymentFormComponent._today();
         this.bulkLines.push({ Date: lastDate, PaymentType: null, FromPartyID: null, Amount: null, ToPartyID: null, Notes: '' });
     }
 
