@@ -44,6 +44,7 @@ export class StockMasterComponent implements OnInit, OnDestroy {
     txnFrom = '';
     txnTo = '';
     txnProduct = '';
+    txnType = '';
     filteredTransactions: any[] = [];
 
     editingTxnId: number | null = null;
@@ -60,6 +61,7 @@ export class StockMasterComponent implements OnInit, OnDestroy {
             if (this.txnFrom && d < this.txnFrom) return false;
             if (this.txnTo && d > this.txnTo) return false;
             if (this.txnProduct && t.ProductName !== this.txnProduct) return false;
+            if (this.txnType && t.Type !== this.txnType) return false;
             return true;
         });
     }
@@ -74,7 +76,7 @@ export class StockMasterComponent implements OnInit, OnDestroy {
         return `${d.getFullYear()}-${('0'+(d.getMonth()+1)).slice(-2)}-${('0'+d.getDate()).slice(-2)}`;
     }
 
-    clearTxnFilter() { this.txnFrom = ''; this.txnTo = ''; this.txnProduct = ''; this.applyTxnFilter(); }
+    clearTxnFilter() { this.txnFrom = ''; this.txnTo = ''; this.txnProduct = ''; this.txnType = ''; this.applyTxnFilter(); }
 
     showTooltip(event: MouseEvent, t: any) {
         if (t.RefType !== 'Dispatch') return;
